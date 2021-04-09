@@ -5,26 +5,26 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 
-namespace Compiler.Lexer
+namespace Compiler.Lexing
 {
-    internal sealed class FileReader
+    internal static class FileReader
     {
-        public FileReader(string File)
-        {
-            FileOpen = OpenFile(File);
-        }
 
-        public string[] CurrentFile;
-        public bool FileOpen = false;
-
-        private bool OpenFile(string FilePath)
+        public static string OpenFile(string FilePath)
         {
-            if(FilePath == String.Empty)
+            if(string.IsNullOrWhiteSpace(FilePath))
             {
                 throw new Exception("File path must not be empty");
             }
-            CurrentFile = File.ReadAllLines(FilePath); // No try-catch here because I was gonna throw the exact same error kekw
-            return true;
+            try
+            {
+                return File.ReadAllText(FilePath);
+            } 
+            catch (Exception e)
+            {
+                Console.WriteLine("Could not open file: " + e);
+                return null;
+            }
         }
     }
 }

@@ -1,4 +1,5 @@
 using NUnit.Framework;
+using Compiler.Lexing;
 
 namespace Compiler.Tests
 {

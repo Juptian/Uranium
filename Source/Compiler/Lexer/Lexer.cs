@@ -4,41 +4,35 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Compiler.Lexer
+namespace Compiler.Lexing
 {
-    internal sealed class Lexer
+    public class Lexer
     {
 
         public Lexer(string file)
         {
-            FReader = new FileReader(file);
+            FileContents = FileReader.OpenFile(file);
         }
 
-        public FileReader FReader;
+        private string FileContents;
 
-        public int CurrentIndex = 0;
 
-        public bool IsFileOpen { get => FReader.FileOpen; private set => IsFileOpen = FReader.FileOpen; }
-
-        public void Next()
+        public void ReadFile()
         {
-
-            for (int i = 0; i < FReader.CurrentFile[CurrentIndex].Length; i++)
+            for(int i = 0; i < FileContents.Length; i++)
             {
-                char ch = FReader.CurrentFile[CurrentIndex][i];
-                Console.WriteLine(ch);
-                CheckChar(FReader.CurrentFile, CurrentIndex, i, ch);
-            }
-            CurrentIndex++;
-            if (CurrentIndex < FReader.CurrentFile.Length)
-            {
-                Next();
+                CheckChar(i + 1, FileContents[i]);
             }
         }
 
-        private void CheckChar(string[] Array, int CurrentIndex, int i, char ch)
+        private bool Match(char ch, int position)
         {
-            TokenType current;
+            return ch == FileContents[position];
+        }
+
+        private TokenType CheckChar(int CurrentIndex, char ch)
+        {
+            TokenType current = TokenType.Null;
             try
             {
                 switch (ch)
@@ -46,18 +40,18 @@ namespace Compiler.Lexer
                     /*case '' or ' ':
                         break;*/
                     case '+':
-                        current = Array[CurrentIndex][i + 1] == '=' ? TokenType.PlusEquals : TokenType.Plus;
+                        current = Match('=', CurrentIndex + 1) ? TokenType.PlusEquals : TokenType.Plus;
                         Console.WriteLine(current);
                         break;
                     case '-':
-                        current = Array[CurrentIndex][i + 1] == '=' ? TokenType.MinusEquals : TokenType.Minus;
+                        current = Match('=', CurrentIndex + 1) ? TokenType.MinusEquals : TokenType.Minus;
                         Console.WriteLine(current);
                         break;
                     case '*':
-                        if (Array[CurrentIndex][i + 1] == '=')
+                        if (Match('=', CurrentIndex + 1))
                             current = TokenType.MultiplyEquals;
 
-                        else if (Array[CurrentIndex][i + 1] == '*')
+                        else if (Match('*', CurrentIndex + 1))
                             current = TokenType.Pow;
 
                         else
@@ -65,19 +59,19 @@ namespace Compiler.Lexer
                         Console.WriteLine(current);
                         break;
                     case '/':
-                        current = Array[CurrentIndex][i + 1] == '=' ? TokenType.DivideEquals : TokenType.Divide;
+                        current = Match('=', CurrentIndex + 1) ? TokenType.DivideEquals : TokenType.Divide;
                         Console.WriteLine(current);
                         break;
                     case '>':
-                        current = Array[CurrentIndex][i + 1] == '=' ? TokenType.GreaterThanEquals : TokenType.GreaterThan;
+                        current = Match('=', CurrentIndex + 1) ? TokenType.GreaterThanEquals : TokenType.GreaterThan;
                         Console.WriteLine(current);
                         break;
                     case '<':
-                        current = Array[CurrentIndex][i + 1] == '=' ? TokenType.LesserThanEquals : TokenType.LesserThan;
+                        current = Match('=', CurrentIndex + 1) ? TokenType.LesserThanEquals : TokenType.LesserThan;
                         Console.WriteLine(current);
                         break;
                     case '=':
-                        current = Array[CurrentIndex][i + 1] == '=' ? TokenType.Equals : TokenType.DoubleEquals;
+                        current = Match('=', CurrentIndex + 1) ? TokenType.Equals : TokenType.DoubleEquals;
                         Console.WriteLine(current);
                         break;
 
@@ -93,6 +87,7 @@ namespace Compiler.Lexer
             {
                 throw new Exception("Line may not end with an operator, are you missing a ;?\n" + e);
             }
+            return current;
 
         }
     }

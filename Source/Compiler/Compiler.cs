@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Compiler.Lexer;
+using Compiler.Lexing;
 
 
 namespace Compiler
@@ -12,8 +12,12 @@ namespace Compiler
     {
         public static void Emit(string[] args)
         {
-            Tokenizer tokenizer = new Tokenizer(args[0]);
-            tokenizer.Read();
+            if(args.Length == 0)
+            {
+                Console.WriteLine("You must specify a file");
+            }
+            Lexer lexer = new Lexer(args[0]);
+            lexer.ReadFile();
         }
     }
 }

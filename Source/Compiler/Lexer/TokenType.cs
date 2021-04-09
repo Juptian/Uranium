@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Compiler.Lexer
+﻿namespace Compiler.Lexing
 {
     public enum TokenType
     {
@@ -28,13 +22,15 @@ namespace Compiler.Lexer
         //Syntaxic symbols
         Semicolon,
         Period,
-        OpenParenthasis,
-        CloseParenthasis,
+        OpenParenthesis,
+        CloseParenthesis,
         OpenCurlyBrackets,
         CloseCurlyBrackets,
         OpenDiamondBrackets,
         CloseDiamondBrackets,
         TypeDeclarator,
-        Null
+        Null,
+
+        BadToken
     }
 }

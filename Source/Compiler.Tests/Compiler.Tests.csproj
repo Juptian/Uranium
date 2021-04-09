@@ -14,7 +14,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Compiler\Compiler.csproj"/>
-    <ProjectReference Include="..\Main\Main.csproj"/>
   </ItemGroup>
 
 </Project>
