@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Compiler.Lexer
 {
-    internal class Tokenizer
+    internal sealed class Tokenizer
     {
         public Tokenizer(string File)
         {

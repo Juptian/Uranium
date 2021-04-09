@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Compiler.Lexer
 {
-    class Lexer
+    internal sealed class Lexer
     {
 
         public Lexer(string file)

@@ -7,7 +7,7 @@ using System.IO;
 
 namespace Compiler.Lexer
 {
-    class FileReader
+    internal sealed class FileReader
     {
         public FileReader(string File)
         {
@@ -23,15 +23,7 @@ namespace Compiler.Lexer
             {
                 throw new Exception("File path must not be empty");
             }
-            try
-            {
-                CurrentFile = File.ReadAllLines(FilePath);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("Couldn't open file because: " + e);
-                return false;
-            }
+            CurrentFile = File.ReadAllLines(FilePath); // No try-catch here because I was gonna throw the exact same error kekw
             return true;
         }
     }
