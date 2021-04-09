@@ -10,22 +10,20 @@ namespace Compiler.Lexer
     {
         public Tokenizer(string File)
         {
-            FReader = new FileReader(File);
+            lexer = new Lexer(File);
         }
 
-        private FileReader FReader;
+        private Lexer lexer;
 
         public void Read()
         {
-            if (!FReader.FileOpen)
+            if (!lexer.IsFileOpen)
             {
                 throw new Exception("File is not open!");
             }
 
-            FReader.Next();
+            lexer.Next();
         }
-
-
     }
     
 }

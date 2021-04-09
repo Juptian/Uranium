@@ -22,6 +22,8 @@ namespace Compiler.Lexer
         DivideEquals,
         GreaterThanEquals,
         LesserThanEquals,
+        Pow,
+        DoubleEquals,
 
         //Syntaxic symbols
         Semicolon,

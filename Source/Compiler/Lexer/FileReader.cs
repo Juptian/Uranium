@@ -14,10 +14,8 @@ namespace Compiler.Lexer
             FileOpen = OpenFile(File);
         }
 
-        public int CurrentIndex = 0;
         public string[] CurrentFile;
         public bool FileOpen = false;
-        
 
         private bool OpenFile(string FilePath)
         {
@@ -35,34 +33,6 @@ namespace Compiler.Lexer
                 return false;
             }
             return true;
-        }
-
-        public void Next()
-        {
-
-            foreach(char ch in CurrentFile[CurrentIndex])
-            {
-                switch (ch)
-                {
-                    case '+':
-                        Console.WriteLine('+');
-                        //return TokenType.Plus;
-                        break;
-                    case ';':
-                        Console.WriteLine(';');
-                        break;
-                    //return TokenType.Semicolon;
-                    default:
-                        Console.Write(ch);
-                        break;
-                        //return TokenType.Null;
-                }
-            }
-            CurrentIndex++;
-            if(CurrentIndex < CurrentFile.Length)
-            {
-                Next();
-            }
         }
     }
 }
