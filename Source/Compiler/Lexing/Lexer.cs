@@ -9,23 +9,23 @@ namespace Compiler.Lexing
 
         public Lexer(string contents)
         {
-            FileContents = contents;
+            m_FileContents = contents;
         }
 
-        private readonly string FileContents;
-        private readonly List<Token> TokenizedList = new();
+        private readonly string m_FileContents;
+        private readonly List<Token> m_TokenizedList = new();
+        private int m_Index = 0;
 
 
         public void LexFile()
         {
-            for(int i = 0; i < FileContents.Length; i++)
+            for(; m_Index < m_FileContents.Length; m_Index++)
             {
-                TokenType t = CheckChar(i + 1, FileContents[i]);
-                if(t != TokenType.BadToken)
-                {
-                    Console.Write(t);
-                    Console.WriteLine(" " + i);
-                }
+                CheckChar(m_FileContents[m_Index]);
+            }
+            foreach(Token t in m_TokenizedList)
+            {
+                Console.WriteLine(t);
             }
         }
 
@@ -33,57 +33,85 @@ namespace Compiler.Lexing
 
         private bool Match(char ch, int position)
         {
-            return ch.Equals(FileContents[position]);
+            if(ch.Equals(m_FileContents[position]))
+            {
+                m_Index++;
+                return true;
+            }
+            return false;
         }
 
-        private TokenType CheckChar(int currentIndex, char ch)
+        private TokenType CheckChar(char ch)
         {
             TokenType current = TokenType.BadToken;
-            int NextIndex = currentIndex + 1;
             try
             {
                 switch (ch)
                 {
                     case '+':
-                        current = Match('=', currentIndex + 1) ? TokenType.PlusEquals : TokenType.Plus;
-                        TokenizedList.Add(new Token(current, currentIndex, ch.ToString(), null) );
+                        current = Match('=', m_Index + 1) ? TokenType.PlusEquals : TokenType.Plus;
+                        m_TokenizedList.Add(new Token(current, m_Index, ch.ToString(), null) );
                         break;
                     case '-':
-                        current = Match('=', currentIndex + 1) ? TokenType.MinusEquals : TokenType.Minus;
-                        TokenizedList.Add(new Token(current, currentIndex, ch.ToString(), null));
+                        current = Match('=', m_Index + 1) ? TokenType.MinusEquals : TokenType.Minus;
+                        m_TokenizedList.Add(new Token(current, m_Index, ch.ToString(), null));
                         break;
                     case '*':
-                        if (Match('=', NextIndex))
+                        if (Match('=', m_Index))
                             current = TokenType.MultiplyEquals;
-                        else if (Match('*', NextIndex))
+                        else if (Match('*', m_Index))
                             current = TokenType.Pow;
                         else
                             current = TokenType.Multiply;
-                        TokenizedList.Add(new Token(current, currentIndex, ch.ToString(), null));
+                        m_TokenizedList.Add(new Token(current, m_Index, ch.ToString(), null));
                         break;
                     case '/':
-                        current = Match('=', currentIndex + 1) ? TokenType.DivideEquals : TokenType.Divide;
-                        TokenizedList.Add(new Token(current, currentIndex, ch.ToString(), null));
+                        current = Match('=', m_Index + 1) ? TokenType.DivideEquals : TokenType.Divide;
+                        m_TokenizedList.Add(new Token(current, m_Index, ch.ToString(), null));
                         break;
                     case '>':
-                        current = Match('=', currentIndex + 1) ? TokenType.GreaterThanEquals : TokenType.GreaterThan;
-                        TokenizedList.Add(new Token(current, currentIndex, ch.ToString(), null));
+                        current = Match('=', m_Index + 1) ? TokenType.GreaterThanEquals : TokenType.GreaterThan;
+                        m_TokenizedList.Add(new Token(current, m_Index, ch.ToString(), null));
                         break;
                     case '<':
-                        current = Match('=', currentIndex + 1) ? TokenType.LesserThanEquals : TokenType.LesserThan;
-                        TokenizedList.Add(new Token(current, currentIndex, ch.ToString(), null));
+                        current = Match('=', m_Index + 1) ? TokenType.LesserThanEquals : TokenType.LesserThan;
+                        m_TokenizedList.Add(new Token(current, m_Index, ch.ToString(), null));
                         break;
                     case '=':
-                        current = Match('=', currentIndex + 1) ? TokenType.DoubleEquals : TokenType.Equals;
-                        TokenizedList.Add(new Token(current, currentIndex, ch.ToString(), null));
+                        current = Match('=', m_Index + 1) ? TokenType.DoubleEquals : TokenType.Equals;
+                        m_TokenizedList.Add(new Token(current, m_Index, ch.ToString(), null));
                         break;
 
                     case ';':
                         current = TokenType.Semicolon;
-                        TokenizedList.Add(new Token(current, currentIndex, ch.ToString(), null));
+                        m_TokenizedList.Add(new Token(current, m_Index, ch.ToString(), null));
+                        break;
+                    case '(':
+                        current = TokenType.OpenParenthesis;
+                        m_TokenizedList.Add(new Token(current, m_Index, ch.ToString(), null));
+                        break;
+                    case ')':
+                        current = TokenType.CloseParenthesis;
+                        m_TokenizedList.Add(new Token(current, m_Index, ch.ToString(), null));
+                        break;
+                    case '{':
+                        current = TokenType.OpenCurlyBrace;
+                        m_TokenizedList.Add(new Token(current, m_Index, ch.ToString(), null));
+                        break;
+                    case '}':
+                        current = TokenType.CloseCurlyBrace;
+                        m_TokenizedList.Add(new Token(current, m_Index, ch.ToString(), null));
+                        break;
+                    case '[':
+                        current = TokenType.OpenBrackets;
+                        m_TokenizedList.Add(new Token(current, m_Index, ch.ToString(), null));
+                        break;
+                    case ']':
+                        current = TokenType.CloseBrackets;
+                        m_TokenizedList.Add(new Token(current, m_Index, ch.ToString(), null));
                         break;
                     default:
-                        TokenizedList.Add(new Token(TokenType.Null, currentIndex, ch.ToString(), ch));
+                        m_TokenizedList.Add(new Token(TokenType.Null, m_Index, ch.ToString(), ch));
                         break;
                 }
             }
@@ -92,7 +120,6 @@ namespace Compiler.Lexing
                 throw new Exception("Line may not end with an operator, are you missing a ;?\n" + e);
             }
             return current;
-
         }
     }
 }
