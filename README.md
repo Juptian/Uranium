@@ -1,4 +1,4 @@
-# Compiler
+# Compiler <img src="https://img.shields.io/github/workflow/status/Juptian/Compiler/.NET?style=plastic">
 I decided to make a language Via C#
 
 ## Contributing
