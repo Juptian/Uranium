@@ -19,16 +19,19 @@
         Pow,
         DoubleEquals,
 
-        //Syntaxic symbols
+        //Syntactic symbols
         Semicolon,
-        Period,
+        Dot,
+        Comma,
         OpenParenthesis,
         CloseParenthesis,
-        OpenCurlyBrackets,
-        CloseCurlyBrackets,
+        OpenCurlyBrace,
+        ClosingCurlyBrace,
         OpenDiamondBrackets,
         CloseDiamondBrackets,
         TypeDeclarator,
+        OpenBrackets,
+        CloseBrackets,
         Null,
 
         BadToken

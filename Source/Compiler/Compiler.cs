@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Compiler.Lexing;
-
+using System.IO;
 
 namespace Compiler
 {
@@ -16,8 +12,25 @@ namespace Compiler
             {
                 Console.WriteLine("You must specify a file");
             }
-            Lexer lexer = new Lexer(args[0]);
-            lexer.ReadFile();
+            Lexer lexer = new( OpenFile(args[0]) );
+            lexer.LexFile();
+        }
+
+        private static string OpenFile(string filePath)
+        {
+            if (string.IsNullOrWhiteSpace(filePath))
+            {
+                throw new Exception("File path must not be empty");
+            }
+            try
+            {
+                return File.ReadAllText(filePath);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Could not open file: " + e);
+                return null;
+            }
         }
     }
 }
