@@ -18,11 +18,21 @@
         LesserThanEquals,
         Pow,
         DoubleEquals,
+        PercentEquals,
 
         //Syntactic symbols
         Semicolon,
+        Colon,
         Dot,
         Comma,
+        Tilde,
+        Percent,
+        Hat,
+        Ampersand,
+        Pipe,
+        HatEquals,
+        DoubleAmpersand,
+        DoublePipe,
         OpenParenthesis,
         CloseParenthesis,
         OpenCurlyBrace,
@@ -31,7 +41,13 @@
         OpenBrackets,
         CloseBrackets,
         Null,
+        LineBreak,
+        WhiteSpace,
+        SingleLineComment,
+        MultiLineComment,
 
+
+        //Token be bad
         BadToken
     }
 }
