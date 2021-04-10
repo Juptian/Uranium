@@ -17,6 +17,8 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 5.0.x
+    - name: Add Microsoft Code Coverage
+      run: dotnet add package Microsoft.CodeCoverage --version 16.9.4
     - name: Restore dependencies
       run: dotnet restore project.sln
     - name: Build
