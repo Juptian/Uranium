@@ -16,8 +16,9 @@ namespace Compiler.Lexing
         private readonly string m_FileContents;
         private readonly List<Token> m_TokenizedList = new();
         private int m_Index = 0;
+#nullable enable
         private object? m_Current;
-        
+#nullable disable
         private char CurrentIndex => Peek(0);
         private char NextIndex => Peek(1);
         
