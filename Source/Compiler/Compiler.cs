@@ -11,6 +11,7 @@ namespace Compiler
             if(args.Length == 0)
             {
                 Console.WriteLine("You must specify a file");
+                return;
             }
             Lexer lexer = new( OpenFile(args[0]) );
             lexer.LexFile();

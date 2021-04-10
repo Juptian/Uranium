@@ -1,5 +1,6 @@
 using NUnit.Framework;
 using Compiler.Lexing;
+using System;
 
 namespace Compiler.Tests
 {
@@ -19,7 +20,14 @@ namespace Compiler.Tests
         [Test]
         public void Test1()
         {
-            Assert.Pass("Test will pass", lexer.Lex(text1[0]) );
+            Assert.AreEqual(TokenType.CloseCurlyBrace, lexer.Lex(text1[0]) );
+            Assert.AreEqual(TokenType.LineBreak, lexer.Lex(text1[1]));
+            Assert.AreEqual(TokenType.LineBreak, lexer.Lex(text1[2]));
+            Assert.AreEqual(TokenType.Plus, lexer.Lex(text1[3]));
+            Assert.AreEqual(TokenType.Equals, lexer.Lex(text1[4]));
+            Assert.AreEqual(TokenType.Semicolon, lexer.Lex(text1[5]));
+
+            Console.WriteLine("Test1 passed!");
         }
     }
 }
