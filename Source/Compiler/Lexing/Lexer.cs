@@ -198,7 +198,7 @@ namespace Compiler.Lexing
                 if (!hasSeparator && (CurrentIndex == '_' || CurrentIndex == ' '))
                     hasSeparator = true;
 
-                if (CurrentIndex == ',') 
+                if (CurrentIndex == '.')
                 {
                     hasMultiDecimals = isDecimal;
                         
