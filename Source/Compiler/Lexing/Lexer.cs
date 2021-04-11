@@ -87,7 +87,7 @@ namespace Compiler.Lexing
                 case '*':
                     if (Match('=', 1))
                         current = TokenType.MultiplyEquals;
-                    else if (Match('*', m_Index))
+                    else if (Match('*', 1))
                         current = TokenType.Pow;
                     else
                         current = TokenType.Multiply;
