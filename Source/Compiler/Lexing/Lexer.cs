@@ -54,18 +54,27 @@ namespace Compiler.Lexing
             return false;
         }
 
+        //Literally lexes a single character
         public TokenType Lex(char ch)
         {
             TokenType current = TokenType.BadToken;
             switch (ch)
             {
+                #region Special Characters
                 //Special characters
                 case '\r':
                 case '\n':
                     current = TokenType.LineBreak;
                     m_TokenizedList.Add(new Token(current, m_Index, ch.ToString(), null));
+                    m_Index += 2;
                     break;
+                case ' ':
+                case '\t':
+                    ReadWhitespace();
+                    break;
+                #endregion
 
+                #region Operators
                 //Math operators
                 case '+':
                     current = Match('=', 1) ? TokenType.PlusEquals : TokenType.Plus;
@@ -88,9 +97,17 @@ namespace Compiler.Lexing
                     if (Match('=', 1))
                         current = TokenType.DivideEquals;
                     else if (Match('/', 1))
+                    {
+                        ReadSingleLineComment();
                         current = TokenType.SingleLineComment;
+                    }
+
                     else if (Match('*', 1))
+                    {
+                        ReadMultiLineComment();
                         current = TokenType.MultiLineComment;
+                    }
+
                     else
                         current = TokenType.Divide;
 
@@ -130,7 +147,9 @@ namespace Compiler.Lexing
                     current = TokenType.Tilde;
                     m_TokenizedList.Add(new Token(current, m_Index, ch.ToString(), null));
                     break;
+                #endregion
 
+                #region Numbers
                 //Numbers
                 case '0':
                 case '1':
@@ -144,9 +163,10 @@ namespace Compiler.Lexing
                 case '9':
                     ReadNum();
                     m_TokenizedList.Add(new Token(TokenType.Number, m_Index, m_Current.ToString(), m_Current));
-
                     break;
+                #endregion
 
+                #region Syntax
                 //Pure syntax
                 case ';':
                     current = TokenType.Semicolon;
@@ -176,6 +196,7 @@ namespace Compiler.Lexing
                     current = TokenType.CloseBrackets;
                     m_TokenizedList.Add(new Token(current, m_Index, ch.ToString(), null));
                     break;
+                #endregion
 
                 //Default
                 default:
@@ -183,6 +204,66 @@ namespace Compiler.Lexing
                     break;
             }
             return current;
+        }
+
+        private void ReadWhitespace()
+        {
+            while(char.IsWhiteSpace(CurrentIndex))
+            {
+                m_Index++;
+            }
+
+            m_Current = TokenType.WhiteSpace;
+        }
+
+        private void ReadSingleLineComment()
+        {
+            m_Index += 2;
+            var finished = false;
+            while(!finished)
+            {
+                switch(CurrentIndex)
+                {
+
+                    case '\0':
+                    case '\r':
+                    case '\n':
+                        finished = true;
+                        break;
+                    default:
+                        m_Index++;
+                        break;
+                }
+            }
+            m_Current = TokenType.SingleLineComment;
+        }
+
+        private void ReadMultiLineComment()
+        {
+            m_Index += 2;
+            var finished = false;
+            while(!finished)
+            {
+                switch(CurrentIndex)
+                {
+
+                    case '\0':
+                        //Gotta report this buddy!
+                        break;
+                    case '*':
+                        if(NextIndex.Equals('/'))
+                        {
+                            m_Index++;
+                            finished = true;
+                        } 
+                        m_Index++;
+                        break;
+                    default:
+                        m_Index++;
+                        break;
+                }
+            }
+            m_Current = TokenType.SingleLineComment; 
         }
 
         private void ReadNum()
@@ -208,20 +289,23 @@ namespace Compiler.Lexing
                 }
                 m_Index++;
             }
+            //Getting the length of a number
             int length = m_Index - startIndex;
 
-
+            //Get's the contents of the number, and replaces , with ., then makes it a CharArray so that I can join it in the text
             char[] cha_text = m_FileContents.Substring(startIndex, length).Replace(',', '.').ToCharArray();
 
+            //Makes a string out of cha_text
             string text = string.Join("", cha_text.Where<char>(e => !char.IsWhiteSpace(e) && !e.Equals('_')) );
             
             //Numbers cannot start with _ or have multiple . s.
             if (text.StartsWith('_'))
             {
                 //TODO: Make a logging system that throws errors :)
-                Console.WriteLine("A number may not start with _");
+                ErrorLogger.ReportNumberStartingWith_();
             }
 
+            //Numbers cannot have multiple .s or ,s.
             if (hasMultiDecimals)
             {
                 ErrorLogger.ReportInvalidNumber();
@@ -241,9 +325,7 @@ namespace Compiler.Lexing
                     {
                         m_Current = (float)value;
                     }
-                    //Extra precautions to avoid someone parsing in a decimal...
-                    //Commented out because they shouldn't be needed
-                    else /*if (value >= double.MinValue && value <= double.MaxValue)*/
+                    else
                     {
                         m_Current = value;
                     }
@@ -265,13 +347,9 @@ namespace Compiler.Lexing
                     {
                         m_Current = (uint)value;
                     }
-                    else if (value <= ulong.MaxValue)
-                    {
-                        m_Current = value;
-                    }
                     else
                     {
-                        throw new Exception("Could parse to unsigned long, but it is above the max value?");
+                        m_Current = value;
                     }
                 }
             }
