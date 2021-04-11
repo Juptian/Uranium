@@ -193,12 +193,12 @@ namespace Compiler.Lexing
 
             while (char.IsDigit(CurrentIndex) ||
                 ((CurrentIndex == '_' || CurrentIndex == ' ') && char.IsDigit(NextIndex)) ||
-                (CurrentIndex == '.' && char.IsDigit(NextIndex)))
+                ((CurrentIndex == '.' || CurrentIndex == ',') && char.IsDigit(NextIndex)) )
             {
                 if (!hasSeparator && (CurrentIndex == '_' || CurrentIndex == ' '))
                     hasSeparator = true;
 
-                if (CurrentIndex == '.')
+                if (CurrentIndex == '.' || CurrentIndex == ',')
                 {
                     hasMultiDecimals = isDecimal;
                         
@@ -209,9 +209,10 @@ namespace Compiler.Lexing
             int length = m_Index - startIndex;
 
 
-            char[] cha_text = m_FileContents.Substring(startIndex, length).ToCharArray();
+            char[] cha_text = m_FileContents.Substring(startIndex, length).Replace(',', '.').ToCharArray();
 
-            string text = string.Join("", cha_text.Where<char>(e => !char.IsWhiteSpace(e) && !e.Equals('_')));
+            string text = string.Join("", cha_text.Where<char>(e => !char.IsWhiteSpace(e) && !e.Equals('_')) );
+            
             //Numbers cannot start with _ or have multiple . s.
             if (text.StartsWith('_'))
             {
