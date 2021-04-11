@@ -45,10 +45,57 @@
         WhiteSpace,
         SingleLineComment,
         MultiLineComment,
+        Bang,
+        BangEquals,
 
-        //
+        //Temp
         Number,
 
+        //Logic keywords
+        IfKeyword,
+        ElseKeyword,
+        BreakKeyword,
+        ContinueKeyword,
+        DefaultKeyword,
+
+        //Specifiers
+        ConstKeyword,
+        ReturnKeyword,
+        ThisKeyword,
+        ToKeyword,
+
+        //Bool keywords
+        TrueKeyword,
+        FalseKeyword,
+        
+        //Type keywords
+        ClassKeyword,
+        StructKeyword,
+        NamespaceKeyword,
+        IntKeyword,
+        FloatKeyword,
+        DoubleKeyword,
+        LongKeyword,
+        VarKeyword,
+
+        //Loop keywords
+        WhileKeyword,
+        DoKeyword,
+
+        //Statements
+        IfStatement,
+        BreakStatement,
+        ContinueStatement,
+        VariableDeclaration,
+        ForStatement,
+        ExpressionStatement,
+        ReturnStatement, 
+        WhileStatement,
+        DoWhileStatement,
+        
+        //End of file
+        EndOfFile,
+        
         //Token be bad
         BadToken
     }

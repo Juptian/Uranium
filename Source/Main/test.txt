@@ -27,3 +27,9 @@ avwa;
 10,001
 
 ;
+//ABCDEFGHIJKLMNOPQRSTUVWXYZ
+
+/* abvc
+
+de
+*/

@@ -7,23 +7,54 @@ namespace Compiler.Tests
     public class Tests
     {
         private Lexer lexer;
-        private readonly string text1 = @"}
-+=;
-";
+
 
         [SetUp]
         public void Setup()
         {
-            lexer = new Lexer(text1);
+
+        }
+
+        public void RunTests()
+        {
+            TestSyntax();
+            TestCompoundOperators();
+            TestNumbers();
         }
 
         [Test]
-        public void Test1()
+        public void TestSyntax()
         {
-            Assert.AreEqual(TokenType.CloseCurlyBrace, lexer.Lex(text1[0]) );
-            Assert.AreEqual(TokenType.LineBreak, lexer.Lex(text1[1]));
+            lexer = new Lexer(@"} 
+");
 
-            Console.WriteLine("Test1 passed!");
+            Assert.AreEqual(TokenType.CloseCurlyBrace, lexer.LexTokens('}') );
+           
+
+            Console.WriteLine("Test 1 passed!");
+        }
+
+        public void TestCompoundOperators()
+        {
+            lexer = new Lexer("/=");
+            Assert.AreEqual(TokenType.DivideEquals, lexer.LexTokens('/'));
+
+            Console.WriteLine("Test 2 passed!");
+
+        }
+
+        public void TestNumbers()
+        {
+            lexer = new Lexer("123.45");
+            Assert.AreEqual(TokenType.Number, lexer.LexTokens('1'));
+            Assert.AreEqual(123.45f, lexer.m_Current);
+
+            lexer = new Lexer("3.141592653589");
+
+            Assert.AreEqual(TokenType.Number, lexer.LexTokens('3'));
+            Assert.AreEqual(3.14159274f, lexer.m_Current);
+
+            Console.WriteLine("Test 3 passed");
         }
     }
 }
