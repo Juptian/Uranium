@@ -30,10 +30,10 @@ namespace Compiler.Lexing
             {
                 Lex(m_FileContents[m_Index]);
             }
-            /*foreach (Token t in m_TokenizedList)
+            foreach (Token t in m_TokenizedList)
             {
                 Console.WriteLine(t);
-            }*/
+            }
         }
 
         private char Peek(int offset)
@@ -143,6 +143,8 @@ namespace Compiler.Lexing
                 case '8':
                 case '9':
                     ReadNum();
+                    m_TokenizedList.Add(new Token(TokenType.Number, m_Index, m_Current.ToString(), m_Current));
+
                     break;
 
                 //Pure syntax
@@ -273,7 +275,7 @@ namespace Compiler.Lexing
                     }
                 }
             }
-            Console.WriteLine(m_Current);
+            
         }
     }
 }

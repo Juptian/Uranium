@@ -46,6 +46,8 @@
         SingleLineComment,
         MultiLineComment,
 
+        //
+        Number,
 
         //Token be bad
         BadToken
