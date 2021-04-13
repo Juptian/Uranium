@@ -7,7 +7,7 @@ using Compiler.CodeAnalysis.Syntax;
 
 namespace Compiler.CodeAnalysis.Parsing
 {
-    internal class Parser
+    internal sealed class Parser
     {
         private readonly SyntaxToken[] _tokens;
         private int _position;
@@ -21,7 +21,7 @@ namespace Compiler.CodeAnalysis.Parsing
             SyntaxToken token;
             do
             {
-                token = lexer.NextToken();
+                token = lexer.Lex();
                 if (token.Kind != SyntaxKind.WhiteSpace || token.Kind != SyntaxKind.BadToken)
                 {
                     tokens.Add(token);
@@ -51,7 +51,7 @@ namespace Compiler.CodeAnalysis.Parsing
             return current;
         }
 
-        private SyntaxToken Match(SyntaxKind kind)
+        private SyntaxToken MatchToken(SyntaxKind kind)
         {
             if (_current.Kind == kind)
             {
@@ -63,54 +63,56 @@ namespace Compiler.CodeAnalysis.Parsing
             return new(kind, _current.Position, null, null);
         }
 
-        private ExpressionSyntax ParseExpression()
-        {
-            return ParseTerm();
-        }
-
         public SyntaxTree Parse()
         {
-            var expression = ParseTerm();
-            var EOFToken = Match(SyntaxKind.EndOfFile);
+            var expression = ParseExpression();
+            var EOFToken = MatchToken(SyntaxKind.EndOfFile);
 
             return new(_diagnostics, expression, EOFToken);
         }
 
-        private ExpressionSyntax ParseTerm()
+        //Allowing for proper operator precedence
+        private ExpressionSyntax ParseExpression(int parentPrecedence = 0)
         {
-            var left = ParseFactor();
-
-            while (_current.Kind == SyntaxKind.Plus || _current.Kind == SyntaxKind.Minus)
+            var left = ParsePrimaryExpression();
+            
+            //Keep looping until our precedence is <= parent precedence, or == 0;
+            while(true)
             {
-                if (_position >= _tokens.Length)
+                var precedence = GetBinaryOperatorPrecedence(_current.Kind);
+                if(precedence == 0 || precedence <= parentPrecedence)
                 {
                     break;
                 }
-                var operatorToken = NextToken();
-                var right = ParseFactor();
-                left = new BinaryExpressionSyntax(left, operatorToken, right);
-            }
 
+                var operatorToken = NextToken();
+                var right = ParseExpression(precedence);
+
+                left = new BinaryExpressionSyntax(left, operatorToken, right);
+
+            }
             return left;
         }
 
-        private ExpressionSyntax ParseFactor()
+        private static int GetBinaryOperatorPrecedence(SyntaxKind kind)
         {
-            var left = ParsePrimaryExpression();
-
-            while (_current.Kind == SyntaxKind.Divide || _current.Kind == SyntaxKind.Pow || _current.Kind == SyntaxKind.Multiply)
+            switch(kind)
             {
-                if (_position >= _tokens.Length)
-                {
-                    break;
-                }
-                var operatorToken = NextToken();
-                var right = ParsePrimaryExpression();
-                left = new BinaryExpressionSyntax(left, operatorToken, right);
+                //Just operator precedence
+                case SyntaxKind.Plus:
+                case SyntaxKind.Minus:
+                    return 1;
+
+                case SyntaxKind.Multiply:
+                case SyntaxKind.Divide:
+                    return 2;
+
+                case SyntaxKind.Pow:
+                    return 3;
+
+                default:
+                    return 0;
             }
-
-            return left;
-
         }
 
         private ExpressionSyntax ParsePrimaryExpression()
@@ -119,12 +121,12 @@ namespace Compiler.CodeAnalysis.Parsing
             {
                 var left = NextToken();
                 var expression = ParseExpression();
-                var right = Match(SyntaxKind.CloseParenthesis);
+                var right = MatchToken(SyntaxKind.CloseParenthesis);
                 return new ParenthesizedExpressionSyntax(left, expression, right);
             }
 
-            var numberToken = Match(SyntaxKind.NumberToken);
-            return new NumberExpressionSyntax(numberToken);
+            var numberToken = MatchToken(SyntaxKind.NumberToken);
+            return new LiteralExpressionSyntax(numberToken);
         }
 
         public static void PrettyPrint(SyntaxNode node, string indent = "", bool isLast = true)

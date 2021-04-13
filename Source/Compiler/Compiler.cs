@@ -12,7 +12,7 @@ namespace Compiler
     {
         public static void Emit(string[] args)
         {
-            bool showTree = false;
+            var showTree = false;
             if(args.Length == 0)
             {
                 Console.WriteLine("You must specify a file, or an input string");
@@ -31,14 +31,12 @@ namespace Compiler
                 }
             }
 
-            var syntaxTree = SyntaxTree.Parse(text);
-             var color = Console.ForegroundColor;
-            
+            var syntaxTree = SyntaxTree.Parse(text);            
             if(showTree)
             {
                 Console.ForegroundColor = ConsoleColor.Yellow;
                 Parser.PrettyPrint(syntaxTree.Root);
-                Console.ForegroundColor = color;
+                Console.ResetColor();    
             }
 
             if(syntaxTree.Diagnostics.Any())
@@ -48,7 +46,7 @@ namespace Compiler
                 {
                     Console.WriteLine(diag);
                 }
-                Console.ForegroundColor = color;
+                Console.ResetColor(); 
             } 
             else
             {
@@ -71,7 +69,7 @@ namespace Compiler
             {
                 return File.ReadAllText(filePath);
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 // We can catch it, and allow for a an input such as 
                 // `dotnet run (2 + 2)`

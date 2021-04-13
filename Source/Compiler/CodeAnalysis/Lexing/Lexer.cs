@@ -31,10 +31,10 @@ namespace Compiler.CodeAnalysis.Lexing
 
         public IEnumerable<string> Diagnostics => _diagnostics;
 
-        public SyntaxToken NextToken()
+        public SyntaxToken Lex()
         {
             ReadSpecialChars(true);
-            LexTokens(_currentIndex);
+            LexToken(_currentIndex);
             if (_index == _source.Length)
             {
                 return new(SyntaxKind.EndOfFile, _index, "\0", null);
@@ -113,7 +113,7 @@ namespace Compiler.CodeAnalysis.Lexing
         }
 
         //Literally lexes a single character
-        public SyntaxKind LexTokens(char ch)
+        public SyntaxKind LexToken(char ch)
         {
             _current = SyntaxKind.BadToken;
             switch (ch)
