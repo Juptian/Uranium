@@ -6,86 +6,94 @@ using Compiler.Syntax;
 #pragma warning disable CS8632
 namespace Compiler.Lexing
 {
-    sealed class Lexer
+    internal sealed class Lexer
     {
+        private readonly string _source;
+        private readonly List<SyntaxToken> _tokens = new();
 
+        private char _currentIndex => Peek(0);
+        private char _nextIndex => Peek(1);
+
+        private int _index;
+        private SyntaxKind _current;
+        public object _currentValue;
+        
+        private readonly List<string> _diagnostics = new();
+        
         public Lexer(string contents)
         {
-            _FileContents = contents;
-            for(int i = 0; i < contents.Length; i++)
+            _source = contents;
+            for(var i = 0; i < contents.Length; i++)
             {
-                Console.WriteLine(contents[i].ToString() + ", " + i);
+                Console.WriteLine($"{contents[i]}, {i}");
             }
         }
-
-        private readonly string _FileContents;
-        private readonly List<SyntaxToken> _TokenizedList = new();
-        private int _Index = 0;
-
-        public object? _Current;
-
-        private char CurrentIndex => Peek(0);
-        private char NextIndex => Peek(1);
-        private SyntaxKind current;
-
-        private readonly List<string> _diagnostics = new();
 
         public IEnumerable<string> Diagnostics => _diagnostics;
 
         public SyntaxToken NextToken()
         {
             ReadSpecialChars(true);
-            LexTokens(CurrentIndex);
-            if (_Index == _FileContents.Length)
-                return new SyntaxToken(SyntaxKind.EndOfFile, _Index, "\0", null);
-            Console.Write(current + ", ");
-            Console.WriteLine(_Index.ToString() + ", " +  CurrentIndex);
-            _Index++;
-            return new SyntaxToken(current, _Index, CurrentIndex.ToString(), _Current);
+            LexTokens(_currentIndex);
+            if (_index == _source.Length)
+            {
+                return new(SyntaxKind.EndOfFile, _index, "\0", null);
+            }
+            
+            Console.Write($"{_current}, ");
+            Console.WriteLine($"{_index}, {_currentIndex}");
+            _index++;
+            return new(_current, _index, _currentIndex.ToString(), _currentValue);
         }
 
         private char Peek(int offset)
         {
-            int ToPeekIndex = _Index + offset;
-            if (ToPeekIndex == _FileContents.Length)
+            var peekIndex = _index + offset;
+
+            if (peekIndex == _source.Length)
+            {
                 return '\0';
-            return _FileContents[ToPeekIndex];
+            }
+            return _source[peekIndex];
         }
 
         private bool Match(char ch, int offset)
         {
             if (ch.Equals(Peek(offset)))
+            {
                 return true;
+            }
+            
             return false;
         }
 
-        private void ReadSpecialChars(bool KeepGoing)
+        private void ReadSpecialChars(bool keepGoing)
         {
             var finished = false;
-            var start = _Index;
-            current = SyntaxKind.BadToken;
+            var start = _index;
+            _current = SyntaxKind.BadToken;
             while(!finished)
             {
-                switch(CurrentIndex)
+                switch(_currentIndex)
                 {
                     //Special characters
                     case '\r':
                     case '\n':
-                        current = SyntaxKind.LineBreak;
+                        _current = SyntaxKind.LineBreak;
                         ReadLineBreak();
-                        finished = !KeepGoing;
+                        finished = !keepGoing;
                         break;
                     case ' ':
                     case '\t':
                         ReadWhitespace();
-                        current = SyntaxKind.WhiteSpace;
+                        _current = SyntaxKind.WhiteSpace;
                         break;
                     case '\0':
-                        current = SyntaxKind.EndOfFile;
+                        _current = SyntaxKind.EndOfFile;
                         finished = true;
                         break;
                     default:
-                        if (char.IsWhiteSpace(CurrentIndex))
+                        if (char.IsWhiteSpace(_currentIndex))
                         {
                             ReadWhitespace();
                         }
@@ -95,12 +103,11 @@ namespace Compiler.Lexing
                         }
                         break;
                 }
-                var length = _Index - start;
+                var length = _index - start;
                 if(length > 0)
                 {
-                    var text = _FileContents.Substring(start, length);
-                    SyntaxToken t = new(current, _Index, text, text);
-                    _TokenizedList.Add(t);
+                    var text = _source.Substring(start, length);
+                    _tokens.Add(new(_current, _index, text, text));
                 }
             }
         }
@@ -108,71 +115,70 @@ namespace Compiler.Lexing
         //Literally lexes a single character
         public SyntaxKind LexTokens(char ch)
         {
-            current = SyntaxKind.BadToken;
+            _current = SyntaxKind.BadToken;
             switch (ch)
             {
                 #region Operators
                 //Math operators
                 case '+':
-                    current = Match('=', 1) ? SyntaxKind.PlusEquals : SyntaxKind.Plus;
+                    _current = Match('=', 1) ? SyntaxKind.PlusEquals : SyntaxKind.Plus;
                     break;
                 case '-':
-                    current = Match('=', 1) ? SyntaxKind.MinusEquals : SyntaxKind.Minus;
+                    _current = Match('=', 1) ? SyntaxKind.MinusEquals : SyntaxKind.Minus;
                     break;
                 case '*':
                     if (Match('=', 1))
-                        current = SyntaxKind.MultiplyEquals;
+                        _current = SyntaxKind.MultiplyEquals;
                     else if (Match('*', 1))
-                        current = SyntaxKind.Pow;
+                        _current = SyntaxKind.Pow;
                     else
-                        current = SyntaxKind.Multiply;
+                        _current = SyntaxKind.Multiply;
                     break;
                 case '/':
                     if (Match('=', 1))
-                        current = SyntaxKind.DivideEquals;
+                        _current = SyntaxKind.DivideEquals;
                     else if (Match('/', 1))
                     {
                         ReadSingleLineComment();
-                        current = SyntaxKind.SingleLineComment;
+                        _current = SyntaxKind.SingleLineComment;
                     }
                     else if (Match('*', 1))
                     {
                         ReadMultiLineComment();
-                        current = SyntaxKind.MultiLineComment;
+                        _current = SyntaxKind.MultiLineComment;
                     }
                     else
-                        current = SyntaxKind.Divide;
+                        _current = SyntaxKind.Divide;
                     
                     break;
                 case '>':
-                    current = Match('=', 1) ? SyntaxKind.GreaterThanEquals : SyntaxKind.GreaterThan;
+                    _current = Match('=', 1) ? SyntaxKind.GreaterThanEquals : SyntaxKind.GreaterThan;
                     break;
                 case '<':
-                    current = Match('=', 1) ? SyntaxKind.LesserThanEquals : SyntaxKind.LesserThan;
+                    _current = Match('=', 1) ? SyntaxKind.LesserThanEquals : SyntaxKind.LesserThan;
                     break;
                 case '=':
-                    current = Match('=', 1) ? SyntaxKind.DoubleEquals : SyntaxKind.Equals;
+                    _current = Match('=', 1) ? SyntaxKind.DoubleEquals : SyntaxKind.Equals;
                     break;
                 case '^':
-                    current = Match('=', 1) ? SyntaxKind.HatEquals : SyntaxKind.Hat;
+                    _current = Match('=', 1) ? SyntaxKind.HatEquals : SyntaxKind.Hat;
                     break;
 
                 //Also operators
                 case '|':
-                    current = Match('|', 1) ? SyntaxKind.DoublePipe : SyntaxKind.Pipe;
+                    _current = Match('|', 1) ? SyntaxKind.DoublePipe : SyntaxKind.Pipe;
                     break;
                 case '&':
-                    current = Match('&', 1) ? SyntaxKind.DoubleAmpersand : SyntaxKind.Ampersand;
+                    _current = Match('&', 1) ? SyntaxKind.DoubleAmpersand : SyntaxKind.Ampersand;
                     break;
                 case '%':
-                    current = Match('=', 1) ? SyntaxKind.PercentEquals : SyntaxKind.Percent;
+                    _current = Match('=', 1) ? SyntaxKind.PercentEquals : SyntaxKind.Percent;
                     break;
                 case '~':
-                    current = SyntaxKind.Tilde;
+                    _current = SyntaxKind.Tilde;
                     break;
                 #endregion
-
-                #region Numbers
+                
                 //Numbers
                 case '0':
                 case '1':
@@ -185,55 +191,51 @@ namespace Compiler.Lexing
                 case '8':
                 case '9':
                     ReadNum();
-                    current = SyntaxKind.NumberToken;
+                    _current = SyntaxKind.NumberToken;
                     break;
-                #endregion
-
-                #region Syntax
+                
                 //Pure syntax
                 case ';':
-                    current = SyntaxKind.Semicolon;
+                    _current = SyntaxKind.Semicolon;
                     break;
                 case '(':
-                    current = SyntaxKind.OpenParenthesis;
+                    _current = SyntaxKind.OpenParenthesis;
                     break;
                 case ')':
-                    current = SyntaxKind.CloseParenthesis;
+                    _current = SyntaxKind.CloseParenthesis;
                     break;
                 case '{':
-                    current = SyntaxKind.OpenCurlyBrace;
+                    _current = SyntaxKind.OpenCurlyBrace;
                     break;
                 case '}':
-                    current = SyntaxKind.CloseCurlyBrace;
+                    _current = SyntaxKind.CloseCurlyBrace;
                     break;
                 case '[':
-                    current = SyntaxKind.OpenBrackets;
+                    _current = SyntaxKind.OpenBrackets;
                     break;
                 case ']':
-                    current = SyntaxKind.CloseBrackets;
+                    _current = SyntaxKind.CloseBrackets;
                     break;
-                #endregion
                 case '\0':
-                    current = SyntaxKind.EndOfFile;
-                    return current;
+                    _current = SyntaxKind.EndOfFile;
+                    return _current;
                 //Default
                 default:
-                    //current = SyntaxKind.Null;
-                    break;
+                    throw new($"Unexpected Syntax Kind: {_current}");
             }
 
-            return current;
+            return _current;
         }
 
         private void ReadLineBreak()
         {
-            if(CurrentIndex == '\r' && NextIndex == '\n')
+            if(_currentIndex == '\r' && _nextIndex == '\n')
             {
-                _Index += 2;
+                _index += 2;
             } 
             else
             {
-                _Index++;
+                _index++;
             }
         }
 
@@ -242,7 +244,7 @@ namespace Compiler.Lexing
             var done = false;
             while(!done)
             {
-                switch(CurrentIndex)
+                switch(_currentIndex)
                 {
                     case '\0':
                     case '\r':
@@ -250,10 +252,10 @@ namespace Compiler.Lexing
                         done = true;
                         break;
                     default:
-                        if (!char.IsWhiteSpace(CurrentIndex))
+                        if (!char.IsWhiteSpace(_currentIndex))
                             done = true;
                         else
-                           _Index++;
+                           _index++;
                         break;
                 }
             }
@@ -261,12 +263,12 @@ namespace Compiler.Lexing
 
         private void ReadSingleLineComment()
         {
-            _Index++;
+            _index++;
             var finished = false;
-            var startIndex = _Index;
+            var startIndex = _index;
             while(!finished)
             {
-                switch(CurrentIndex)
+                switch(_currentIndex)
                 {
                     case '\0':
                     case '\r':
@@ -274,11 +276,11 @@ namespace Compiler.Lexing
                         finished = true;
                         break;
                     default:
-                        _Index++;
+                        _index++;
                         break;
                 }
             }
-            _Current = SyntaxKind.SingleLineComment;
+            _currentValue = SyntaxKind.SingleLineComment;
             
             //Commented out, is here for debug purposes
             /*var length = _Index - startIndex;
@@ -287,32 +289,32 @@ namespace Compiler.Lexing
 
         private void ReadMultiLineComment()
         {
-            _Index++;
+            _index++;
             var finished = false;
-            var startIndex = _Index;
+            var startIndex = _index;
             while(!finished)
             {
-                switch(CurrentIndex)
+                switch(_currentIndex)
                 {
 
                     case '\0':
                         ErrorLogger.ReportUnfinishedMultiLineComment();
-                        current = SyntaxKind.EndOfFile;
+                        _current = SyntaxKind.EndOfFile;
                         return;
                     case '*':
-                        if(NextIndex.Equals('/'))
+                        if(_nextIndex.Equals('/'))
                         {
-                            _Index++;
+                            _index++;
                             finished = true;
                         } 
-                        _Index++;
+                        _index++;
                         break;
                     default:
-                        _Index++;
+                        _index++;
                         break;
                 }
             }
-            _Current = SyntaxKind.SingleLineComment;
+            _currentValue = SyntaxKind.SingleLineComment;
 
             //Commented out, is here for debug purposes
             /*var length = _Index - startIndex;
@@ -321,41 +323,42 @@ namespace Compiler.Lexing
 
         private void ReadNum()
         {
-            bool hasSeparator = false;
-            bool isDecimal = false;
-            bool hasMultiDecimals = false;
-            int startIndex = _Index;
+            var hasSeparator = false;
+            var isDecimal = false;
+            var hasMultiDecimals = false;
+            var startIndex = _index;
 
-
-            while (char.IsDigit(CurrentIndex) ||
-                ((CurrentIndex == '_' || CurrentIndex == ' ') && char.IsDigit(NextIndex)) ||
-                ((CurrentIndex == '.' || CurrentIndex == ',') && char.IsDigit(NextIndex)) )
+            while (char.IsDigit(_currentIndex) ||
+                  (_currentIndex == '_' || _currentIndex == ' ') && char.IsDigit(_nextIndex) ||
+                  (_currentIndex == '.' || _currentIndex == ',') && char.IsDigit(_nextIndex))
             {
-                if (!hasSeparator && (CurrentIndex == '_' || CurrentIndex == ' '))
+                if (!hasSeparator && (_currentIndex == '_' || _currentIndex == ' '))
+                {
                     hasSeparator = true;
+                }
 
-                if (CurrentIndex == '.' || CurrentIndex == ',')
+                if (_currentIndex == '.' || _currentIndex == ',')
                 {
                     hasMultiDecimals = isDecimal;
-                        
                     isDecimal = true;
                 }
-                _Index++;
+                _index++;
             }
+            
             //Getting the length of a number
-            int length = _Index - startIndex;
+            var length = _index - startIndex;
 
             //Get's the contents of the number, and replaces , with ., then makes it a CharArray so that I can join it in the text
-            char[] cha_text = _FileContents.Substring(startIndex, length).Replace(',', '.').ToCharArray();
+            var charArray = _source.Substring(startIndex, length).Replace(',', '.').ToCharArray();
 
             //Makes a string out of cha_text
-            string text = string.Join("", cha_text.Where<char>(e => !char.IsWhiteSpace(e) && !e.Equals('_')) );
+            var text = string.Join("", charArray.Where(e => !char.IsWhiteSpace(e) && !e.Equals('_')) );
             
             //Numbers cannot start with _ or have multiple . s.
             if (text.StartsWith('_'))
             {
                 //TODO: Make a logging system that throws errors :)
-                ErrorLogger.ReportNumberStartingWith_();
+                ErrorLogger.ReportNumberStartingWithUnderscore();
             }
 
             //Numbers cannot have multiple .s or ,s.
@@ -363,7 +366,6 @@ namespace Compiler.Lexing
             {
                 ErrorLogger.ReportInvalidNumber();
             }
-         
 
             if (isDecimal)
             {
@@ -376,11 +378,11 @@ namespace Compiler.Lexing
                 {
                     if (value >= float.MinValue && value <= float.MaxValue)
                     {
-                        _Current = (float)value;
+                        _currentValue = (float)value;
                     }
                     else
                     {
-                        _Current = value;
+                        _currentValue = value;
                     }
                 }
             }
@@ -394,19 +396,19 @@ namespace Compiler.Lexing
                 {
                     if (value <= int.MaxValue)
                     {
-                        _Current = (int)value;
+                        _currentValue = (int)value;
                     }
                     else if (value <= uint.MaxValue)
                     {
-                        _Current = (uint)value;
+                        _currentValue = (uint)value;
                     }
                     else
                     {
-                        _Current = value;
+                        _currentValue = value;
                     }
                 }
             }
-            _Index--;
+            _index--;
             //Console.WriteLine(_Current);
         }
     }

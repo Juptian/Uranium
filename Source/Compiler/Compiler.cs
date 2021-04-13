@@ -13,10 +13,11 @@ namespace Compiler
         {
             if(args.Length == 0)
             {
-                Console.WriteLine("You must specify a file");
+                Console.WriteLine("You must specify a file, or an input string");
                 return;
             }
-            string text = OpenFile(args[0]);
+            
+            var text = OpenFile(args[0]);
             var parser = new Parser(text);
 
             var syntaxTree = parser.Parse();
@@ -32,13 +33,15 @@ namespace Compiler
             {
                 Console.ForegroundColor = ConsoleColor.Red;
                 foreach (var diag in syntaxTree.Diagnostics)
+                {
                     Console.WriteLine(diag);
+                }
                 Console.ForegroundColor = color;
             } 
             else
             {
-                var e = new Evaluator(syntaxTree.Root);
-                var result = e.Evaluate();
+                var evaluator = new Evaluator(syntaxTree.Root);
+                var result = evaluator.Evaluate();
                 Console.WriteLine(result);
             }
 
@@ -50,16 +53,17 @@ namespace Compiler
         {
             if (string.IsNullOrWhiteSpace(filePath))
             {
-                throw new Exception("File path must not be empty");
+                throw new("File path must not be empty");
             }
             try
             {
-                return File.ReadAllText(filePath) + "\0";
+                return File.ReadAllText(filePath);
             }
             catch (Exception e)
             {
-                Console.WriteLine("Could not open file: " + e);
-                return null;
+                // We can catch it, and allow for a an input such as 
+                // `dotnet run (2 + 2)`
+                return filePath;
             }
         }
     }

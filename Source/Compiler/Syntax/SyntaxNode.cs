@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using Compiler.Lexing;
+﻿using System.Collections.Generic;
 
 namespace Compiler.Syntax
 {
-    abstract class SyntaxNode
+    internal abstract class SyntaxNode
     {
         public abstract SyntaxKind Kind { get; }
 

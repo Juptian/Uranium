@@ -9,14 +9,15 @@ namespace Compiler.Syntax
 {
     internal sealed class SyntaxTree
     {
-        public SyntaxTree(IEnumerable<string> diagnositcs, ExpressionSyntax root, SyntaxToken endOfFileToken)
+        public SyntaxTree(IEnumerable<string> diagnostics, ExpressionSyntax root, SyntaxToken endOfFileToken)
         {
-            Diagnostics = diagnositcs.ToArray();
+            Diagnostics = diagnostics.ToArray();
             Root = root;
             EndOfFileToken = endOfFileToken;
         }
 
         public IReadOnlyList<string> Diagnostics { get; }
         public ExpressionSyntax Root { get; }
-        public SyntaxToken EndOfFileToken { get; }    }
+        public SyntaxToken EndOfFileToken { get; }    
+    }
 }
