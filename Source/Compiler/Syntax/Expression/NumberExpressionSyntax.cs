@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections;
-using System.Linq;
-using Compiler.Lexing;
+﻿using System.Collections.Generic;
 
 namespace Compiler.Syntax.Expression
 {
-    sealed class NumberExpressionSyntax : ExpressionSyntax
+    internal sealed class NumberExpressionSyntax : ExpressionSyntax
     {
         public NumberExpressionSyntax(SyntaxToken numberToken)
         {

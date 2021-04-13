@@ -19,15 +19,14 @@ namespace Compiler.Syntax
         public override SyntaxKind Kind { get; }
         public int Position { get; }
         public string Text { get; }
-
-        public Object? Value;
+        public object? Value { get; }
 
         public override IEnumerable<SyntaxNode> GetChildren()
         {
             return Enumerable.Empty<SyntaxNode>();
         }
 
-        public override String ToString()
+        public override string ToString()
         {
             return $"{Kind}, {Position}, {Text}";
         }
