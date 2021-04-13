@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Compiler.Lexing;
+using Compiler.CodeAnalysis.Lexing;
 #pragma warning disable CS8632
-namespace Compiler.Syntax
+namespace Compiler.CodeAnalysis.Syntax
 {
     internal class SyntaxToken : SyntaxNode
     {

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Compiler.Syntax.Expression
+namespace Compiler.CodeAnalysis.Syntax.Expression
 {
     internal sealed class NumberExpressionSyntax : ExpressionSyntax
     {
@@ -13,7 +13,7 @@ namespace Compiler.Syntax.Expression
 
         public override IEnumerable<SyntaxNode> GetChildren()
         {
-            yield return NumberToken; 
+            yield return NumberToken;
         }
     }
 }

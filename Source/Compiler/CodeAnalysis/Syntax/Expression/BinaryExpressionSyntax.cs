@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using Compiler.CodeAnalysis.Syntax.Expression;
+using System.Collections.Generic;
 
-namespace Compiler.Syntax.Expression
+namespace Compiler.CodeAnalysis.Syntax.Expression
 {
     internal sealed class BinaryExpressionSyntax : ExpressionSyntax
     {
@@ -15,13 +16,13 @@ namespace Compiler.Syntax.Expression
         public SyntaxToken OperatorToken { get; }
         public ExpressionSyntax Right { get; }
 
-        public override SyntaxKind Kind => SyntaxKind.BinaryExpression;  
-        
+        public override SyntaxKind Kind => SyntaxKind.BinaryExpression;
+
         public override IEnumerable<SyntaxNode> GetChildren()
         {
             yield return Left;
             yield return OperatorToken;
             yield return Right;
-        } 
+        }
     }
 }

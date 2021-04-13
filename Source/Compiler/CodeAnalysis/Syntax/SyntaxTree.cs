@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Compiler.Syntax.Expression;
+using Compiler.CodeAnalysis.Syntax.Expression;
+using Compiler.CodeAnalysis.Parsing;
 
-namespace Compiler.Syntax
+namespace Compiler.CodeAnalysis.Syntax
 {
     internal sealed class SyntaxTree
     {
@@ -18,6 +19,12 @@ namespace Compiler.Syntax
 
         public IReadOnlyList<string> Diagnostics { get; }
         public ExpressionSyntax Root { get; }
-        public SyntaxToken EndOfFileToken { get; }    
+        public SyntaxToken EndOfFileToken { get; }
+
+        public static SyntaxTree Parse(string text)
+        {
+            var parser = new Parser(text);
+            return parser.Parse();
+        }
     }
 }

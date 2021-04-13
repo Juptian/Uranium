@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Compiler.Syntax.Expression
+namespace Compiler.CodeAnalysis.Syntax.Expression
 {
     internal class Evaluator
     {
@@ -10,23 +10,23 @@ namespace Compiler.Syntax.Expression
             _root = root;
         }
 
-        public long Evaluate()
+        public int Evaluate()
         {
             return EvaluateExpression(_root);
         }
-        
+
         private int EvaluateExpression(ExpressionSyntax node)
         {
-            if(node is NumberExpressionSyntax n)
+            if (node is NumberExpressionSyntax n)
             {
-                return (int) n.NumberToken.Value;
+                return (int)n.NumberToken.Value;
             }
-            if(node is BinaryExpressionSyntax b)
+            if (node is BinaryExpressionSyntax b)
             {
                 var left = EvaluateExpression(b.Left);
                 var right = EvaluateExpression(b.Right);
 
-                switch(b.OperatorToken.Kind)
+                switch (b.OperatorToken.Kind)
                 {
                     case SyntaxKind.Plus:
                         return left + right;
@@ -37,12 +37,8 @@ namespace Compiler.Syntax.Expression
                     case SyntaxKind.Divide:
                         return left / right;
                     case SyntaxKind.Pow:
-                        long result = left;
-                        for(long i = 0; i < right; i++)
-                        {
-                            result *= right;
-                        }
-                        return (int)result;
+                        
+                        return (int)Math.Pow( (double) left, (double)right);
                     default:
                         // We can throw exceptions here because we've exhausted all options,
                         // and this is an internal compiler error, should handle this more gracefully,

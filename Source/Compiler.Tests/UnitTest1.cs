@@ -1,6 +1,6 @@
 using NUnit.Framework;
-using Compiler.Lexing;
-using Compiler.Syntax;
+using Compiler.CodeAnalysis.Lexing;
+using Compiler.CodeAnalysis.Syntax;
 using System;
 
 namespace Compiler.Tests

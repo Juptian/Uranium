@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using Compiler.Logging;
-using Compiler.Syntax;
-#pragma warning disable CS8632
-namespace Compiler.Lexing
+using Compiler.CodeAnalysis.Syntax;
+
+namespace Compiler.CodeAnalysis.Lexing
 {
     internal sealed class Lexer
     {
@@ -17,16 +17,16 @@ namespace Compiler.Lexing
         private int _index;
         private SyntaxKind _current;
         public object _currentValue;
-        
+
         private readonly List<string> _diagnostics = new();
-        
+
         public Lexer(string contents)
         {
             _source = contents;
-            for(var i = 0; i < contents.Length; i++)
+            /*for (var i = 0; i < contents.Length; i++)
             {
                 Console.WriteLine($"{contents[i]}, {i}");
-            }
+            }*/
         }
 
         public IEnumerable<string> Diagnostics => _diagnostics;
@@ -39,7 +39,7 @@ namespace Compiler.Lexing
             {
                 return new(SyntaxKind.EndOfFile, _index, "\0", null);
             }
-            
+
             Console.Write($"{_current}, ");
             Console.WriteLine($"{_index}, {_currentIndex}");
             _index++;
@@ -63,7 +63,7 @@ namespace Compiler.Lexing
             {
                 return true;
             }
-            
+
             return false;
         }
 
@@ -72,9 +72,9 @@ namespace Compiler.Lexing
             var finished = false;
             var start = _index;
             _current = SyntaxKind.BadToken;
-            while(!finished)
+            while (!finished)
             {
-                switch(_currentIndex)
+                switch (_currentIndex)
                 {
                     //Special characters
                     case '\r':
@@ -104,7 +104,7 @@ namespace Compiler.Lexing
                         break;
                 }
                 var length = _index - start;
-                if(length > 0)
+                if (length > 0)
                 {
                     var text = _source.Substring(start, length);
                     _tokens.Add(new(_current, _index, text, text));
@@ -130,7 +130,10 @@ namespace Compiler.Lexing
                     if (Match('=', 1))
                         _current = SyntaxKind.MultiplyEquals;
                     else if (Match('*', 1))
+                    {
                         _current = SyntaxKind.Pow;
+                        _index++;
+                    }
                     else
                         _current = SyntaxKind.Multiply;
                     break;
@@ -149,7 +152,7 @@ namespace Compiler.Lexing
                     }
                     else
                         _current = SyntaxKind.Divide;
-                    
+
                     break;
                 case '>':
                     _current = Match('=', 1) ? SyntaxKind.GreaterThanEquals : SyntaxKind.GreaterThan;
@@ -178,7 +181,7 @@ namespace Compiler.Lexing
                     _current = SyntaxKind.Tilde;
                     break;
                 #endregion
-                
+
                 //Numbers
                 case '0':
                 case '1':
@@ -193,7 +196,7 @@ namespace Compiler.Lexing
                     ReadNum();
                     _current = SyntaxKind.NumberToken;
                     break;
-                
+
                 //Pure syntax
                 case ';':
                     _current = SyntaxKind.Semicolon;
@@ -229,10 +232,10 @@ namespace Compiler.Lexing
 
         private void ReadLineBreak()
         {
-            if(_currentIndex == '\r' && _nextIndex == '\n')
+            if (_currentIndex == '\r' && _nextIndex == '\n')
             {
                 _index += 2;
-            } 
+            }
             else
             {
                 _index++;
@@ -242,9 +245,9 @@ namespace Compiler.Lexing
         private void ReadWhitespace()
         {
             var done = false;
-            while(!done)
+            while (!done)
             {
-                switch(_currentIndex)
+                switch (_currentIndex)
                 {
                     case '\0':
                     case '\r':
@@ -255,7 +258,7 @@ namespace Compiler.Lexing
                         if (!char.IsWhiteSpace(_currentIndex))
                             done = true;
                         else
-                           _index++;
+                            _index++;
                         break;
                 }
             }
@@ -266,9 +269,9 @@ namespace Compiler.Lexing
             _index++;
             var finished = false;
             var startIndex = _index;
-            while(!finished)
+            while (!finished)
             {
-                switch(_currentIndex)
+                switch (_currentIndex)
                 {
                     case '\0':
                     case '\r':
@@ -281,7 +284,7 @@ namespace Compiler.Lexing
                 }
             }
             _currentValue = SyntaxKind.SingleLineComment;
-            
+
             //Commented out, is here for debug purposes
             /*var length = _Index - startIndex;
             Console.WriteLine(_FileContents.Substring(startIndex, length));*/
@@ -292,9 +295,9 @@ namespace Compiler.Lexing
             _index++;
             var finished = false;
             var startIndex = _index;
-            while(!finished)
+            while (!finished)
             {
-                switch(_currentIndex)
+                switch (_currentIndex)
                 {
 
                     case '\0':
@@ -302,11 +305,11 @@ namespace Compiler.Lexing
                         _current = SyntaxKind.EndOfFile;
                         return;
                     case '*':
-                        if(_nextIndex.Equals('/'))
+                        if (_nextIndex.Equals('/'))
                         {
                             _index++;
                             finished = true;
-                        } 
+                        }
                         _index++;
                         break;
                     default:
@@ -344,7 +347,7 @@ namespace Compiler.Lexing
                 }
                 _index++;
             }
-            
+
             //Getting the length of a number
             var length = _index - startIndex;
 
@@ -352,8 +355,8 @@ namespace Compiler.Lexing
             var charArray = _source.Substring(startIndex, length).Replace(',', '.').ToCharArray();
 
             //Makes a string out of cha_text
-            var text = string.Join("", charArray.Where(e => !char.IsWhiteSpace(e) && !e.Equals('_')) );
-            
+            var text = string.Join("", charArray.Where(e => !char.IsWhiteSpace(e) && !e.Equals('_')));
+
             //Numbers cannot start with _ or have multiple . s.
             if (text.StartsWith('_'))
             {

@@ -1,11 +1,11 @@
 ﻿using System;
-using Compiler.Lexing;
-using Compiler.Syntax;
-using Compiler.Syntax.Expression;
+using Compiler.CodeAnalysis.Lexing;
+using Compiler.CodeAnalysis.Syntax.Expression;
 using System.Collections.Generic;
 using System.Linq;
+using Compiler.CodeAnalysis.Syntax;
 
-namespace Compiler.Parsing
+namespace Compiler.CodeAnalysis.Parsing
 {
     internal class Parser
     {
@@ -26,13 +26,13 @@ namespace Compiler.Parsing
                 {
                     tokens.Add(token);
                 }
-            } 
+            }
             while (token.Kind != SyntaxKind.EndOfFile);
             _tokens = tokens.ToArray();
         }
 
         public IEnumerable<string> Diagnostics => _diagnostics;
-        
+
         private SyntaxToken Peek(int offset)
         {
             var index = _position + offset;
@@ -40,17 +40,17 @@ namespace Compiler.Parsing
             {
                 return _tokens[^1];
             }
-            
+
             return _tokens[index];
         }
 
-        private SyntaxToken NextToken() 
+        private SyntaxToken NextToken()
         {
             var current = _current;
             _position++;
             return current;
         }
-            
+
         private SyntaxToken Match(SyntaxKind kind)
         {
             if (_current.Kind == kind)
@@ -58,7 +58,7 @@ namespace Compiler.Parsing
                 return NextToken();
             }
 
-            //_diagnostics.Add($"Unexpected token: {Current.Kind}, expected {kind}");
+            _diagnostics.Add($"Unexpected token: {_current.Kind}, expected {kind}");
 
             return new(kind, _current.Position, null, null);
         }
@@ -78,9 +78,9 @@ namespace Compiler.Parsing
 
         private ExpressionSyntax ParseTerm()
         {
-            var left = ParsePrimaryExpression();
+            var left = ParseFactor();
 
-            while(_current.Kind == SyntaxKind.Plus || _current.Kind == SyntaxKind.Minus)
+            while (_current.Kind == SyntaxKind.Plus || _current.Kind == SyntaxKind.Minus)
             {
                 if (_position >= _tokens.Length)
                 {
@@ -98,7 +98,7 @@ namespace Compiler.Parsing
         {
             var left = ParsePrimaryExpression();
 
-            while( _current.Kind == SyntaxKind.Divide || _current.Kind == SyntaxKind.Pow || _current.Kind == SyntaxKind.Multiply)
+            while (_current.Kind == SyntaxKind.Divide || _current.Kind == SyntaxKind.Pow || _current.Kind == SyntaxKind.Multiply)
             {
                 if (_position >= _tokens.Length)
                 {
@@ -115,14 +115,14 @@ namespace Compiler.Parsing
 
         private ExpressionSyntax ParsePrimaryExpression()
         {
-            if(_current.Kind == SyntaxKind.OpenParenthesis)
+            if (_current.Kind == SyntaxKind.OpenParenthesis)
             {
                 var left = NextToken();
                 var expression = ParseExpression();
                 var right = Match(SyntaxKind.CloseParenthesis);
                 return new ParenthesizedExpressionSyntax(left, expression, right);
             }
-            
+
             var numberToken = Match(SyntaxKind.NumberToken);
             return new NumberExpressionSyntax(numberToken);
         }
@@ -132,8 +132,8 @@ namespace Compiler.Parsing
             var marker = isLast ? "└───" : "├───";
 
             Console.Write(indent + marker + node.Kind);
-            
-            if(node is SyntaxToken t && t.Value != null)
+
+            if (node is SyntaxToken t && t.Value != null)
             {
                 Console.Write(" " + t.Value);
             }

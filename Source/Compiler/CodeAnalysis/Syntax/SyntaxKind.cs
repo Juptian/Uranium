@@ -1,5 +1,5 @@
-﻿namespace Compiler.Syntax
-{
+﻿namespace Compiler.CodeAnalysis.Syntax
+{ 
     public enum SyntaxKind 
     {
         //Math symbols
@@ -67,7 +67,7 @@
         //Bool keywords
         TrueKeyword,
         FalseKeyword,
-        
+
         //Type keywords
         ClassKeyword,
         StructKeyword,
@@ -89,7 +89,7 @@
         VariableDeclaration,
         ForStatement,
         ExpressionStatement,
-        ReturnStatement, 
+        ReturnStatement,
         WhileStatement,
         DoWhileStatement,
 
@@ -109,7 +109,7 @@
 
         //End of file
         EndOfFile,
-        
+
         //Token be bad
         BadToken
     }

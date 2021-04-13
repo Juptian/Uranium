@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Compiler.Syntax.Expression
+namespace Compiler.CodeAnalysis.Syntax.Expression
 {
     internal sealed class ParenthesizedExpressionSyntax : ExpressionSyntax
     {
@@ -8,7 +8,7 @@ namespace Compiler.Syntax.Expression
         {
             OpenParenthesisToken = openParenthesisToken;
             Expression = expression;
-            ClosedParenthesisToken = closedParenthesisToken; 
+            ClosedParenthesisToken = closedParenthesisToken;
         }
         public SyntaxToken OpenParenthesisToken { get; }
         public ExpressionSyntax Expression { get; }

@@ -1,4 +1,4 @@
 ﻿
 dotnet test
-dotnet run test.txt
+dotnet run test.txt --#showtree
 PAUSE

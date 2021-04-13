@@ -1,9 +1,10 @@
 ﻿using System;
-using Compiler.Lexing;
-using Compiler.Parsing;
-using Compiler.Syntax.Expression;
+using Compiler.CodeAnalysis.Lexing;
+using Compiler.CodeAnalysis.Syntax.Expression;
 using System.Linq;
 using System.IO;
+using Compiler.CodeAnalysis.Syntax;
+using Compiler.CodeAnalysis.Parsing;
 
 namespace Compiler
 {
@@ -11,6 +12,7 @@ namespace Compiler
     {
         public static void Emit(string[] args)
         {
+            bool showTree = false;
             if(args.Length == 0)
             {
                 Console.WriteLine("You must specify a file, or an input string");
@@ -18,16 +20,26 @@ namespace Compiler
             }
             
             var text = OpenFile(args[0]);
-            var parser = new Parser(text);
 
-            var syntaxTree = parser.Parse();
+            for(int i = 1; i < args.Length; i++)
+            {
+                Console.WriteLine(args[i]);
+                if(args[i].Equals("--#SHOWTREE", StringComparison.OrdinalIgnoreCase))
+                {
+                    showTree ^= true;
+                    Console.WriteLine(showTree ? "Now showing syntax tree" : "No longer showing syntax tree"); 
+                }
+            }
 
-            var color = Console.ForegroundColor;
-            Console.ForegroundColor = ConsoleColor.Yellow;
-
-            Parser.PrettyPrint(syntaxTree.Root);
-
-            Console.ForegroundColor = color;
+            var syntaxTree = SyntaxTree.Parse(text);
+             var color = Console.ForegroundColor;
+            
+            if(showTree)
+            {
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Parser.PrettyPrint(syntaxTree.Root);
+                Console.ForegroundColor = color;
+            }
 
             if(syntaxTree.Diagnostics.Any())
             {
