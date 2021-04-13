@@ -21,6 +21,23 @@ namespace Compiler.CodeAnalysis.Syntax.Expression
             {
                 return (int)n.LiteralToken.Value;
             }
+            if(node is UnaryExpressionSyntax u)
+            {
+                var operand = EvaluateExpression(u.Operand);
+
+                if(u.OperatorToken.Kind == SyntaxKind.Plus)
+                {
+                    return operand;
+                }
+                else if(u.OperatorToken.Kind == SyntaxKind.Minus)
+                {
+                    return -operand;
+                }
+
+                Console.Error.WriteLine($"Unexpected unary operator {u.OperatorToken.Kind}");
+            }
+
+
             if (node is BinaryExpressionSyntax b)
             {
                 var left = EvaluateExpression(b.Left);

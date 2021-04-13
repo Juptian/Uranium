@@ -40,8 +40,8 @@ namespace Compiler.CodeAnalysis.Lexing
                 return new(SyntaxKind.EndOfFile, _index, "\0", null);
             }
 
-            Console.Write($"{_current}, ");
-            Console.WriteLine($"{_index}, {_currentIndex}");
+            /*Console.Write($"{_current}, ");
+            Console.WriteLine($"{_index}, {_currentIndex}");*/
             _index++;
             return new(_current, _index, _currentIndex.ToString(), _currentValue);
         }

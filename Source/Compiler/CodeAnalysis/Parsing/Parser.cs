@@ -74,12 +74,26 @@ namespace Compiler.CodeAnalysis.Parsing
         //Allowing for proper operator precedence
         private ExpressionSyntax ParseExpression(int parentPrecedence = 0)
         {
-            var left = ParsePrimaryExpression();
+
+            ExpressionSyntax left;
+            var unaryOperatorPrecedence = _current.Kind.GetUnaryOperatorPrecedence();
+            
+            //Allowing for unary operator precedence
+            if(unaryOperatorPrecedence != 0 && unaryOperatorPrecedence >= parentPrecedence)
+            {
+                var operatorToken = NextToken();
+                var operand = ParseExpression(unaryOperatorPrecedence);
+                left = new UnaryExpressionSyntax(operatorToken, operand);
+            }
+            else
+            {
+                left = ParsePrimaryExpression();
+            }
             
             //Keep looping until our precedence is <= parent precedence, or == 0;
             while(true)
             {
-                var precedence = GetBinaryOperatorPrecedence(_current.Kind);
+                var precedence = _current.Kind.GetBinaryOperatorPrecedence();
                 if(precedence == 0 || precedence <= parentPrecedence)
                 {
                     break;
@@ -94,26 +108,6 @@ namespace Compiler.CodeAnalysis.Parsing
             return left;
         }
 
-        private static int GetBinaryOperatorPrecedence(SyntaxKind kind)
-        {
-            switch(kind)
-            {
-                //Just operator precedence
-                case SyntaxKind.Plus:
-                case SyntaxKind.Minus:
-                    return 1;
-
-                case SyntaxKind.Multiply:
-                case SyntaxKind.Divide:
-                    return 2;
-
-                case SyntaxKind.Pow:
-                    return 3;
-
-                default:
-                    return 0;
-            }
-        }
 
         private ExpressionSyntax ParsePrimaryExpression()
         {
