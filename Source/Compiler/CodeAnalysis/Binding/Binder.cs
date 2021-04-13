@@ -13,24 +13,13 @@ namespace Compiler.CodeAnalysis.Binding
     {
         //Binding the expression
         public BoundExpression BindExpression(ExpressionSyntax syntax)
-        {
-            //Calling the correct function based off of the syntax kind
-            //Also returning it's value
-            switch(syntax.Kind)
+            => syntax.Kind switch // Calling the correct function based off of the syntax kind and returning it's value.
             {
-                case SyntaxKind.BinaryExpression:
-                    return BindBinaryExpression((BinaryExpressionSyntax)syntax);
-                
-                case SyntaxKind.UnaryExpression:
-                    return BindUnaryExpression((UnaryExpressionSyntax)syntax);
-                
-                case SyntaxKind.LiteralExpression:
-                    return BindLiteralExpression((LiteralExpressionSyntax)syntax);
-
-                default:
-                    throw new($"Unexpected syntax {syntax.Kind}");
-            }
-        }
+                SyntaxKind.BinaryExpression => BindBinaryExpression((BinaryExpressionSyntax)syntax),
+                SyntaxKind.UnaryExpression => BindUnaryExpression((UnaryExpressionSyntax)syntax),
+                SyntaxKind.LiteralExpression => BindLiteralExpression((LiteralExpressionSyntax)syntax),
+                _ => throw new($"Unexpected syntax {syntax.Kind}"),
+            };
 
         //Diagnostics, pretty neat not gonna lie
         private readonly List<string> _diagnostics = new();
@@ -93,15 +82,12 @@ namespace Compiler.CodeAnalysis.Binding
                 return null;
             // If the unary operator is not a + or - we throw an error
             // Because you can't just do /10 for example, you need another expression
-            switch(kind)
+            return kind switch
             {
-                case SyntaxKind.Plus:
-                    return BoundUnaryOperatorKind.Identity;
-                case SyntaxKind.Minus:
-                    return BoundUnaryOperatorKind.Negation;
-                default:
-                    throw new($"Unexpected unary operator {kind}");
-            }           
+                SyntaxKind.Plus => BoundUnaryOperatorKind.Identity,
+                SyntaxKind.Minus => BoundUnaryOperatorKind.Negation,
+                _ => throw new($"Unexpected unary operator {kind}"),
+            };
         }
 
         private BoundBinaryOperatorKind? BindBinaryOperatorKind(SyntaxKind kind, Type leftType, Type rightType)
@@ -111,27 +97,18 @@ namespace Compiler.CodeAnalysis.Binding
             {
                 return null;
             }
-            
+
             //If we get pass the null check, we check what operator is used
             //Then we will use it in the evaluator according to the result
-            switch(kind)
+            return kind switch
             {
-                case SyntaxKind.Plus:
-                    return BoundBinaryOperatorKind.Addition;
-                case SyntaxKind.Minus:
-                    return BoundBinaryOperatorKind.Subtraction;
-                case SyntaxKind.Multiply:
-                    return BoundBinaryOperatorKind.Multiplication;
-                case SyntaxKind.Divide:
-                    return BoundBinaryOperatorKind.Division;
-                case SyntaxKind.Pow:
-                    return BoundBinaryOperatorKind.Pow;
-
-                default:
-                    throw new($"Unexpected binary operator {kind}");
-            }              
+                SyntaxKind.Plus => BoundBinaryOperatorKind.Addition,
+                SyntaxKind.Minus => BoundBinaryOperatorKind.Subtraction,
+                SyntaxKind.Multiply => BoundBinaryOperatorKind.Multiplication,
+                SyntaxKind.Divide => BoundBinaryOperatorKind.Division,
+                SyntaxKind.Pow => BoundBinaryOperatorKind.Pow,
+                _ => throw new($"Unexpected binary operator {kind}"),
+            };
         }
-
-
     }
 }
