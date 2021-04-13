@@ -15,23 +15,23 @@ namespace Compiler.CodeAnalysis.Syntax.Expression
             _root = root;
         }
 
-        public int Evaluate()
+        public object Evaluate()
         {
             return EvaluateExpression(_root);
         }
 
-        private int EvaluateExpression(BoundExpression node)
+        private object EvaluateExpression(BoundExpression node)
         {
             //if it's a literal expression, return it's value
             if (node is BoundLiteralExpression n) 
             {
-                return (int)n.Value;
+                return n.Value;
             }
             //if it's a Unary expression, we just evaluate the operand
             //and return it's value according to the symbol
             else if(node is BoundUnaryExpression u)
             {
-                var operand = EvaluateExpression(u.Operand);
+                var operand = (int)EvaluateExpression(u.Operand);
 
                 if(u.OperatorKind == BoundUnaryOperatorKind.Identity)
                 {
@@ -49,8 +49,8 @@ namespace Compiler.CodeAnalysis.Syntax.Expression
             //then return a value based off of the current operator kind
             else if (node is BoundBinaryExpression b)
             {
-                var left = EvaluateExpression(b.Left);
-                var right = EvaluateExpression(b.Right);
+                var left = (int)EvaluateExpression(b.Left);
+                var right = (int)EvaluateExpression(b.Right);
 
                 switch (b.OperatorKind)
                 {
@@ -65,7 +65,7 @@ namespace Compiler.CodeAnalysis.Syntax.Expression
                     case BoundBinaryOperatorKind.Pow:
                         //This is terrible, don't do this
                         //I just haven't added support for multiple types yet, and Math.Pow only takes doubles 
-                        return (int)Math.Pow( (double) left, (double)right);
+                        return Math.Pow( (double) left, (double)right);
                     
                     default:
                         //We can throw exceptions here because we've exhausted all options,

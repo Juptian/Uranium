@@ -20,10 +20,13 @@ namespace Compiler.CodeAnalysis.Binding
             {
                 case SyntaxKind.BinaryExpression:
                     return BindBinaryExpression((BinaryExpressionSyntax)syntax);
+                
                 case SyntaxKind.UnaryExpression:
                     return BindUnaryExpression((UnaryExpressionSyntax)syntax);
+                
                 case SyntaxKind.LiteralExpression:
                     return BindLiteralExpression((LiteralExpressionSyntax)syntax);
+
                 default:
                     throw new($"Unexpected syntax {syntax.Kind}");
             }
@@ -39,7 +42,7 @@ namespace Compiler.CodeAnalysis.Binding
         {
             //Value is being parsed into a nullable int
             //That then gets checked to see if it's null, and gets assigned to 0 if it is.
-            var value = syntax.LiteralToken.Value as int? ?? 0;
+            var value = syntax.Value ?? 0;
             return new BoundLiteralExpression(value);
         }
 
@@ -47,13 +50,17 @@ namespace Compiler.CodeAnalysis.Binding
         {
             var boundOperand = BindExpression(syntax.Operand);
             var boundOperatorKind = BindUnaryOperatorKind(syntax.OperatorToken.Kind, boundOperand.Type);
-            
+             Console.WriteLine(boundOperatorKind);
+            Console.WriteLine(boundOperatorKind is null);
+           
             //Checking to see if the result of our BindUnaryOperatorKind call is null
             //And reporting it to the diagnostics
             //Then returning our boundOperand
-            if(boundOperatorKind == null)
+            if(boundOperatorKind is null)
             {
+                Console.WriteLine(_diagnostics.Count);
                 _diagnostics.Add($"Unary operand {syntax.OperatorToken.Text} is not defined for {boundOperand.Type}!");
+                Console.WriteLine(_diagnostics.Count);
                 return boundOperand;
             }
             
@@ -66,8 +73,9 @@ namespace Compiler.CodeAnalysis.Binding
             var boundLeft = BindExpression(syntax.Left);
             var boundRight = BindExpression(syntax.Right);
 
-            var boundOperatorKind = BindBinaryOperatorKind(syntax.OperatorToken.Kind, boundLeft.Type, boundRight.Type);     
-            
+            var boundOperatorKind = BindBinaryOperatorKind(syntax.OperatorToken.Kind, boundLeft.Type, boundRight.Type);
+             Console.WriteLine(boundOperatorKind);
+           
             //Same as in the BindUnaryExpression but we return our boundLeft instead
             if(boundOperatorKind == null)
             {

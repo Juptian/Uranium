@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using Compiler.Logging;
 using Compiler.CodeAnalysis.Syntax;
+//Nobody gives a shit about you error
+//I know that the string is nullable, no need to remind me!
+#pragma warning disable CS8632 
 
 namespace Compiler.CodeAnalysis.Lexing
 {
@@ -16,7 +19,9 @@ namespace Compiler.CodeAnalysis.Lexing
 
         private int _index;
         private SyntaxKind _current;
+        private string? _text;
         public object _currentValue;
+
 
         private readonly List<string> _diagnostics = new();
 
@@ -43,6 +48,10 @@ namespace Compiler.CodeAnalysis.Lexing
             /*Console.Write($"{_current}, ");
             Console.WriteLine($"{_index}, {_currentIndex}");*/
             _index++;
+            if(_text != null)
+            {
+                return new(_current, _index, _text, _currentValue);
+            }
             return new(_current, _index, _currentIndex.ToString(), _currentValue);
         }
 
@@ -115,6 +124,23 @@ namespace Compiler.CodeAnalysis.Lexing
         //Literally lexes a single character
         public SyntaxKind LexToken(char ch)
         {
+            if(char.IsLetter(ch))
+            {
+                var start = _index;
+                while (char.IsLetter(_currentIndex))
+                {
+                    _index++;
+                }
+                    
+                var length = _index - start;
+                var text = _source.Substring(start, length);
+                var kind = SyntaxFacts.GetKeywordKind(text);
+                _current = kind;
+                _text = text;
+                _index--;
+                return _current;
+            }
+
             _current = SyntaxKind.BadToken;
             switch (ch)
             {
@@ -226,7 +252,6 @@ namespace Compiler.CodeAnalysis.Lexing
                 default:
                     throw new($"Unexpected Syntax Kind: {_current}");
             }
-
             return _current;
         }
 

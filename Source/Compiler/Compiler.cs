@@ -31,7 +31,7 @@ namespace Compiler
                 switch(args[i].ToUpper())
                 {
                     case "--#SHOWTREE":
-                        showTree ^= true;
+                        showTree = true;
                         Console.WriteLine(showTree ? "Now showing syntax tree" : "No longer showing syntax tree"); 
                         break;
                     default:
@@ -61,7 +61,7 @@ namespace Compiler
 
                 //Literally just looping over each diagnostic,
                 //to fucking yeet them at us
-                foreach (var diag in syntaxTree.Diagnostics)
+                foreach (var diag in diagnostics)
                 {
                     Console.WriteLine(diag);
                 }

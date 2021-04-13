@@ -111,16 +111,26 @@ namespace Compiler.CodeAnalysis.Parsing
 
         private ExpressionSyntax ParsePrimaryExpression()
         {
-            if (_current.Kind == SyntaxKind.OpenParenthesis)
+            //Converted to switch before we get too many checks
+            switch(_current.Kind)
             {
-                var left = NextToken();
-                var expression = ParseExpression();
-                var right = MatchToken(SyntaxKind.CloseParenthesis);
-                return new ParenthesizedExpressionSyntax(left, expression, right);
-            }
+                case SyntaxKind.OpenParenthesis:
+                    var left = NextToken();
+                    var expression = ParseExpression();
+                    var right = MatchToken(SyntaxKind.CloseParenthesis);
+                    return new ParenthesizedExpressionSyntax(left, expression, right);
+                
+                case SyntaxKind.TrueKeyword:
+                case SyntaxKind.FalseKeyword:
+                    var keywordToken = NextToken();
+                    var value = _current.Kind == SyntaxKind.TrueKeyword;
+                    return new LiteralExpressionSyntax(keywordToken, value);
 
-            var numberToken = MatchToken(SyntaxKind.NumberToken);
-            return new LiteralExpressionSyntax(numberToken);
+                default:
+                    var numberToken = MatchToken(SyntaxKind.NumberToken);
+                    return new LiteralExpressionSyntax(numberToken);
+
+            }       
         }
 
         public static void PrettyPrint(SyntaxNode node, string indent = "", bool isLast = true)
