@@ -2,6 +2,8 @@
 
 namespace Compiler.CodeAnalysis.Syntax.Expression
 {
+    //This allows for parenthesized expressions to work
+    //Mostly
     internal sealed class ParenthesizedExpressionSyntax : ExpressionSyntax
     {
         public ParenthesizedExpressionSyntax(SyntaxToken openParenthesisToken, ExpressionSyntax expression, SyntaxToken closedParenthesisToken)

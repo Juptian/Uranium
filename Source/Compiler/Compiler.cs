@@ -3,8 +3,11 @@ using Compiler.CodeAnalysis.Lexing;
 using Compiler.CodeAnalysis.Syntax.Expression;
 using System.Linq;
 using System.IO;
+using System.Collections;
+using System.Collections.Generic;
 using Compiler.CodeAnalysis.Syntax;
 using Compiler.CodeAnalysis.Parsing;
+using Compiler.CodeAnalysis.Binding;
 
 namespace Compiler
 {
@@ -21,17 +24,29 @@ namespace Compiler
             
             var text = OpenFile(args[0]);
 
+            //Looping over the args to check if they want to show the tree
             for(int i = 1; i < args.Length; i++)
             {
-                Console.WriteLine(args[i]);
-                if(args[i].Equals("--#SHOWTREE", StringComparison.OrdinalIgnoreCase))
+                //Using a switch statement here for future proofing!
+                switch(args[i].ToUpper())
                 {
-                    showTree ^= true;
-                    Console.WriteLine(showTree ? "Now showing syntax tree" : "No longer showing syntax tree"); 
+                    case "--#SHOWTREE":
+                        showTree ^= true;
+                        Console.WriteLine(showTree ? "Now showing syntax tree" : "No longer showing syntax tree"); 
+                        break;
+                    default:
+                        break;
                 }
             }
 
-            var syntaxTree = SyntaxTree.Parse(text);            
+            var syntaxTree = SyntaxTree.Parse(text);
+            var binder = new Binder();
+            var boundExpression = binder.BindExpression(syntaxTree.Root);
+
+            //We concat the binder's diagnostics, and the syntax tree's diagnostics in case of ANY errors
+            var diagnostics = syntaxTree.Diagnostics.Concat(binder.Diagnostics).ToArray();
+            
+            //Displaying the tree if the program is ran with --#showTree
             if(showTree)
             {
                 Console.ForegroundColor = ConsoleColor.Yellow;
@@ -39,26 +54,33 @@ namespace Compiler
                 Console.ResetColor();    
             }
 
-            if(syntaxTree.Diagnostics.Any())
+            //If there are any diagnostics, we print them in red
+            if(diagnostics.Any())
             {
                 Console.ForegroundColor = ConsoleColor.Red;
+
+                //Literally just looping over each diagnostic,
+                //to fucking yeet them at us
                 foreach (var diag in syntaxTree.Diagnostics)
                 {
                     Console.WriteLine(diag);
                 }
+                //Reset the color so that it doesn't look bad
                 Console.ResetColor(); 
             } 
             else
             {
-                var evaluator = new Evaluator(syntaxTree.Root);
+                //Evaluate expressions!
+                var evaluator = new Evaluator(boundExpression);
                 var result = evaluator.Evaluate();
+                
+                //And of course we gotta log the values
                 Console.WriteLine(result);
             }
-
-            //Lexer lexer = new( OpenFile(args[0]) );
-            //lexer.NextToken();
+        
         }
-
+        
+        //As the title would suggest, it opens a file, and returns it's contents
         private static string OpenFile(string filePath)
         {
             if (string.IsNullOrWhiteSpace(filePath))

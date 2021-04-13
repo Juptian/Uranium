@@ -2,6 +2,7 @@
 
 namespace Compiler.CodeAnalysis.Syntax.Expression
 {
+    //Just a literal expression, it has a token, and that's it!
     internal sealed class LiteralExpressionSyntax : ExpressionSyntax
     {
         public LiteralExpressionSyntax(SyntaxToken literalToken)

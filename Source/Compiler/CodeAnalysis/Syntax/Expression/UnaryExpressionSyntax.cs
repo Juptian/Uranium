@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace Compiler.CodeAnalysis.Syntax.Expression
 {
+    //BoundUnaryExpression but syntax
     internal sealed class UnaryExpressionSyntax : ExpressionSyntax
     {
         public UnaryExpressionSyntax(SyntaxToken operatorToken, ExpressionSyntax operand)

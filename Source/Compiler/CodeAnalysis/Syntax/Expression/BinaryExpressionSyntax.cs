@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 namespace Compiler.CodeAnalysis.Syntax.Expression
 {
+    //Basically just the BoundBinaryExpression but it's syntax instead
     internal sealed class BinaryExpressionSyntax : ExpressionSyntax
     {
         public BinaryExpressionSyntax(ExpressionSyntax left, SyntaxToken operatorToken, ExpressionSyntax right)
