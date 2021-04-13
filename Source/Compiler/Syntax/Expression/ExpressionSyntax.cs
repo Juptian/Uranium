@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Compiler.Parser
+namespace Compiler.Syntax.Expression
 {
-    class Parser
+    abstract class ExpressionSyntax : SyntaxNode
     {
     }
 }

@@ -7,9 +7,6 @@ namespace Main
     {
         static void Main(string[] args)
         {
-            Tests tests = new();
-            tests.RunTests();
-
             Compiler.Compiler.Emit(args);
         }
     }

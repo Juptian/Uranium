@@ -1,6 +1,6 @@
-﻿namespace Compiler.Lexing
+﻿namespace Compiler.Syntax
 {
-    public enum TokenType
+    public enum SyntaxKind 
     {
         //Math symbols
         Plus,
@@ -49,7 +49,7 @@
         BangEquals,
 
         //Temp
-        Number,
+        NumberToken,
 
         //Logic keywords
         IfKeyword,
@@ -92,7 +92,21 @@
         ReturnStatement, 
         WhileStatement,
         DoWhileStatement,
-        
+
+
+        // Expressions
+        AssignmentExpression,
+        BinaryExpression,
+        CallExpression,
+        CompoundAssignmentExpression,
+        LiteralExpression,
+        MemberAccessExpression,
+        NameExpression,
+        ParenthesizedExpression,
+        UnaryExpression,
+        NamespaceDeclaration,
+        NumberExpression,
+
         //End of file
         EndOfFile,
         

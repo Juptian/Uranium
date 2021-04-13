@@ -2,65 +2,68 @@
 using System.Collections.Generic;
 using System.Linq;
 using Compiler.Logging;
-
+using Compiler.Syntax;
+#pragma warning disable CS8632
 namespace Compiler.Lexing
 {
-    public class Lexer
+    sealed class Lexer
     {
 
         public Lexer(string contents)
         {
-            m_FileContents = contents;
+            _FileContents = contents;
+            for(int i = 0; i < contents.Length; i++)
+            {
+                Console.WriteLine(contents[i].ToString() + ", " + i);
+            }
         }
 
-        private readonly string m_FileContents;
-        private readonly List<Token> m_TokenizedList = new();
-        private int m_Index = 0;
-#nullable enable
-        public object? m_Current;
-#nullable disable
+        private readonly string _FileContents;
+        private readonly List<SyntaxToken> _TokenizedList = new();
+        private int _Index = 0;
+
+        public object? _Current;
+
         private char CurrentIndex => Peek(0);
         private char NextIndex => Peek(1);
-        private TokenType current;
+        private SyntaxKind current;
 
-        
+        private readonly List<string> _diagnostics = new();
 
-        public void LexFile()
+        public IEnumerable<string> Diagnostics => _diagnostics;
+
+        public SyntaxToken NextToken()
         {
-            for (; m_Index < m_FileContents.Length; m_Index++)
-            {
-                ReadSpecialChars(false);
-                LexTokens(m_FileContents[m_Index]);
-            }
-            /*foreach (Token t in m_TokenizedList)
-            {
-                Console.WriteLine(t);
-            }*/
+            ReadSpecialChars(true);
+            LexTokens(CurrentIndex);
+            if (_Index == _FileContents.Length)
+                return new SyntaxToken(SyntaxKind.EndOfFile, _Index, "\0", null);
+            Console.Write(current + ", ");
+            Console.WriteLine(_Index.ToString() + ", " +  CurrentIndex);
+            _Index++;
+            return new SyntaxToken(current, _Index, CurrentIndex.ToString(), _Current);
         }
 
         private char Peek(int offset)
         {
-            int ToPeekIndex = m_Index + offset;
-            if (ToPeekIndex == m_FileContents.Length)
+            int ToPeekIndex = _Index + offset;
+            if (ToPeekIndex == _FileContents.Length)
                 return '\0';
-            return m_FileContents[ToPeekIndex];
+            return _FileContents[ToPeekIndex];
         }
 
         private bool Match(char ch, int offset)
         {
             if (ch.Equals(Peek(offset)))
-            {
-                m_Index++;
                 return true;
-            }
             return false;
         }
 
         private void ReadSpecialChars(bool KeepGoing)
         {
             var finished = false;
-            var start = m_Index;
-            current = TokenType.BadToken;
+            var start = _Index;
+            current = SyntaxKind.BadToken;
             while(!finished)
             {
                 switch(CurrentIndex)
@@ -68,16 +71,18 @@ namespace Compiler.Lexing
                     //Special characters
                     case '\r':
                     case '\n':
-                        current = TokenType.LineBreak;
+                        current = SyntaxKind.LineBreak;
                         ReadLineBreak();
-                        AddTokenToList(current, CurrentIndex, null);
                         finished = !KeepGoing;
                         break;
                     case ' ':
                     case '\t':
                         ReadWhitespace();
-                        current = TokenType.WhiteSpace;
-                        AddTokenToList(current, CurrentIndex, null);
+                        current = SyntaxKind.WhiteSpace;
+                        break;
+                    case '\0':
+                        current = SyntaxKind.EndOfFile;
+                        finished = true;
                         break;
                     default:
                         if (char.IsWhiteSpace(CurrentIndex))
@@ -90,92 +95,80 @@ namespace Compiler.Lexing
                         }
                         break;
                 }
-                var length = m_Index - start;
+                var length = _Index - start;
                 if(length > 0)
                 {
-                    var text = m_FileContents.Substring(start, length);
-                    Token t = new Token(current, m_Index, text, text);
-                    m_TokenizedList.Add(t);
+                    var text = _FileContents.Substring(start, length);
+                    SyntaxToken t = new(current, _Index, text, text);
+                    _TokenizedList.Add(t);
                 }
             }
         }
 
         //Literally lexes a single character
-        public TokenType LexTokens(char ch)
+        public SyntaxKind LexTokens(char ch)
         {
-            current = TokenType.BadToken;
+            current = SyntaxKind.BadToken;
             switch (ch)
             {
                 #region Operators
                 //Math operators
                 case '+':
-                    current = Match('=', 1) ? TokenType.PlusEquals : TokenType.Plus;
-                    AddTokenToList(current, ch, null);
+                    current = Match('=', 1) ? SyntaxKind.PlusEquals : SyntaxKind.Plus;
                     break;
                 case '-':
-                    current = Match('=', 1) ? TokenType.MinusEquals : TokenType.Minus;
-                    AddTokenToList(current, ch, null);
+                    current = Match('=', 1) ? SyntaxKind.MinusEquals : SyntaxKind.Minus;
                     break;
                 case '*':
                     if (Match('=', 1))
-                        current = TokenType.MultiplyEquals;
+                        current = SyntaxKind.MultiplyEquals;
                     else if (Match('*', 1))
-                        current = TokenType.Pow;
+                        current = SyntaxKind.Pow;
                     else
-                        current = TokenType.Multiply;
-                    AddTokenToList(current, ch, null);
+                        current = SyntaxKind.Multiply;
                     break;
                 case '/':
                     if (Match('=', 1))
-                        current = TokenType.DivideEquals;
+                        current = SyntaxKind.DivideEquals;
                     else if (Match('/', 1))
                     {
                         ReadSingleLineComment();
-                        current = TokenType.SingleLineComment;
+                        current = SyntaxKind.SingleLineComment;
                     }
                     else if (Match('*', 1))
                     {
                         ReadMultiLineComment();
-                        current = TokenType.MultiLineComment;
+                        current = SyntaxKind.MultiLineComment;
                     }
                     else
-                        current = TokenType.Divide;
-                    AddTokenToList(current, ch, null);
+                        current = SyntaxKind.Divide;
                     
                     break;
                 case '>':
-                    current = Match('=', 1) ? TokenType.GreaterThanEquals : TokenType.GreaterThan;
-                    AddTokenToList(current, ch, null);
+                    current = Match('=', 1) ? SyntaxKind.GreaterThanEquals : SyntaxKind.GreaterThan;
                     break;
                 case '<':
-                    current = Match('=', 1) ? TokenType.LesserThanEquals : TokenType.LesserThan;
-                    AddTokenToList(current, ch, null);
+                    current = Match('=', 1) ? SyntaxKind.LesserThanEquals : SyntaxKind.LesserThan;
                     break;
                 case '=':
-                    current = Match('=', 1) ? TokenType.DoubleEquals : TokenType.Equals;
-                    AddTokenToList(current, ch, null);
+                    current = Match('=', 1) ? SyntaxKind.DoubleEquals : SyntaxKind.Equals;
                     break;
                 case '^':
-                    current = Match('=', 1) ? TokenType.HatEquals : TokenType.Hat;
-                    AddTokenToList(current, ch, null);
+                    current = Match('=', 1) ? SyntaxKind.HatEquals : SyntaxKind.Hat;
                     break;
 
                 //Also operators
                 case '|':
-                    current = Match('|', 1) ? TokenType.DoublePipe : TokenType.Pipe;
-                    AddTokenToList(current, ch, null);
+                    current = Match('|', 1) ? SyntaxKind.DoublePipe : SyntaxKind.Pipe;
                     break;
                 case '&':
-                    current = Match('&', 1) ? TokenType.DoubleAmpersand : TokenType.Ampersand;
-                    AddTokenToList(current, ch, null);
+                    current = Match('&', 1) ? SyntaxKind.DoubleAmpersand : SyntaxKind.Ampersand;
                     break;
                 case '%':
-                    current = Match('=', 1) ? TokenType.PercentEquals : TokenType.Percent;
-                    AddTokenToList(current, ch, null);
+                    current = Match('=', 1) ? SyntaxKind.PercentEquals : SyntaxKind.Percent;
                     break;
                 case '~':
-                    current = TokenType.Tilde;
-                    AddTokenToList(current, ch, null);
+                    current = SyntaxKind.Tilde;
                     break;
                 #endregion
 
@@ -192,113 +185,111 @@ namespace Compiler.Lexing
                 case '8':
                 case '9':
                     ReadNum();
-                    current = TokenType.Number;
-                    AddTokenToList(TokenType.Number, ch, m_Current);
+                    current = SyntaxKind.NumberToken;
                     break;
                 #endregion
 
                 #region Syntax
                 //Pure syntax
                 case ';':
-                    current = TokenType.Semicolon;
-                    AddTokenToList(current, ch, null); 
+                    current = SyntaxKind.Semicolon;
                     break;
                 case '(':
-                    current = TokenType.OpenParenthesis;
-                    AddTokenToList(current, ch, null);                    
+                    current = SyntaxKind.OpenParenthesis;
                     break;
                 case ')':
-                    current = TokenType.CloseParenthesis;
-                    AddTokenToList(current, ch, null);
+                    current = SyntaxKind.CloseParenthesis;
                     break;
                 case '{':
-                    current = TokenType.OpenCurlyBrace;
-                    AddTokenToList(current, ch, null);
+                    current = SyntaxKind.OpenCurlyBrace;
                     break;
                 case '}':
-                    current = TokenType.CloseCurlyBrace;
-                    AddTokenToList(current, ch, null);
+                    current = SyntaxKind.CloseCurlyBrace;
                     break;
                 case '[':
-                    current = TokenType.OpenBrackets;
-                    AddTokenToList(current, ch, null);
+                    current = SyntaxKind.OpenBrackets;
                     break;
                 case ']':
-                    current = TokenType.CloseBrackets;
-                    AddTokenToList(current, ch, null);
+                    current = SyntaxKind.CloseBrackets;
                     break;
                 #endregion
-
+                case '\0':
+                    current = SyntaxKind.EndOfFile;
+                    return current;
                 //Default
                 default:
-                    current = TokenType.Null;
-                    AddTokenToList(current, ch, ch);
+                    //current = SyntaxKind.Null;
                     break;
             }
 
             return current;
         }
 
-        private void AddTokenToList(TokenType tType, char ch, object? obj)
-        {
-            Token t = new(tType, m_Index, ch.ToString(), obj);
-            m_TokenizedList.Add(t);
-        }
-
         private void ReadLineBreak()
         {
             if(CurrentIndex == '\r' && NextIndex == '\n')
             {
-                m_Index += 2;
+                _Index += 2;
             } 
             else
             {
-                m_Index++;
+                _Index++;
             }
         }
 
         private void ReadWhitespace()
         {
-            while(char.IsWhiteSpace(CurrentIndex))
+            var done = false;
+            while(!done)
             {
-                m_Index++;
+                switch(CurrentIndex)
+                {
+                    case '\0':
+                    case '\r':
+                    case '\n':
+                        done = true;
+                        break;
+                    default:
+                        if (!char.IsWhiteSpace(CurrentIndex))
+                            done = true;
+                        else
+                           _Index++;
+                        break;
+                }
             }
-
-            m_Current = TokenType.WhiteSpace;
         }
 
         private void ReadSingleLineComment()
         {
-            m_Index++;
+            _Index++;
             var finished = false;
-            var startIndex = m_Index;
+            var startIndex = _Index;
             while(!finished)
             {
                 switch(CurrentIndex)
                 {
-
                     case '\0':
                     case '\r':
                     case '\n':
                         finished = true;
                         break;
                     default:
-                        m_Index++;
+                        _Index++;
                         break;
                 }
             }
-            m_Current = TokenType.SingleLineComment;
+            _Current = SyntaxKind.SingleLineComment;
             
             //Commented out, is here for debug purposes
-            /*var length = m_Index - startIndex;
-            Console.WriteLine(m_FileContents.Substring(startIndex, length));*/
+            /*var length = _Index - startIndex;
+            Console.WriteLine(_FileContents.Substring(startIndex, length));*/
         }
 
         private void ReadMultiLineComment()
         {
-            m_Index++;
+            _Index++;
             var finished = false;
-            var startIndex = m_Index;
+            var startIndex = _Index;
             while(!finished)
             {
                 switch(CurrentIndex)
@@ -306,25 +297,26 @@ namespace Compiler.Lexing
 
                     case '\0':
                         ErrorLogger.ReportUnfinishedMultiLineComment();
-                        break;
+                        current = SyntaxKind.EndOfFile;
+                        return;
                     case '*':
                         if(NextIndex.Equals('/'))
                         {
-                            m_Index++;
+                            _Index++;
                             finished = true;
                         } 
-                        m_Index++;
+                        _Index++;
                         break;
                     default:
-                        m_Index++;
+                        _Index++;
                         break;
                 }
             }
-            m_Current = TokenType.SingleLineComment;
+            _Current = SyntaxKind.SingleLineComment;
 
             //Commented out, is here for debug purposes
-            /*var length = m_Index - startIndex;
-            Console.WriteLine(m_FileContents.Substring(startIndex, length));*/
+            /*var length = _Index - startIndex;
+            Console.WriteLine(_FileContents.Substring(startIndex, length));*/
         }
 
         private void ReadNum()
@@ -332,7 +324,7 @@ namespace Compiler.Lexing
             bool hasSeparator = false;
             bool isDecimal = false;
             bool hasMultiDecimals = false;
-            int startIndex = m_Index;
+            int startIndex = _Index;
 
 
             while (char.IsDigit(CurrentIndex) ||
@@ -348,13 +340,13 @@ namespace Compiler.Lexing
                         
                     isDecimal = true;
                 }
-                m_Index++;
+                _Index++;
             }
             //Getting the length of a number
-            int length = m_Index - startIndex;
+            int length = _Index - startIndex;
 
             //Get's the contents of the number, and replaces , with ., then makes it a CharArray so that I can join it in the text
-            char[] cha_text = m_FileContents.Substring(startIndex, length).Replace(',', '.').ToCharArray();
+            char[] cha_text = _FileContents.Substring(startIndex, length).Replace(',', '.').ToCharArray();
 
             //Makes a string out of cha_text
             string text = string.Join("", cha_text.Where<char>(e => !char.IsWhiteSpace(e) && !e.Equals('_')) );
@@ -384,11 +376,11 @@ namespace Compiler.Lexing
                 {
                     if (value >= float.MinValue && value <= float.MaxValue)
                     {
-                        m_Current = (float)value;
+                        _Current = (float)value;
                     }
                     else
                     {
-                        m_Current = value;
+                        _Current = value;
                     }
                 }
             }
@@ -402,20 +394,20 @@ namespace Compiler.Lexing
                 {
                     if (value <= int.MaxValue)
                     {
-                        m_Current = (int)value;
+                        _Current = (int)value;
                     }
                     else if (value <= uint.MaxValue)
                     {
-                        m_Current = (uint)value;
+                        _Current = (uint)value;
                     }
                     else
                     {
-                        m_Current = value;
+                        _Current = value;
                     }
                 }
             }
-
-            Console.WriteLine(m_Current);
+            _Index--;
+            //Console.WriteLine(_Current);
         }
     }
 }
