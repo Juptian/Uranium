@@ -114,18 +114,21 @@ namespace Compiler.CodeAnalysis.Parsing
             //Converted to switch before we get too many checks
             switch(_current.Kind)
             {
+                //Parenthesis
                 case SyntaxKind.OpenParenthesis:
                     var left = NextToken();
                     var expression = ParseExpression();
                     var right = MatchToken(SyntaxKind.CloseParenthesis);
                     return new ParenthesizedExpressionSyntax(left, expression, right);
                 
+                //Bools
                 case SyntaxKind.TrueKeyword:
                 case SyntaxKind.FalseKeyword:
                     var keywordToken = NextToken();
-                    var value = _current.Kind == SyntaxKind.TrueKeyword;
+                    var value = keywordToken.Kind == SyntaxKind.TrueKeyword;
                     return new LiteralExpressionSyntax(keywordToken, value);
 
+                //Assuming default is a number token
                 default:
                     var numberToken = MatchToken(SyntaxKind.NumberToken);
                     return new LiteralExpressionSyntax(numberToken);

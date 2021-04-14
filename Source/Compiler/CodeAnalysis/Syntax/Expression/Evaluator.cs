@@ -31,15 +31,15 @@ namespace Compiler.CodeAnalysis.Syntax.Expression
             //and return it's value according to the symbol
             else if(node is BoundUnaryExpression u)
             {
-                var operand = (int)EvaluateExpression(u.Operand);
-
-                if(u.OperatorKind == BoundUnaryOperatorKind.Identity)
+                var operand = EvaluateExpression(u.Operand);
+                switch(u.Op.Kind)
                 {
-                    return operand;
-                }
-                else if(u.OperatorKind == BoundUnaryOperatorKind.Negation)
-                {
-                    return -operand;
+                    case BoundUnaryOperatorKind.Identity:
+                        return (int)operand;
+                    case BoundUnaryOperatorKind.Negation:
+                        return -(int)operand;
+                    case BoundUnaryOperatorKind.LogicalNegation:
+                        return !(bool)operand;
                 }
 
                 Console.Error.WriteLine($"Unexpected unary operator {u.Kind}");
@@ -49,30 +49,40 @@ namespace Compiler.CodeAnalysis.Syntax.Expression
             //then return a value based off of the current operator kind
             else if (node is BoundBinaryExpression b)
             {
-                var left = (int)EvaluateExpression(b.Left);
-                var right = (int)EvaluateExpression(b.Right);
+                var left = EvaluateExpression(b.Left);
+                var right = EvaluateExpression(b.Right);
 
-                switch (b.OperatorKind)
+                switch (b.Op.Kind)
                 {
                     case BoundBinaryOperatorKind.Addition:
-                        return left + right;
+                        return (int)left + (int)right;
                     case BoundBinaryOperatorKind.Subtraction:
-                        return left - right;
+                        return (int)left - (int)right;
                     case BoundBinaryOperatorKind.Multiplication:
-                        return left * right;
+                        return (int)left * (int)right;
                     case BoundBinaryOperatorKind.Division:
-                        return left / right;
+                        return (int)left / (int)right;
                     case BoundBinaryOperatorKind.Pow:
-                        //This is terrible, don't do this
-                        //I just haven't added support for multiple types yet, and Math.Pow only takes doubles 
                         return Math.Pow( (double) left, (double)right);
+
+                    case BoundBinaryOperatorKind.LogicalAND:
+                        return (bool)left && (bool)right;
+                    case BoundBinaryOperatorKind.LogicalOR:
+                        return (bool)left || (bool)right;
+                    case BoundBinaryOperatorKind.LogicalXOREquals:
+                        var leftBool = (bool)left;
+                        var rightBool = (bool)right;
+                        return leftBool ^= rightBool;
+                    case BoundBinaryOperatorKind.LogicalXOR:
+                        return (bool)left ^ (bool)right;
+
                     
                     default:
                         //We can throw exceptions here because we've exhausted all options,
                         //and this is an internal compiler error, should handle this more gracefully,
                         //but during the development stage, and exception will provide more info,
                         //on the stack trace :)
-                        throw new($"Unexpected binary operator {b.OperatorKind}");
+                        throw new($"Unexpected binary operator {b.Op.Kind}");
                 }
             }
             //Same as above ^^ 

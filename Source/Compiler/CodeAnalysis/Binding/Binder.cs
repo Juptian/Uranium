@@ -38,9 +38,7 @@ namespace Compiler.CodeAnalysis.Binding
         private BoundExpression BindUnaryExpression(UnaryExpressionSyntax syntax)
         {
             var boundOperand = BindExpression(syntax.Operand);
-            var boundOperatorKind = BindUnaryOperatorKind(syntax.OperatorToken.Kind, boundOperand.Type);
-             Console.WriteLine(boundOperatorKind);
-            Console.WriteLine(boundOperatorKind is null);
+            var boundOperatorKind = BoundUnaryOperator.Bind(syntax.OperatorToken.Kind, boundOperand.Type);
            
             //Checking to see if the result of our BindUnaryOperatorKind call is null
             //And reporting it to the diagnostics
@@ -53,7 +51,7 @@ namespace Compiler.CodeAnalysis.Binding
                 return boundOperand;
             }
             
-            return new BoundUnaryExpression(boundOperatorKind.Value, boundOperand);
+            return new BoundUnaryExpression(boundOperatorKind, boundOperand);
         }
 
 
@@ -62,17 +60,16 @@ namespace Compiler.CodeAnalysis.Binding
             var boundLeft = BindExpression(syntax.Left);
             var boundRight = BindExpression(syntax.Right);
 
-            var boundOperatorKind = BindBinaryOperatorKind(syntax.OperatorToken.Kind, boundLeft.Type, boundRight.Type);
-             Console.WriteLine(boundOperatorKind);
+            var boundOperatorKind = BoundBinaryOperator.Bind(syntax.OperatorToken.Kind, boundLeft.Type, boundRight.Type);
            
             //Same as in the BindUnaryExpression but we return our boundLeft instead
             if(boundOperatorKind == null)
             {
-                _diagnostics.Add($"Binary operand {syntax.OperatorToken.Text} is not defined for {boundLeft.Type}!");
+                _diagnostics.Add($"Binary operand '{syntax.OperatorToken.Kind}' is not defined for {boundLeft.Type}!");
                 return boundLeft;
             }
 
-            return new BoundBinaryExpression(boundLeft, boundOperatorKind.Value, boundRight);
+            return new BoundBinaryExpression(boundLeft, boundOperatorKind, boundRight);
         }
 
         private BoundUnaryOperatorKind? BindUnaryOperatorKind(SyntaxKind kind, Type operandType)

@@ -13,6 +13,10 @@ namespace Compiler.CodeAnalysis.Binding.NodeKinds
         Subtraction,
         Multiplication,
         Division,
-        Pow
+        Pow,
+        LogicalAND,
+        LogicalOR,
+        LogicalXOREquals,
+        LogicalXOR
     }
 }

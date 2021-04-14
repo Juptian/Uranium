@@ -32,6 +32,7 @@ namespace Compiler.CodeAnalysis.Syntax
                 //  1
                 //Because this is how math works!
                 SyntaxKind.Plus or SyntaxKind.Minus => 4,
+                SyntaxKind.Bang => 4,
                 _ => 0,
             };
 

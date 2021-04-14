@@ -10,6 +10,8 @@ namespace Compiler.CodeAnalysis.Binding.NodeKinds
    internal enum BoundUnaryOperatorKind
    {
         Identity,
-        Negation
-   } 
+        Negation,
+        LogicalNegation,
+        LogicalXOR
+    } 
 }

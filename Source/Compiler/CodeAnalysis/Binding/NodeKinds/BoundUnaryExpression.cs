@@ -12,13 +12,13 @@ namespace Compiler.CodeAnalysis.Binding.NodeKinds
     //Yes I'm looking at you
     internal sealed class BoundUnaryExpression : BoundExpression
     {
-        public BoundUnaryExpression(BoundUnaryOperatorKind operatorKind, BoundExpression operand)
+        public BoundUnaryExpression(BoundUnaryOperator op, BoundExpression operand)
         {
-            OperatorKind = operatorKind;
+            Op = op;
             Operand = operand;
         }
 
-        public BoundUnaryOperatorKind OperatorKind { get; }
+        public BoundUnaryOperator Op { get; }
         public BoundExpression Operand { get; }
 
         public override Type Type => Operand.Type;

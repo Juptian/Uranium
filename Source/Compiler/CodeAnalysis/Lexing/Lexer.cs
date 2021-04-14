@@ -38,6 +38,7 @@ namespace Compiler.CodeAnalysis.Lexing
 
         public SyntaxToken Lex()
         {
+            _current = SyntaxKind.BadToken;
             ReadSpecialChars(true);
             LexToken(_currentIndex);
             if (_index == _source.Length)
@@ -45,7 +46,7 @@ namespace Compiler.CodeAnalysis.Lexing
                 return new(SyntaxKind.EndOfFile, _index, "\0", null);
             }
 
-            /*Console.Write($"{_current}, ");
+/*            Console.Write($"{_current}, ");
             Console.WriteLine($"{_index}, {_currentIndex}");*/
             _index++;
             if(_text != null)
@@ -70,6 +71,7 @@ namespace Compiler.CodeAnalysis.Lexing
         {
             if (ch.Equals(Peek(offset)))
             {
+                _index++;
                 return true;
             }
 
@@ -80,7 +82,6 @@ namespace Compiler.CodeAnalysis.Lexing
         {
             var finished = false;
             var start = _index;
-            _current = SyntaxKind.BadToken;
             while (!finished)
             {
                 switch (_currentIndex)
@@ -140,8 +141,6 @@ namespace Compiler.CodeAnalysis.Lexing
                 _index--;
                 return _current;
             }
-
-            _current = SyntaxKind.BadToken;
             switch (ch)
             {
                 #region Operators
@@ -191,6 +190,9 @@ namespace Compiler.CodeAnalysis.Lexing
                     break;
                 case '^':
                     _current = Match('=', 1) ? SyntaxKind.HatEquals : SyntaxKind.Hat;
+                    break;
+                case '!':
+                    _current = Match('-', 1) ? SyntaxKind.BangEquals : SyntaxKind.Bang;
                     break;
 
                 //Also operators
@@ -250,7 +252,9 @@ namespace Compiler.CodeAnalysis.Lexing
                     return _current;
                 //Default
                 default:
-                    throw new($"Unexpected Syntax Kind: {_current}");
+                    //It could be a whitespace/linebreak/ect statement, so we just break
+
+                    break;
             }
             return _current;
         }
@@ -293,7 +297,7 @@ namespace Compiler.CodeAnalysis.Lexing
         {
             _index++;
             var finished = false;
-            var startIndex = _index;
+            //var startIndex = _index;
             while (!finished)
             {
                 switch (_currentIndex)
@@ -319,7 +323,7 @@ namespace Compiler.CodeAnalysis.Lexing
         {
             _index++;
             var finished = false;
-            var startIndex = _index;
+            //var startIndex = _index;
             while (!finished)
             {
                 switch (_currentIndex)
