@@ -77,7 +77,7 @@ namespace Compiler.CodeAnalysis.Parsing
 
             ExpressionSyntax left;
             var unaryOperatorPrecedence = _current.Kind.GetUnaryOperatorPrecedence();
-            
+
             //Allowing for unary operator precedence
             if(unaryOperatorPrecedence != 0 && unaryOperatorPrecedence >= parentPrecedence)
             {
@@ -94,14 +94,18 @@ namespace Compiler.CodeAnalysis.Parsing
             while(true)
             {
                 var precedence = _current.Kind.GetBinaryOperatorPrecedence();
+                
                 if(precedence == 0 || precedence <= parentPrecedence)
                 {
                     break;
                 }
-
+                
+                //Taking the current token, and moving the index
                 var operatorToken = NextToken();
+                //Recursively calling the ParseExpression with the current precedence
                 var right = ParseExpression(precedence);
 
+                //Making left a New BinaryExpressionSyntax
                 left = new BinaryExpressionSyntax(left, operatorToken, right);
 
             }

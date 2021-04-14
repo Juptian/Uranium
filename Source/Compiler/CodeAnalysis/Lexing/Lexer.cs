@@ -46,7 +46,7 @@ namespace Compiler.CodeAnalysis.Lexing
                 return new(SyntaxKind.EndOfFile, _index, "\0", null);
             }
 
-/*            Console.Write($"{_current}, ");
+            /*Console.Write($"{_current}, ");
             Console.WriteLine($"{_index}, {_currentIndex}");*/
             _index++;
             if(_text != null)
@@ -192,7 +192,7 @@ namespace Compiler.CodeAnalysis.Lexing
                     _current = Match('=', 1) ? SyntaxKind.HatEquals : SyntaxKind.Hat;
                     break;
                 case '!':
-                    _current = Match('-', 1) ? SyntaxKind.BangEquals : SyntaxKind.Bang;
+                    _current = Match('=', 1) ? SyntaxKind.BangEquals : SyntaxKind.Bang;
                     break;
 
                 //Also operators

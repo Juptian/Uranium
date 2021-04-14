@@ -17,6 +17,8 @@ namespace Compiler.CodeAnalysis.Binding.NodeKinds
         LogicalAND,
         LogicalOR,
         LogicalXOREquals,
-        LogicalXOR
+        LogicalXOR,
+        LogicalEquals,
+        NotEquals
     }
 }

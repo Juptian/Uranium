@@ -13,6 +13,11 @@ namespace Compiler.CodeAnalysis.Binding.NodeKinds
             : this(syntaxKind, kind, type, type, type)
         { }
 
+        public BoundBinaryOperator(SyntaxKind syntaxKind, BoundBinaryOperatorKind kind, Type operandType, Type resultType)
+            : this(syntaxKind, kind, operandType, operandType, resultType)
+        { }
+
+
         public BoundBinaryOperator(SyntaxKind syntaxKind, BoundBinaryOperatorKind kind, Type leftType, Type rightType, Type resultType)
         {
             SyntaxKind = syntaxKind;
@@ -36,9 +41,14 @@ namespace Compiler.CodeAnalysis.Binding.NodeKinds
             new BoundBinaryOperator(SyntaxKind.Multiply, BoundBinaryOperatorKind.Multiplication, typeof(int)),
             new BoundBinaryOperator(SyntaxKind.Divide, BoundBinaryOperatorKind.Division, typeof(int)),
             new BoundBinaryOperator(SyntaxKind.Pow, BoundBinaryOperatorKind.Pow, typeof(double)),
+            new BoundBinaryOperator(SyntaxKind.DoubleEquals, BoundBinaryOperatorKind.LogicalEquals, typeof(int), typeof(bool)),
+            new BoundBinaryOperator(SyntaxKind.BangEquals, BoundBinaryOperatorKind.NotEquals, typeof(int), typeof(bool)),
+
 
             new BoundBinaryOperator(SyntaxKind.DoubleAmpersand, BoundBinaryOperatorKind.LogicalAND, typeof(bool)),
             new BoundBinaryOperator(SyntaxKind.DoublePipe, BoundBinaryOperatorKind.LogicalOR, typeof(bool)),
+            new BoundBinaryOperator(SyntaxKind.DoubleEquals, BoundBinaryOperatorKind.LogicalEquals, typeof(bool)),
+            new BoundBinaryOperator(SyntaxKind.BangEquals, BoundBinaryOperatorKind.NotEquals, typeof(bool)),
         };
 
         public static BoundBinaryOperator Bind(SyntaxKind syntaxKind, Type leftType, Type rightType)

@@ -54,6 +54,13 @@ namespace Compiler.CodeAnalysis.Syntax.Expression
 
                 switch (b.Op.Kind)
                 {
+                    //Universal
+                    case BoundBinaryOperatorKind.LogicalEquals:
+                        return Equals(left, right); 
+                    case BoundBinaryOperatorKind.NotEquals:
+                        return !Equals(left, right);
+
+                    //Int
                     case BoundBinaryOperatorKind.Addition:
                         return (int)left + (int)right;
                     case BoundBinaryOperatorKind.Subtraction:
@@ -64,7 +71,8 @@ namespace Compiler.CodeAnalysis.Syntax.Expression
                         return (int)left / (int)right;
                     case BoundBinaryOperatorKind.Pow:
                         return Math.Pow( (double) left, (double)right);
-
+                    
+                    //Bool
                     case BoundBinaryOperatorKind.LogicalAND:
                         return (bool)left && (bool)right;
                     case BoundBinaryOperatorKind.LogicalOR:

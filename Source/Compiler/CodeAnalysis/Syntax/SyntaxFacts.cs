@@ -8,13 +8,19 @@ namespace Compiler.CodeAnalysis.Syntax
 {
     internal static class SyntaxFacts
     {
+        private static int _minusValue = 4;
         public static int GetBinaryOperatorPrecedence(this SyntaxKind kind)
             => kind switch
             {
                 //Just operator precedence
-                SyntaxKind.Plus or SyntaxKind.Minus => 1,
-                SyntaxKind.Multiply or SyntaxKind.Divide => 2,
-                SyntaxKind.Pow => 3,
+
+                SyntaxKind.DoublePipe => _minusValue - 3,
+                SyntaxKind.DoubleAmpersand => _minusValue - 2, 
+                SyntaxKind.DoubleEquals or SyntaxKind.BangEquals => _minusValue - 1,
+
+                SyntaxKind.Plus or SyntaxKind.Minus => _minusValue,
+                SyntaxKind.Multiply or SyntaxKind.Divide => _minusValue + 1,
+                SyntaxKind.Pow => _minusValue + 2,
                 _ => 0,
             };
 
@@ -31,8 +37,7 @@ namespace Compiler.CodeAnalysis.Syntax
                 //  |
                 //  1
                 //Because this is how math works!
-                SyntaxKind.Plus or SyntaxKind.Minus => 4,
-                SyntaxKind.Bang => 4,
+                SyntaxKind.Plus or SyntaxKind.Minus or SyntaxKind.Bang => _minusValue + 3,
                 _ => 0,
             };
 

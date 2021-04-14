@@ -41,6 +41,7 @@ namespace Compiler
 
             var syntaxTree = SyntaxTree.Parse(text);
             var binder = new Binder();
+            Console.WriteLine(syntaxTree.Root);
             var boundExpression = binder.BindExpression(syntaxTree.Root);
 
             //We concat the binder's diagnostics, and the syntax tree's diagnostics in case of ANY errors

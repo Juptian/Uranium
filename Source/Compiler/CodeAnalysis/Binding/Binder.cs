@@ -45,9 +45,7 @@ namespace Compiler.CodeAnalysis.Binding
             //Then returning our boundOperand
             if(boundOperatorKind is null)
             {
-                Console.WriteLine(_diagnostics.Count);
                 _diagnostics.Add($"Unary operand {syntax.OperatorToken.Text} is not defined for {boundOperand.Type}!");
-                Console.WriteLine(_diagnostics.Count);
                 return boundOperand;
             }
             
