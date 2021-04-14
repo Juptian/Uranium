@@ -5,6 +5,7 @@ using System.Linq;
 using System.IO;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using Compiler.CodeAnalysis.Syntax;
 using Compiler.CodeAnalysis.Parsing;
 using Compiler.CodeAnalysis.Binding;
@@ -25,9 +26,13 @@ namespace Compiler
             
             var text = OpenFile(args[0]);
 
+            var variables = new Dictionary<string, object>();
+
+
             //Looping over the args to check if they want to show the tree
             for(int i = 1; i < args.Length; i++)
             {
+                
                 //Using a switch statement here for future proofing!
                 switch(args[i].ToUpper())
                 {
@@ -43,7 +48,7 @@ namespace Compiler
             var syntaxTree = SyntaxTree.Parse(text);
             var compilation = new Compilation(syntaxTree);
 
-            var result = compilation.Evaluate();
+            var result = compilation.Evaluate(variables);
 
 
 
@@ -66,9 +71,10 @@ namespace Compiler
             else
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-
+                
+                Console.WriteLine();
                 //Literally just looping over each diagnostic,
-                //to fucking yeet them at us
+                //to give us all of the errors
                 foreach (var diag in diagnostics)
                 {
                     Console.WriteLine(diag);

@@ -3,9 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Compiler.Logging;
 using Compiler.CodeAnalysis.Syntax;
-//Nobody gives a shit about you error
-//I know that the string is nullable, no need to remind me!
-#pragma warning disable CS8632 
 
 namespace Compiler.CodeAnalysis.Lexing
 {
@@ -14,16 +11,16 @@ namespace Compiler.CodeAnalysis.Lexing
         private readonly string _source;
         private readonly List<SyntaxToken> _tokens = new();
 
-        private char _currentIndex => Peek(0);
-        private char _nextIndex => Peek(1);
+        private char CurrentIndex => Peek(0);
+        private char NextIndex => Peek(1);
 
         private int _index;
         private SyntaxKind _current;
         private string? _text;
-        public object _currentValue;
+        private object? _currentValue;
 
 
-        private readonly List<string> _diagnostics = new();
+        private readonly DiagnosticBag _diagnostics = new();
 
         public Lexer(string contents)
         {
@@ -34,37 +31,30 @@ namespace Compiler.CodeAnalysis.Lexing
             }*/
         }
 
-        public IEnumerable<string> Diagnostics => _diagnostics;
+        public DiagnosticBag Diagnostics => _diagnostics;
 
         public SyntaxToken Lex()
         {
             _current = SyntaxKind.BadToken;
             ReadSpecialChars(true);
-            LexToken(_currentIndex);
+            LexToken(CurrentIndex);
             if (_index == _source.Length)
             {
                 return new(SyntaxKind.EndOfFile, _index, "\0", null);
             }
 
             /*Console.Write($"{_current}, ");
-            Console.WriteLine($"{_index}, {_currentIndex}");*/
+            Console.WriteLine($"{_index}, {CurrentIndex}");*/
+
             _index++;
-            if(_text != null)
-            {
-                return new(_current, _index, _text, _currentValue);
-            }
-            return new(_current, _index, _currentIndex.ToString(), _currentValue);
+            return new(_current, _index, _text ?? CurrentIndex.ToString(), _currentValue);
         }
 
         private char Peek(int offset)
         {
             var peekIndex = _index + offset;
 
-            if (peekIndex == _source.Length)
-            {
-                return '\0';
-            }
-            return _source[peekIndex];
+            return peekIndex == _source.Length ? '\0' : _source[peekIndex];    
         }
 
         private bool Match(char ch, int offset)
@@ -84,7 +74,7 @@ namespace Compiler.CodeAnalysis.Lexing
             var start = _index;
             while (!finished)
             {
-                switch (_currentIndex)
+                switch (CurrentIndex)
                 {
                     //Special characters
                     case '\r':
@@ -103,7 +93,7 @@ namespace Compiler.CodeAnalysis.Lexing
                         finished = true;
                         break;
                     default:
-                        if (char.IsWhiteSpace(_currentIndex))
+                        if (char.IsWhiteSpace(CurrentIndex))
                         {
                             ReadWhitespace();
                         }
@@ -122,13 +112,14 @@ namespace Compiler.CodeAnalysis.Lexing
             }
         }
 
-        //Literally lexes a single character
+        //Literally lexes a single token
+        //Yes this parses keywords
         public SyntaxKind LexToken(char ch)
         {
             if(char.IsLetter(ch))
             {
                 var start = _index;
-                while (char.IsLetter(_currentIndex))
+                while (char.IsLetter(CurrentIndex))
                 {
                     _index++;
                 }
@@ -139,19 +130,50 @@ namespace Compiler.CodeAnalysis.Lexing
                 _current = kind;
                 _text = text;
                 _index--;
+                _current = SyntaxKind.IdentifierToken;
                 return _current;
             }
+
+            //Using a bool to check conditions with more ease
+            bool matched;
             switch (ch)
             {
-                #region Operators
                 //Math operators
                 case '+':
-                    _current = Match('=', 1) ? SyntaxKind.PlusEquals : SyntaxKind.Plus;
+                    if(Match('=', 1))
+                    {
+                        _current = SyntaxKind.PlusEquals;
+                        _text = "+";
+                    } 
+                    else if (Match('+', 1))
+                    {
+                        _current = SyntaxKind.PlusPlus;
+                        _text = "++";
+                    } 
+                    else
+                    {
+                        _current = SyntaxKind.Plus;
+                        _text = "+";
+                    }
                     break;
                 case '-':
-                    _current = Match('=', 1) ? SyntaxKind.MinusEquals : SyntaxKind.Minus;
+                    if(Match('=', 1))
+                    {
+                        _current = SyntaxKind.MinusEquals;
+                        _text = "-=";
+                    } 
+                    else if (Match('-', 1))
+                    {
+                        _current = SyntaxKind.MinusMinus;
+                        _text = "--";
+                    } 
+                    else
+                    {
+                        _current = SyntaxKind.Minus;
+                        _text = "-";
+                    }
                     break;
-                case '*':
+                case '*':               
                     if (Match('=', 1))
                         _current = SyntaxKind.MultiplyEquals;
                     else if (Match('*', 1))
@@ -180,35 +202,53 @@ namespace Compiler.CodeAnalysis.Lexing
 
                     break;
                 case '>':
-                    _current = Match('=', 1) ? SyntaxKind.GreaterThanEquals : SyntaxKind.GreaterThan;
+                    matched = Match('=', 1);
+                    _text = matched ? ">=" : ">";
+                    _current = matched ? SyntaxKind.GreaterThanEquals : SyntaxKind.GreaterThan;
                     break;
                 case '<':
-                    _current = Match('=', 1) ? SyntaxKind.LesserThanEquals : SyntaxKind.LesserThan;
+                    matched = Match('=', 1);
+                    _text = matched ? "<=" : "<";
+                    _current = matched ? SyntaxKind.LesserThanEquals : SyntaxKind.LesserThan;
                     break;
                 case '=':
-                    _current = Match('=', 1) ? SyntaxKind.DoubleEquals : SyntaxKind.Equals;
+                    matched = Match('=', 1);
+                    _text = matched ? "==" : "=";
+                    _current = matched ? SyntaxKind.DoubleEquals : SyntaxKind.Equals;
                     break;
                 case '^':
-                    _current = Match('=', 1) ? SyntaxKind.HatEquals : SyntaxKind.Hat;
+                    matched = Match('=', 1);
+                    _text = matched ? "^=" : "^";
+                    _current = matched ? SyntaxKind.HatEquals : SyntaxKind.Hat;
                     break;
                 case '!':
-                    _current = Match('=', 1) ? SyntaxKind.BangEquals : SyntaxKind.Bang;
+                    matched = Match('=', 1);
+                    _text = matched ? "!=" : "!";
+                    _current = matched ? SyntaxKind.BangEquals : SyntaxKind.Bang;
                     break;
 
                 //Also operators
                 case '|':
-                    _current = Match('|', 1) ? SyntaxKind.DoublePipe : SyntaxKind.Pipe;
+                    matched = Match('|', 1);
+                    _text = matched ? "||" : "|";
+                    _current = matched ? SyntaxKind.DoublePipe : SyntaxKind.Pipe;
                     break;
+
                 case '&':
-                    _current = Match('&', 1) ? SyntaxKind.DoubleAmpersand : SyntaxKind.Ampersand;
+                    matched = Match('&', 1);
+                    _text = matched ? "&&" : "&";
+
+                    _current = matched  ? SyntaxKind.DoubleAmpersand : SyntaxKind.Ampersand;
                     break;
                 case '%':
-                    _current = Match('=', 1) ? SyntaxKind.PercentEquals : SyntaxKind.Percent;
+                    matched = Match('=', 1);
+                    _text = matched ? "%=" : "%";
+
+                    _current = matched ? SyntaxKind.PercentEquals : SyntaxKind.Percent;
                     break;
                 case '~':
                     _current = SyntaxKind.Tilde;
                     break;
-                #endregion
 
                 //Numbers
                 case '0':
@@ -253,15 +293,19 @@ namespace Compiler.CodeAnalysis.Lexing
                 //Default
                 default:
                     //It could be a whitespace/linebreak/ect statement, so we just break
-
+                    if(char.IsLetter(ch))
+                    {
+                        _current = SyntaxKind.Null;
+                    }
                     break;
             }
             return _current;
         }
 
+
         private void ReadLineBreak()
         {
-            if (_currentIndex == '\r' && _nextIndex == '\n')
+            if (CurrentIndex == '\r' && NextIndex == '\n')
             {
                 _index += 2;
             }
@@ -276,7 +320,7 @@ namespace Compiler.CodeAnalysis.Lexing
             var done = false;
             while (!done)
             {
-                switch (_currentIndex)
+                switch (CurrentIndex)
                 {
                     case '\0':
                     case '\r':
@@ -284,7 +328,7 @@ namespace Compiler.CodeAnalysis.Lexing
                         done = true;
                         break;
                     default:
-                        if (!char.IsWhiteSpace(_currentIndex))
+                        if (!char.IsWhiteSpace(CurrentIndex))
                             done = true;
                         else
                             _index++;
@@ -300,7 +344,7 @@ namespace Compiler.CodeAnalysis.Lexing
             //var startIndex = _index;
             while (!finished)
             {
-                switch (_currentIndex)
+                switch (CurrentIndex)
                 {
                     case '\0':
                     case '\r':
@@ -323,18 +367,19 @@ namespace Compiler.CodeAnalysis.Lexing
         {
             _index++;
             var finished = false;
-            //var startIndex = _index;
+            var startIndex = _index;
             while (!finished)
             {
-                switch (_currentIndex)
+                switch (CurrentIndex)
                 {
 
                     case '\0':
-                        ErrorLogger.ReportUnfinishedMultiLineComment();
+                        var length = _index - startIndex;
+                        _diagnostics.ReportUnfinishedMultiLineComment(new(startIndex, length), length);
                         _current = SyntaxKind.EndOfFile;
                         return;
                     case '*':
-                        if (_nextIndex.Equals('/'))
+                        if (NextIndex.Equals('/'))
                         {
                             _index++;
                             finished = true;
@@ -360,16 +405,16 @@ namespace Compiler.CodeAnalysis.Lexing
             var hasMultiDecimals = false;
             var startIndex = _index;
 
-            while (char.IsDigit(_currentIndex) ||
-                  (_currentIndex == '_' || _currentIndex == ' ') && char.IsDigit(_nextIndex) ||
-                  (_currentIndex == '.' || _currentIndex == ',') && char.IsDigit(_nextIndex))
+            while (char.IsDigit(CurrentIndex) ||
+                  (CurrentIndex == '_' || CurrentIndex == ' ') && char.IsDigit(NextIndex) ||
+                  (CurrentIndex == '.' || CurrentIndex == ',') && char.IsDigit(NextIndex))
             {
-                if (!hasSeparator && (_currentIndex == '_' || _currentIndex == ' '))
+                if (!hasSeparator && (CurrentIndex == '_' || CurrentIndex == ' '))
                 {
                     hasSeparator = true;
                 }
 
-                if (_currentIndex == '.' || _currentIndex == ',')
+                if (CurrentIndex == '.' || CurrentIndex == ',')
                 {
                     hasMultiDecimals = isDecimal;
                     isDecimal = true;
@@ -377,34 +422,30 @@ namespace Compiler.CodeAnalysis.Lexing
                 _index++;
             }
 
-            //Getting the length of a number
             var length = _index - startIndex;
 
-            //Get's the contents of the number, and replaces , with ., then makes it a CharArray so that I can join it in the text
+            //Replacing , with . here so that I can parse it into a number
+            //This allows a user to chose between , and . as their decimal separator
             var charArray = _source.Substring(startIndex, length).Replace(',', '.').ToCharArray();
 
-            //Makes a string out of cha_text
             var text = string.Join("", charArray.Where(e => !char.IsWhiteSpace(e) && !e.Equals('_')));
 
             //Numbers cannot start with _ or have multiple . s.
             if (text.StartsWith('_'))
             {
-                //TODO: Make a logging system that throws errors :)
-                ErrorLogger.ReportNumberStartingWithUnderscore();
+                _diagnostics.ReportNumberStartWithUnderscore(new(startIndex, length), text, typeof(int));
             }
 
             //Numbers cannot have multiple .s or ,s.
             if (hasMultiDecimals)
             {
-                ErrorLogger.ReportInvalidNumber();
             }
 
             if (isDecimal)
             {
                 if (!double.TryParse(text, out var value))
                 {
-                    //Yeet();
-                    Console.WriteLine("Couldn't parse to double! " + text);
+                    _diagnostics.ReportInvalidNumber(new(startIndex, length), text, typeof(double));
                 }
                 else
                 {
@@ -422,7 +463,7 @@ namespace Compiler.CodeAnalysis.Lexing
             {
                 if (!ulong.TryParse(text, out var value))
                 {
-                    Console.WriteLine("Number too big!" + text);
+                    _diagnostics.ReportInvalidNumber(new(startIndex, length), text, typeof(long));
                 }
                 else
                 {

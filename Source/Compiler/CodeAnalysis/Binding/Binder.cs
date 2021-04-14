@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Compiler.CodeAnalysis.Syntax;
 using Compiler.CodeAnalysis.Binding.NodeKinds;
 using Compiler.CodeAnalysis.Syntax.Expression;
+using Compiler.Logging;
 
 namespace Compiler.CodeAnalysis.Binding
 {
@@ -15,26 +16,34 @@ namespace Compiler.CodeAnalysis.Binding
         public BoundExpression BindExpression(ExpressionSyntax syntax)
             => syntax.Kind switch // Calling the correct function based off of the syntax kind and returning it's value.
             {
+                //Base expressions
                 SyntaxKind.BinaryExpression => BindBinaryExpression((BinaryExpressionSyntax)syntax),
                 SyntaxKind.UnaryExpression => BindUnaryExpression((UnaryExpressionSyntax)syntax),
                 SyntaxKind.LiteralExpression => BindLiteralExpression((LiteralExpressionSyntax)syntax),
-                SyntaxKind.ParenthesizedExpression => BindExpression(((ParenthesizedExpressionSyntax)syntax).Expression),
+                SyntaxKind.ParenthesizedExpression => BindParenthesizedExpression((ParenthesizedExpressionSyntax)syntax), 
+                
+                //Name + Assignments
+                SyntaxKind.NameExpression => BindNameExpression((NameExpressionSyntax)syntax),
+                SyntaxKind.AssignmentExpression => BindAssignmentExpression((AssignmentExpressionSyntax)syntax),
                 _ => throw new($"Unexpected syntax {syntax.Kind}"),
             };
 
         //Diagnostics, pretty neat not gonna lie
-        private readonly List<string> _diagnostics = new();
+        private readonly DiagnosticBag _diagnostics = new();
+        private readonly Dictionary<string, object> _variables;
+
+        public Binder(Dictionary<string, object> variables)
+        {
+            _variables = variables;
+        }
 
         //Public diagnostics that nobody can edit :C
-        public IEnumerable<string> Diagnostics => _diagnostics;
+        public DiagnosticBag Diagnostics => _diagnostics;
 
-        private BoundExpression BindLiteralExpression(LiteralExpressionSyntax syntax)
-        {
-            //Value is being parsed into a nullable int
-            //That then gets checked to see if it's null, and gets assigned to 0 if it is.
-            var value = syntax.Value ?? 0;
-            return new BoundLiteralExpression(value);
-        }
+
+        //Value is being parsed into a nullable int
+        //That then gets checked to see if it's null, and gets assigned to 0 if it is.
+        private BoundExpression BindLiteralExpression(LiteralExpressionSyntax syntax) => new BoundLiteralExpression(syntax.Value ?? 0);
 
         private BoundExpression BindUnaryExpression(UnaryExpressionSyntax syntax)
         {
@@ -46,7 +55,7 @@ namespace Compiler.CodeAnalysis.Binding
             //Then returning our boundOperand
             if(boundOperatorKind is null)
             {
-                _diagnostics.Add($"Unary operand {syntax.OperatorToken.Text} is not defined for {boundOperand.Type} and!");
+                _diagnostics.ReportUndefinedUnaryOperator(syntax.OperatorToken.Span, syntax.OperatorToken.Text ?? "null", boundOperand.Type);
                 return boundOperand;
             }
             
@@ -62,14 +71,38 @@ namespace Compiler.CodeAnalysis.Binding
             var boundOperatorKind = BoundBinaryOperator.Bind(syntax.OperatorToken.Kind, boundLeft.Type, boundRight.Type);
            
             //Same as in the BindUnaryExpression but we return our boundLeft instead
-            if(boundOperatorKind == null)
+            if(boundOperatorKind is null)
             {
-                _diagnostics.Add($"Binary operand '{syntax.OperatorToken.Kind}' is not defined for {boundLeft.Type} and {boundRight.Type}!");
+                Console.WriteLine(syntax.OperatorToken.Text);
+                _diagnostics.ReportUndefinedBinaryOperator(syntax.OperatorToken.Span, syntax.OperatorToken.Text, boundLeft.Type, boundRight.Type);
                 return boundLeft;
             }
 
             return new BoundBinaryExpression(boundLeft, boundOperatorKind, boundRight);
         }
 
+        //Just to stay consistant tbh
+        private BoundExpression BindParenthesizedExpression(ParenthesizedExpressionSyntax syntax) => BindExpression(syntax.Expression);
+
+        private BoundExpression BindNameExpression(NameExpressionSyntax syntax)
+        {
+            var name = syntax.IdentifierToken.Text;
+            
+            //Trying to get the value, if it returns then great, if not we report it
+            if (_variables.TryGetValue(name ?? "", out var value))
+            {
+                _diagnostics.ReportUndefinedName(syntax.IdentifierToken.Span, name ?? "name is null");
+                return new BoundLiteralExpression(0);
+            }
+            var type = value?.GetType() ?? typeof(int);
+            return new BoundVariableExpression(name ?? "int", type);
+        }
+
+        private BoundExpression BindAssignmentExpression(AssignmentExpressionSyntax syntax)
+        {
+            var name = syntax.IdentifierToken.Text;
+            var boundExpression = BindExpression(syntax.Expression);
+            return new BoundAssignmentExpression(name ?? "", boundExpression);
+        }
     }
 }

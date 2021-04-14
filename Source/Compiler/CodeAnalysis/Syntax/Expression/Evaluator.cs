@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Compiler.CodeAnalysis.Binding;
 using Compiler.CodeAnalysis.Binding.NodeKinds;
 
@@ -10,9 +11,11 @@ namespace Compiler.CodeAnalysis.Syntax.Expression
     internal sealed class Evaluator
     {
         private readonly BoundExpression _root;
-        public Evaluator(BoundExpression root)
+        private readonly Dictionary<string, object> _variables;
+        public Evaluator(BoundExpression root, Dictionary<string, object> variables)
         {
             _root = root;
+            _variables = variables;
         }
 
         public object Evaluate()
@@ -22,84 +25,95 @@ namespace Compiler.CodeAnalysis.Syntax.Expression
 
         private object EvaluateExpression(BoundExpression node)
         {
-            //if it's a literal expression, return it's value
-            if (node is BoundLiteralExpression n) 
+            switch(node)
             {
-                return n.Value;
-            }
-            //if it's a Unary expression, we just evaluate the operand
-            //and return it's value according to the symbol
-            else if(node is BoundUnaryExpression u)
-            {
-                var operand = EvaluateExpression(u.Operand);
-                switch(u.Op.Kind)
-                {
-                    case BoundUnaryOperatorKind.Identity:
-                        return (int)operand;
-                    case BoundUnaryOperatorKind.Negation:
-                        return -(int)operand;
-                    case BoundUnaryOperatorKind.LogicalNegation:
-                        return !(bool)operand;
-                }
+                //if it's a literal expression, return it's value
+                case BoundLiteralExpression n: 
+                    return n.Value;
 
-                Console.Error.WriteLine($"Unexpected unary operator {u.Kind}");
-            }
-            //If it's none of the above, we check out last resort
-            //A BoundBinaryExpression, here we evaluate the left and right sides of both expressions
-            //then return a value based off of the current operator kind
-            else if (node is BoundBinaryExpression b)
-            {
-                var left = EvaluateExpression(b.Left);
-                var right = EvaluateExpression(b.Right);
+                //if it's a Unary expression, we just evaluate the operand
+                //and return it's value according to the symbol
+                case BoundUnaryExpression u:
+                   var operand = EvaluateExpression(u.Operand);
+                    switch(u.Op.Kind)
+                    {
+                        case BoundUnaryOperatorKind.Identity:
+                            return (int)operand;
+                        case BoundUnaryOperatorKind.Negation:
+                            return -(int)operand;
+                        case BoundUnaryOperatorKind.LogicalNegation:
+                            return !(bool)operand;
+                    }
 
-                switch (b.Op.Kind)
-                {
-                    //Universal
-                    case BoundBinaryOperatorKind.LogicalEquals:
-                        return Equals(left, right); 
-                    case BoundBinaryOperatorKind.NotEquals:
-                        return !Equals(left, right);
+                    Console.Error.WriteLine($"Unexpected unary operator {u.Kind}");
+                    break;
 
-                    //Int
-                    case BoundBinaryOperatorKind.Addition:
-                        return (int)left + (int)right;
-                    case BoundBinaryOperatorKind.Subtraction:
-                        return (int)left - (int)right;
-                    case BoundBinaryOperatorKind.Multiplication:
-                        return (int)left * (int)right;
-                    case BoundBinaryOperatorKind.Division:
-                        return (int)left / (int)right;
-                    case BoundBinaryOperatorKind.Pow:
-                        var result = (int)left;
-                        var leftAsInt = (int)left;
-                        for(var i = 1; i < (int)right; i++)
-                        {
-                            result *= leftAsInt;
-                        }
-                        return result;
+                case BoundVariableExpression v:
+                    return _variables[v.Name];
+
+                case BoundAssignmentExpression a:
+                    var value = EvaluateExpression(a.Expression);
+                    _variables[a.Name] = value;
+                    return value;
+
+                //If it's none of the above, we check out last resort
+                //A BoundBinaryExpression, here we evaluate the left and right sides of both expressions
+                //then return a value based off of the current operator kind
+                case BoundBinaryExpression b:
+                     var left = EvaluateExpression(b.Left);
+                    var right = EvaluateExpression(b.Right);
+                        
+                    switch (b.Op.Kind)  
+                    {
+                        //Universal
+                        case BoundBinaryOperatorKind.LogicalEquals:
+                            return Equals(left, right); 
+                        case BoundBinaryOperatorKind.NotEquals:
+                            return !Equals(left, right);
+
+                        //Int
+                        case BoundBinaryOperatorKind.Addition:
+                            return (int)left + (int)right;
+                        case BoundBinaryOperatorKind.Subtraction:
+                            return (int)left - (int)right;
+                        case BoundBinaryOperatorKind.Multiplication:
+                            return (int)left * (int)right;
+                        case BoundBinaryOperatorKind.Division:
+                            return (int)left / (int)right;
+                        case BoundBinaryOperatorKind.Pow:
+                            var result = (int)left;
+                            var leftAsInt = (int)left;
+                            for(var i = 1; i < (int)right; i++)
+                            {
+                                result *= leftAsInt;
+                            }
+                            return result;
                                             
-                    //Bool
-                    case BoundBinaryOperatorKind.LogicalAND:
-                        return (bool)left && (bool)right;
-                    case BoundBinaryOperatorKind.LogicalOR:
-                        return (bool)left || (bool)right;
-                    case BoundBinaryOperatorKind.LogicalXOREquals:
-                        var leftBool = (bool)left;
-                        var rightBool = (bool)right;
-                        return leftBool ^= rightBool;
-                    case BoundBinaryOperatorKind.LogicalXOR:
-                        return (bool)left ^ (bool)right;
+                        //Bool
+                        case BoundBinaryOperatorKind.LogicalAND:
+                            return (bool)left && (bool)right;
+                        case BoundBinaryOperatorKind.LogicalOR:
+                            return (bool)left || (bool)right;
+                        case BoundBinaryOperatorKind.LogicalXOREquals:
+                            var leftBool = (bool)left;
+                            var rightBool = (bool)right;
+                            return leftBool ^= rightBool;
+                        case BoundBinaryOperatorKind.LogicalXOR:
+                            return (bool)left ^ (bool)right;
 
                     
-                    default:
-                        //We can throw exceptions here because we've exhausted all options,
-                        //and this is an internal compiler error, should handle this more gracefully,
-                        //but during the development stage, and exception will provide more info,
-                        //on the stack trace :)
-                        throw new($"Unexpected binary operator {b.Op.Kind}");
-                }
+                        default:
+                            //We can throw exceptions here because we've exhausted all options,
+                            //and this is an internal compiler error, should handle this more gracefully,
+                            //but during the development stage, and exception will provide more info,
+                            //on the stack trace :)
+                            throw new($"Unexpected binary operator {b.Op.Kind}");
+                    }
+                default:
+                    //Same as above ^^
+                    throw new($"Unexpected node {node.Kind}");
             }
-            //Same as above ^^ 
+            //Same as above ^^
             throw new($"Unexpected node {node.Kind}");
         }
     }

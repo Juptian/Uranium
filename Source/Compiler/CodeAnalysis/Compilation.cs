@@ -7,6 +7,7 @@ using Compiler.CodeAnalysis.Syntax;
 using Compiler.CodeAnalysis.Parsing;
 using Compiler.CodeAnalysis.Binding;
 using Compiler.CodeAnalysis.Syntax.Expression;
+using Compiler.Logging;
 
 
 namespace Compiler.CodeAnalysis
@@ -20,9 +21,9 @@ namespace Compiler.CodeAnalysis
 
         public SyntaxTree Syntax { get; }
 
-        public EvaluationResult Evaluate()
+        public EvaluationResult Evaluate(Dictionary<string, object> variables)
         {
-            var binder = new Binder();
+            var binder = new Binder(variables);
             var boundExpression = binder.BindExpression(Syntax.Root);
 
             var diagnostics = Syntax.Diagnostics.Concat(binder.Diagnostics).ToArray();
@@ -32,9 +33,9 @@ namespace Compiler.CodeAnalysis
                 return new(diagnostics, null);
             }
 
-            var evaluator = new Evaluator(boundExpression);
+            var evaluator = new Evaluator(boundExpression, variables);
             var value = evaluator.Evaluate();
-            return new(Array.Empty<string>(), value);
+            return new(Array.Empty<Diagnostic>(), value);
         }
     }
 }

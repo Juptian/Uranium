@@ -4,6 +4,7 @@ using Compiler.CodeAnalysis.Syntax.Expression;
 using System.Collections.Generic;
 using System.Linq;
 using Compiler.CodeAnalysis.Syntax;
+using Compiler.Logging;
 
 namespace Compiler.CodeAnalysis.Parsing
 {
@@ -11,8 +12,7 @@ namespace Compiler.CodeAnalysis.Parsing
     {
         private readonly SyntaxToken[] _tokens;
         private int _position;
-        private SyntaxToken _current => Peek(0);
-        private readonly List<string> _diagnostics = new();
+        private readonly DiagnosticBag _diagnostics = new();
 
         public Parser(string text)
         {
@@ -29,10 +29,12 @@ namespace Compiler.CodeAnalysis.Parsing
             }
             while (token.Kind != SyntaxKind.EndOfFile);
             _tokens = tokens.ToArray();
+            _diagnostics.Concat(lexer.Diagnostics);
         }
 
-        public IEnumerable<string> Diagnostics => _diagnostics;
-
+        private SyntaxToken Current => Peek(0);
+        public DiagnosticBag Diagnostics => _diagnostics;
+        
         private SyntaxToken Peek(int offset)
         {
             var index = _position + offset;
@@ -46,21 +48,21 @@ namespace Compiler.CodeAnalysis.Parsing
 
         private SyntaxToken NextToken()
         {
-            var current = _current;
+            var current = Current;
             _position++;
             return current;
         }
 
         private SyntaxToken MatchToken(SyntaxKind kind)
         {
-            if (_current.Kind == kind)
+            if (Current.Kind == kind)
             {
                 return NextToken();
             }
 
-            _diagnostics.Add($"Unexpected token: {_current.Kind}, expected {kind}");
+            _diagnostics.ReportInvalidToken(Current.Span, Current, kind);
 
-            return new(kind, _current.Position, null, null);
+            return new(kind, Current.Position, null, null);
         }
 
         public SyntaxTree Parse()
@@ -70,19 +72,52 @@ namespace Compiler.CodeAnalysis.Parsing
 
             return new(_diagnostics, expression, EOFToken);
         }
+        
+        private ExpressionSyntax ParseExpression()
+        {
+            return ParseAssignmentExpression();
+        }
+
+        private ExpressionSyntax ParseAssignmentExpression()
+        {
+            //Assignments will be done like this:
+            //
+            //a = b = 5
+            //
+            //
+            //   =
+            //  / \
+            // a   =
+            //    / \
+            //    b  5
+            //Checking for an identifier token, and a double equals
+            //this way we can actually assign two identifiers
+            
+            if(Current.Kind == SyntaxKind.IdentifierToken &&
+                Peek(1).Kind == SyntaxKind.Equals)
+            {
+                //Despite knowing the token, we want to consume it, to avoid loops
+                var identifierToken = NextToken();
+                var operatorToken = NextToken();
+
+                var right = ParseAssignmentExpression();
+                return new AssignmentExpressionSyntax(identifierToken, operatorToken, right);
+            }
+            return ParseBinaryExpression();
+        }
 
         //Allowing for proper operator precedence
-        private ExpressionSyntax ParseExpression(int parentPrecedence = 0)
+        private ExpressionSyntax ParseBinaryExpression(int parentPrecedence = 0)
         {
 
             ExpressionSyntax left;
-            var unaryOperatorPrecedence = _current.Kind.GetUnaryOperatorPrecedence();
+            var unaryOperatorPrecedence = Current.Kind.GetUnaryOperatorPrecedence();
 
             //Allowing for unary operator precedence
             if(unaryOperatorPrecedence != 0 && unaryOperatorPrecedence >= parentPrecedence)
             {
                 var operatorToken = NextToken();
-                var operand = ParseExpression(unaryOperatorPrecedence);
+                var operand = ParseBinaryExpression(unaryOperatorPrecedence);
                 left = new UnaryExpressionSyntax(operatorToken, operand);
             }
             else
@@ -93,7 +128,7 @@ namespace Compiler.CodeAnalysis.Parsing
             //Keep looping until our precedence is <= parent precedence, or == 0;
             while(true)
             {
-                var precedence = _current.Kind.GetBinaryOperatorPrecedence();
+                var precedence = Current.Kind.GetBinaryOperatorPrecedence();
                 
                 if(precedence == 0 || precedence <= parentPrecedence)
                 {
@@ -103,7 +138,7 @@ namespace Compiler.CodeAnalysis.Parsing
                 //Taking the current token, and moving the index
                 var operatorToken = NextToken();
                 //Recursively calling the ParseExpression with the current precedence
-                var right = ParseExpression(precedence);
+                var right = ParseBinaryExpression(precedence);
 
                 //Making left a New BinaryExpressionSyntax
                 left = new BinaryExpressionSyntax(left, operatorToken, right);
@@ -116,7 +151,7 @@ namespace Compiler.CodeAnalysis.Parsing
         private ExpressionSyntax ParsePrimaryExpression()
         {
             //Converted to switch before we get too many checks
-            switch(_current.Kind)
+            switch(Current.Kind)
             {
                 //Parenthesis
                 case SyntaxKind.OpenParenthesis:
@@ -132,6 +167,12 @@ namespace Compiler.CodeAnalysis.Parsing
                     var value = keywordToken.Kind == SyntaxKind.TrueKeyword;
                     return new LiteralExpressionSyntax(keywordToken, value);
 
+                //Identifiers
+                case SyntaxKind.IdentifierToken:
+                    var identifierToken = NextToken();
+
+                    return new NameExpressionSyntax(identifierToken);
+
                 //Assuming default is a number token
                 default:
                     var numberToken = MatchToken(SyntaxKind.NumberToken);
@@ -146,9 +187,9 @@ namespace Compiler.CodeAnalysis.Parsing
 
             Console.Write(indent + marker + node.Kind);
 
-            if (node is SyntaxToken t && t.Value != null)
+            if (node is SyntaxToken token && token.Value is not null)
             {
-                Console.Write(" " + t.Value);
+                Console.Write(" " + token.Value);
             }
             Console.WriteLine();
             indent += isLast ? "    " : "│   ";

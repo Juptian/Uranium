@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Main": {
+      "commandName": "Project",
+      "commandLineArgs": "test.txt --#showtree"
+    }
+  }
+}

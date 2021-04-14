@@ -8,7 +8,7 @@ namespace Compiler.CodeAnalysis.Syntax
 {
     internal static class SyntaxFacts
     {
-        private static int _minusValue = 4;
+        private static readonly int _minusValue = 4;
         public static int GetBinaryOperatorPrecedence(this SyntaxKind kind)
             => kind switch
             {
@@ -46,6 +46,17 @@ namespace Compiler.CodeAnalysis.Syntax
             {
                 "true" => SyntaxKind.TrueKeyword,
                 "false" => SyntaxKind.FalseKeyword,
+                "double" => SyntaxKind.DoubleKeyword,
+                "string" => SyntaxKind.StringKeyword,
+                "float" => SyntaxKind.FloatKeyword,
+                "long" => SyntaxKind.LongKeyword,
+                "bool" => SyntaxKind.BoolKeyword,
+                "var" => SyntaxKind.VarKeyword,
+                "struct" => SyntaxKind.StructKeyword,
+                "class" => SyntaxKind.ClassKeyword,
+                "namespace" => SyntaxKind.NamespaceKeyword,
+                "enum" => SyntaxKind.EnumKeywrod,
+                "typedef" => SyntaxKind.TypeDefKeyword,
                 _ => SyntaxKind.BadToken,
             };
     }

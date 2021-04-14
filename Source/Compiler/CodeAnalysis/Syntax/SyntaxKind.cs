@@ -19,6 +19,8 @@
         Pow,
         DoubleEquals,
         PercentEquals,
+        PlusPlus,
+        MinusMinus,
 
         //Syntactic symbols
         Semicolon,
@@ -50,6 +52,7 @@
 
         //Temp
         NumberToken,
+        IdentifierToken,
 
         //Logic keywords
         IfKeyword,
@@ -71,12 +74,17 @@
         //Type keywords
         ClassKeyword,
         StructKeyword,
+        EnumKeywrod,
         NamespaceKeyword,
+
         IntKeyword,
         FloatKeyword,
         DoubleKeyword,
         LongKeyword,
         VarKeyword,
+        StringKeyword,
+        BoolKeyword,
+        TypeDefKeyword,
 
         //Loop keywords
         WhileKeyword,

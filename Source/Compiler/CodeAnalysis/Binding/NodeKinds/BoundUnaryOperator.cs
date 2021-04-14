@@ -35,7 +35,7 @@ namespace Compiler.CodeAnalysis.Binding.NodeKinds
             new BoundUnaryOperator(SyntaxKind.Bang, BoundUnaryOperatorKind.LogicalNegation, typeof(bool)),
         };
 
-        public static BoundUnaryOperator Bind(SyntaxKind syntaxKind, Type operandType)
+        public static BoundUnaryOperator? Bind(SyntaxKind syntaxKind, Type operandType)
         {
             foreach(var op in _operators)
             {

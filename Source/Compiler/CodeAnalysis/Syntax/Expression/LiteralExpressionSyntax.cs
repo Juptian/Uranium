@@ -7,7 +7,7 @@ namespace Compiler.CodeAnalysis.Syntax.Expression
     {
 
         public LiteralExpressionSyntax(SyntaxToken literalToken)
-            : this(literalToken, literalToken.Value)
+            : this(literalToken, literalToken.Value ?? 0)
         { }
 
         public LiteralExpressionSyntax(SyntaxToken literalToken, object value)
