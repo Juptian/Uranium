@@ -8,6 +8,7 @@ using Compiler.CodeAnalysis.Parsing;
 using Compiler.CodeAnalysis.Binding;
 using Compiler.CodeAnalysis.Syntax.Expression;
 using Compiler.Logging;
+using Compiler.CodeAnalysis.Text;
 
 
 namespace Compiler.CodeAnalysis
@@ -21,7 +22,7 @@ namespace Compiler.CodeAnalysis
 
         public SyntaxTree Syntax { get; }
 
-        public EvaluationResult Evaluate(Dictionary<string, object> variables)
+        public EvaluationResult Evaluate(Dictionary<VariableSymbol, object> variables)
         {
             var binder = new Binder(variables);
             var boundExpression = binder.BindExpression(Syntax.Root);

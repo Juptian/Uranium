@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Compiler.CodeAnalysis.Binding;
 using Compiler.CodeAnalysis.Binding.NodeKinds;
+using Compiler.CodeAnalysis.Text;
 
 namespace Compiler.CodeAnalysis.Syntax.Expression
 {
@@ -11,8 +12,8 @@ namespace Compiler.CodeAnalysis.Syntax.Expression
     internal sealed class Evaluator
     {
         private readonly BoundExpression _root;
-        private readonly Dictionary<string, object> _variables;
-        public Evaluator(BoundExpression root, Dictionary<string, object> variables)
+        private readonly Dictionary<VariableSymbol, object> _variables;
+        public Evaluator(BoundExpression root, Dictionary<VariableSymbol, object> variables)
         {
             _root = root;
             _variables = variables;
@@ -49,11 +50,11 @@ namespace Compiler.CodeAnalysis.Syntax.Expression
                     break;
 
                 case BoundVariableExpression v:
-                    return _variables[v.Name];
+                    return _variables[v.Variable];
 
                 case BoundAssignmentExpression a:
                     var value = EvaluateExpression(a.Expression);
-                    _variables[a.Name] = value;
+                    _variables[a.Variable] = value;
                     return value;
 
                 //If it's none of the above, we check out last resort

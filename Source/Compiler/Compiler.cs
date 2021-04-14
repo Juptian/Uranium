@@ -10,6 +10,7 @@ using Compiler.CodeAnalysis.Syntax;
 using Compiler.CodeAnalysis.Parsing;
 using Compiler.CodeAnalysis.Binding;
 using Compiler.CodeAnalysis;
+using Compiler.CodeAnalysis.Text;
 
 namespace Compiler
 {
@@ -26,7 +27,7 @@ namespace Compiler
             
             var text = OpenFile(args[0]);
 
-            var variables = new Dictionary<string, object>();
+            var variables = new Dictionary<VariableSymbol, object>();
 
 
             //Looping over the args to check if they want to show the tree

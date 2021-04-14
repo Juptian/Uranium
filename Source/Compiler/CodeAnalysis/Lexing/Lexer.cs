@@ -127,10 +127,9 @@ namespace Compiler.CodeAnalysis.Lexing
                 var length = _index - start;
                 var text = _source.Substring(start, length);
                 var kind = SyntaxFacts.GetKeywordKind(text);
-                _current = kind;
+                _current = kind == SyntaxKind.BadToken ? SyntaxKind.IdentifierToken : kind;
                 _text = text;
                 _index--;
-                _current = SyntaxKind.IdentifierToken;
                 return _current;
             }
 
