@@ -18,6 +18,7 @@ namespace Compiler.CodeAnalysis.Binding
                 SyntaxKind.BinaryExpression => BindBinaryExpression((BinaryExpressionSyntax)syntax),
                 SyntaxKind.UnaryExpression => BindUnaryExpression((UnaryExpressionSyntax)syntax),
                 SyntaxKind.LiteralExpression => BindLiteralExpression((LiteralExpressionSyntax)syntax),
+                SyntaxKind.ParenthesizedExpression => BindExpression(((ParenthesizedExpressionSyntax)syntax).Expression),
                 _ => throw new($"Unexpected syntax {syntax.Kind}"),
             };
 
@@ -45,7 +46,7 @@ namespace Compiler.CodeAnalysis.Binding
             //Then returning our boundOperand
             if(boundOperatorKind is null)
             {
-                _diagnostics.Add($"Unary operand {syntax.OperatorToken.Text} is not defined for {boundOperand.Type}!");
+                _diagnostics.Add($"Unary operand {syntax.OperatorToken.Text} is not defined for {boundOperand.Type} and!");
                 return boundOperand;
             }
             
@@ -63,7 +64,7 @@ namespace Compiler.CodeAnalysis.Binding
             //Same as in the BindUnaryExpression but we return our boundLeft instead
             if(boundOperatorKind == null)
             {
-                _diagnostics.Add($"Binary operand '{syntax.OperatorToken.Kind}' is not defined for {boundLeft.Type}!");
+                _diagnostics.Add($"Binary operand '{syntax.OperatorToken.Kind}' is not defined for {boundLeft.Type} and {boundRight.Type}!");
                 return boundLeft;
             }
 

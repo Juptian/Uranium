@@ -27,6 +27,6 @@ namespace Compiler.CodeAnalysis.Binding.NodeKinds
         public BoundExpression Right { get; }
 
         public override Type Type => Op.ResultType;
-        public override BoundNodeKind Kind => BoundNodeKind.UnaryExpression;
+        public override BoundNodeKind Kind => BoundNodeKind.BinaryExpression;
     }
 }

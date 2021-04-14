@@ -70,8 +70,14 @@ namespace Compiler.CodeAnalysis.Syntax.Expression
                     case BoundBinaryOperatorKind.Division:
                         return (int)left / (int)right;
                     case BoundBinaryOperatorKind.Pow:
-                        return Math.Pow( (double) left, (double)right);
-                    
+                        var result = (int)left;
+                        var leftAsInt = (int)left;
+                        for(var i = 1; i < (int)right; i++)
+                        {
+                            result *= leftAsInt;
+                        }
+                        return result;
+                                            
                     //Bool
                     case BoundBinaryOperatorKind.LogicalAND:
                         return (bool)left && (bool)right;

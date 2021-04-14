@@ -7,7 +7,7 @@ using Compiler.CodeAnalysis.Lexing;
 #pragma warning disable CS8632
 namespace Compiler.CodeAnalysis.Syntax
 {
-    internal class SyntaxToken : SyntaxNode
+    public class SyntaxToken : SyntaxNode
     {
         public SyntaxToken(SyntaxKind kind, int position, string text, object value)
         {

@@ -40,10 +40,9 @@ namespace Compiler.CodeAnalysis.Binding.NodeKinds
             new BoundBinaryOperator(SyntaxKind.Minus, BoundBinaryOperatorKind.Subtraction, typeof(int)),
             new BoundBinaryOperator(SyntaxKind.Multiply, BoundBinaryOperatorKind.Multiplication, typeof(int)),
             new BoundBinaryOperator(SyntaxKind.Divide, BoundBinaryOperatorKind.Division, typeof(int)),
-            new BoundBinaryOperator(SyntaxKind.Pow, BoundBinaryOperatorKind.Pow, typeof(double)),
+            new BoundBinaryOperator(SyntaxKind.Pow, BoundBinaryOperatorKind.Pow, typeof(int), typeof(int)),
             new BoundBinaryOperator(SyntaxKind.DoubleEquals, BoundBinaryOperatorKind.LogicalEquals, typeof(int), typeof(bool)),
             new BoundBinaryOperator(SyntaxKind.BangEquals, BoundBinaryOperatorKind.NotEquals, typeof(int), typeof(bool)),
-
 
             new BoundBinaryOperator(SyntaxKind.DoubleAmpersand, BoundBinaryOperatorKind.LogicalAND, typeof(bool)),
             new BoundBinaryOperator(SyntaxKind.DoublePipe, BoundBinaryOperatorKind.LogicalOR, typeof(bool)),

@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using Compiler.CodeAnalysis.Syntax;
 using Compiler.CodeAnalysis.Parsing;
 using Compiler.CodeAnalysis.Binding;
+using Compiler.CodeAnalysis;
 
 namespace Compiler
 {
@@ -40,13 +41,14 @@ namespace Compiler
             }
 
             var syntaxTree = SyntaxTree.Parse(text);
-            var binder = new Binder();
-            Console.WriteLine(syntaxTree.Root);
-            var boundExpression = binder.BindExpression(syntaxTree.Root);
+            var compilation = new Compilation(syntaxTree);
+
+            var result = compilation.Evaluate();
+
+
 
             //We concat the binder's diagnostics, and the syntax tree's diagnostics in case of ANY errors
-            var diagnostics = syntaxTree.Diagnostics.Concat(binder.Diagnostics).ToArray();
-            
+            var diagnostics = result.Diagnostics;            
             //Displaying the tree if the program is ran with --#showTree
             if(showTree)
             {
@@ -56,7 +58,12 @@ namespace Compiler
             }
 
             //If there are any diagnostics, we print them in red
-            if(diagnostics.Any())
+            if(!diagnostics.Any())
+            {
+                //Print out the results if there are no diagnostics
+                Console.WriteLine(result.Value);
+            } 
+            else
             {
                 Console.ForegroundColor = ConsoleColor.Red;
 
@@ -68,15 +75,7 @@ namespace Compiler
                 }
                 //Reset the color so that it doesn't look bad
                 Console.ResetColor(); 
-            } 
-            else
-            {
-                //Evaluate expressions!
-                var evaluator = new Evaluator(boundExpression);
-                var result = evaluator.Evaluate();
-                
-                //And of course we gotta log the values
-                Console.WriteLine(result);
+
             }
         
         }
