@@ -72,40 +72,5 @@ namespace Compiler.CodeAnalysis.Binding
             return new BoundBinaryExpression(boundLeft, boundOperatorKind, boundRight);
         }
 
-        private BoundUnaryOperatorKind? BindUnaryOperatorKind(SyntaxKind kind, Type operandType)
-        {
-            //We only allow ints for now
-            if (operandType != typeof(int))
-                return null;
-            // If the unary operator is not a + or - we throw an error
-            // Because you can't just do /10 for example, you need another expression
-            return kind switch
-            {
-                SyntaxKind.Plus => BoundUnaryOperatorKind.Identity,
-                SyntaxKind.Minus => BoundUnaryOperatorKind.Negation,
-                _ => throw new($"Unexpected unary operator {kind}"),
-            };
-        }
-
-        private BoundBinaryOperatorKind? BindBinaryOperatorKind(SyntaxKind kind, Type leftType, Type rightType)
-        {
-            //Returning null if right or left is not an int, we only accept an int right now
-            if(leftType != typeof(int) || rightType != typeof(int))
-            {
-                return null;
-            }
-
-            //If we get pass the null check, we check what operator is used
-            //Then we will use it in the evaluator according to the result
-            return kind switch
-            {
-                SyntaxKind.Plus => BoundBinaryOperatorKind.Addition,
-                SyntaxKind.Minus => BoundBinaryOperatorKind.Subtraction,
-                SyntaxKind.Multiply => BoundBinaryOperatorKind.Multiplication,
-                SyntaxKind.Divide => BoundBinaryOperatorKind.Division,
-                SyntaxKind.Pow => BoundBinaryOperatorKind.Pow,
-                _ => throw new($"Unexpected binary operator {kind}"),
-            };
-        }
     }
 }
