@@ -18,7 +18,7 @@ jobs:
       with:
         dotnet-version: 5.0.x
     - name: Restore dependencies
-      run: dotnet restore Project.sln
+      run: dotnet restore Uranium.sln
     - name: Build
       run: dotnet build Uranium.sln --no-restore
     - name: Test
