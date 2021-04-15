@@ -20,6 +20,6 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore Project.sln
     - name: Build
-      run: dotnet build Project.sln --no-restore
+      run: dotnet build Uranium.sln --no-restore
     - name: Test
       run: dotnet test Source/Compiler.Tests --no-build --verbosity normal
