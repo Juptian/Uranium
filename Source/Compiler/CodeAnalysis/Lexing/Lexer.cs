@@ -24,10 +24,10 @@ namespace Compiler.CodeAnalysis.Lexing
 
         public Lexer(string contents)
         {
-            _source = contents;
+            source = contents;
             /*for (var i = 0; i < contents.Length; i++)
             {
-                Console.WriteLine($"{contents[i]}, {i}");
+                Console.Write($"{contents[i]}, {i}");
             }*/
         }
 
@@ -36,18 +36,17 @@ namespace Compiler.CodeAnalysis.Lexing
         public SyntaxToken Lex()
         {
             _current = SyntaxKind.BadToken;
-            ReadSpecialChars(true);
+            ReadSpecialChars(false);
             LexToken(CurrentIndex);
-            if (_index == _source.Length)
+
+            /*if (_index == _source.Length)
             {
                 return new(SyntaxKind.EndOfFile, _index, "\0", null);
-            }
+            }*/
 
-            /*Console.Write($"{_current}, ");
-            Console.WriteLine($"{_index}, {CurrentIndex}");*/
-
-            _index++;
-            return new(_current, _index, _text ?? CurrentIndex.ToString(), _currentValue);
+            Console.Write($"{_current}, ");
+            Console.WriteLine($"{_index}, {CurrentIndex}");
+            return new(_current, _index++, _text ?? CurrentIndex.ToString(), _currentValue);
         }
 
         private char Peek(int offset)
@@ -82,6 +81,7 @@ namespace Compiler.CodeAnalysis.Lexing
                         _current = SyntaxKind.LineBreak;
                         ReadLineBreak();
                         finished = !keepGoing;
+                        _text = finished ? "\n" : _text;
                         break;
                     case ' ':
                     case '\t':
@@ -96,6 +96,7 @@ namespace Compiler.CodeAnalysis.Lexing
                         if (char.IsWhiteSpace(CurrentIndex))
                         {
                             ReadWhitespace();
+                            _current = SyntaxKind.WhiteSpace;
                         }
                         else
                         {
@@ -142,7 +143,7 @@ namespace Compiler.CodeAnalysis.Lexing
                     if(Match('=', 1))
                     {
                         _current = SyntaxKind.PlusEquals;
-                        _text = "+";
+                        _text = "+=";
                     } 
                     else if (Match('+', 1))
                     {
@@ -174,18 +175,24 @@ namespace Compiler.CodeAnalysis.Lexing
                     break;
                 case '*':               
                     if (Match('=', 1))
+                    {
                         _current = SyntaxKind.MultiplyEquals;
+                        _text = "*=";
+                    }
                     else if (Match('*', 1))
                     {
                         _current = SyntaxKind.Pow;
-                        _index++;
+                        _text = "**";
                     }
                     else
                         _current = SyntaxKind.Multiply;
                     break;
                 case '/':
                     if (Match('=', 1))
+                    {
                         _current = SyntaxKind.DivideEquals;
+                        _text = "/=";
+                    }
                     else if (Match('/', 1))
                     {
                         ReadSingleLineComment();
@@ -289,6 +296,16 @@ namespace Compiler.CodeAnalysis.Lexing
                 case '\0':
                     _current = SyntaxKind.EndOfFile;
                     return _current;
+
+                case ',':
+                    _current = SyntaxKind.Comma;
+                    break;
+                case '.':
+                    _current = SyntaxKind.Dot;
+                    break;
+                case ':':
+                    _current = SyntaxKind.Colon;
+                    break;
                 //Default
                 default:
                     //It could be a whitespace/linebreak/ect statement, so we just break
@@ -296,6 +313,7 @@ namespace Compiler.CodeAnalysis.Lexing
                     {
                         _current = SyntaxKind.Null;
                     }
+                    _text = ch.ToString();
                     break;
             }
             return _current;
@@ -312,11 +330,13 @@ namespace Compiler.CodeAnalysis.Lexing
             {
                 _index++;
             }
+            _current = SyntaxKind.LineBreak;
         }
 
         private void ReadWhitespace()
         {
             var done = false;
+
             while (!done)
             {
                 switch (CurrentIndex)
@@ -328,12 +348,17 @@ namespace Compiler.CodeAnalysis.Lexing
                         break;
                     default:
                         if (!char.IsWhiteSpace(CurrentIndex))
+                        {
                             done = true;
+                        }
                         else
+                        {
                             _index++;
+                        }
                         break;
                 }
             }
+            _current = SyntaxKind.WhiteSpace;
         }
 
         private void ReadSingleLineComment()
@@ -427,8 +452,9 @@ namespace Compiler.CodeAnalysis.Lexing
             //This allows a user to chose between , and . as their decimal separator
             var charArray = _source.Substring(startIndex, length).Replace(',', '.').ToCharArray();
 
+            _text = string.Join("", charArray);
             var text = string.Join("", charArray.Where(e => !char.IsWhiteSpace(e) && !e.Equals('_')));
-
+            
             //Numbers cannot start with _ or have multiple . s.
             if (text.StartsWith('_'))
             {
@@ -438,6 +464,7 @@ namespace Compiler.CodeAnalysis.Lexing
             //Numbers cannot have multiple .s or ,s.
             if (hasMultiDecimals)
             {
+                _diagnostics.ReportInvalidNumber(new(startIndex, length), text, typeof(double));
             }
 
             if (isDecimal)

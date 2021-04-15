@@ -6,7 +6,6 @@
     <LangVersion>9</LangVersion>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Compiler\Compiler.csproj"/>
-    <ProjectReference Include="..\Compiler.Tests\Compiler.Tests.csproj"/>  
+    <ProjectReference Include="..\Compiler\Compiler.csproj" />  
   </ItemGroup>
 </Project>

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Compiler.CodeAnalysis.Syntax.Expression;
 using Compiler.CodeAnalysis.Parsing;
 using Compiler.Logging;
+using Compiler.CodeAnalysis.Lexing;
 
 namespace Compiler.CodeAnalysis.Syntax
 {
@@ -26,6 +27,21 @@ namespace Compiler.CodeAnalysis.Syntax
         {
             var parser = new Parser(text);
             return parser.Parse();
+        }
+
+        public static IEnumerable<SyntaxToken> LexTokens(string text)
+        {
+            Console.WriteLine(text);
+            var lexer = new Lexer(text);
+            while(true)
+            {
+                var token = lexer.Lex();
+                if (token.Kind == SyntaxKind.EndOfFile)
+                {
+                    break;
+                }
+                yield return token;
+            }
         }
     }
 }
