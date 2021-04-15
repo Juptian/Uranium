@@ -40,12 +40,7 @@ namespace Compiler.CodeAnalysis.Lexing
             ReadSpecialChars(false);
             LexToken(CurrentIndex);
 
-            /*if (_index == _source.Length)
-            {
-                return new(SyntaxKind.EndOfFile, _index, "\0", null);
-            }*/
-
-            /*Console.Write($"{_current}, ");
+            /*Console.Write($"{_current}, {_text}, ");
             Console.WriteLine($"{_index}, {CurrentIndex}");*/
             return new(_current, _index++, _text ?? PreviousIndex.ToString(), _currentValue);
         }
@@ -186,7 +181,10 @@ namespace Compiler.CodeAnalysis.Lexing
                         _text = "**";
                     }
                     else
+                    {
                         _current = SyntaxKind.Multiply;
+                        _text = "*";
+                    }
                     break;
                 case '/':
                     if (Match('=', 1))
@@ -205,8 +203,11 @@ namespace Compiler.CodeAnalysis.Lexing
                         _current = SyntaxKind.MultiLineComment;
                     }
                     else
+                    {
                         _current = SyntaxKind.Divide;
-
+                        _text = "/";
+                    }
+                        
                     break;
                 case '>':
                     matched = Match('=', 1);
@@ -255,6 +256,7 @@ namespace Compiler.CodeAnalysis.Lexing
                     break;
                 case '~':
                     _current = SyntaxKind.Tilde;
+                    _text = "~";
                     break;
 
                 //Numbers
@@ -275,24 +277,31 @@ namespace Compiler.CodeAnalysis.Lexing
                 //Pure syntax
                 case ';':
                     _current = SyntaxKind.Semicolon;
+                    _text = ";";
                     break;
                 case '(':
                     _current = SyntaxKind.OpenParenthesis;
+                    _text = "(";
                     break;
                 case ')':
                     _current = SyntaxKind.CloseParenthesis;
+                    _text = ")";
                     break;
                 case '{':
                     _current = SyntaxKind.OpenCurlyBrace;
+                    _text = "{";
                     break;
                 case '}':
                     _current = SyntaxKind.CloseCurlyBrace;
+                    _text = "}";
                     break;
                 case '[':
                     _current = SyntaxKind.OpenBrackets;
+                    _text = "[";
                     break;
                 case ']':
                     _current = SyntaxKind.CloseBrackets;
+                    _text = "]";
                     break;
                 case '\0':
                     _current = SyntaxKind.EndOfFile;
@@ -300,12 +309,15 @@ namespace Compiler.CodeAnalysis.Lexing
 
                 case ',':
                     _current = SyntaxKind.Comma;
+                    _text = ",";
                     break;
                 case '.':
                     _current = SyntaxKind.Dot;
+                    _text = "."; 
                     break;
                 case ':':
                     _current = SyntaxKind.Colon;
+                    _text = ":";
                     break;
                 //Default
                 default:

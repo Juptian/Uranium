@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Diagnostics;
 using Xunit;
 using Compiler.CodeAnalysis.Syntax;
 
@@ -20,7 +21,7 @@ namespace Compiler.Tests.CodeAnalysis.Syntax
         static LexerTest()
         {
             //Made a method so that it looks cleaner
-            _testCases = Concatenate(GetOperatorTokens(), GetSyntacticSymbols(), GetNumbers(), GetKeywords());
+            _testCases = Concatenate(GetSoloOperators(), GetCompoundOperators(), GetSyntacticSymbols(), GetNumbers(), GetKeywords());
         }
        
 
@@ -41,22 +42,25 @@ namespace Compiler.Tests.CodeAnalysis.Syntax
             ( SyntaxKind kind1, string text1,
               SyntaxKind kind2, string text2 )
         {
-            var text = text1 + " " + text2;
+            var text = text1 + text2;
             var tokens = SyntaxTree.LexTokens(text).ToArray();
+
+            if(tokens[1].Text != text2)
+                foreach(var t in tokens) { Debug.WriteLine(t); }
             
             Assert.Equal(2, tokens.Length);
 
             Assert.Equal(tokens[0].Kind, kind1);
-            Assert.Equal(tokens[0].Text, text1);
-
             Assert.Equal(tokens[1].Kind, kind2);
+
+            Assert.Equal(tokens[0].Text, text1);
             Assert.Equal(tokens[1].Text, text2);
         }
 
 
         private static bool RequiresSeparator(SyntaxKind kind1, SyntaxKind kind2)
         {
-            var tokensThatRequire = Concatenate(GetKeywords(), GetNumbers());
+            var tokensThatRequire = Concatenate(GetSoloOperators(), GetKeywords(), GetNumbers());
 
             foreach(var s in tokensThatRequire)
             {
@@ -84,36 +88,43 @@ namespace Compiler.Tests.CodeAnalysis.Syntax
             }
         }
 
-        private static IEnumerable<(SyntaxKind kind, string text)> GetOperatorTokens()
+        private static IEnumerable<(SyntaxKind kind, string text)> GetSoloOperators()
         {
             return new[]
             {
                 (SyntaxKind.Equals, "="),
-                (SyntaxKind.DoubleEquals, "=="),
                 (SyntaxKind.Plus, "+"),
+                (SyntaxKind.Minus, "-"),
+                (SyntaxKind.Divide, "/"),
+                (SyntaxKind.Multiply, "*"),
+                (SyntaxKind.Percent, "%"),
+                (SyntaxKind.Ampersand, "&"),
+                (SyntaxKind.Pipe, "|"),
+                (SyntaxKind.Hat, "^"),
+                (SyntaxKind.GreaterThan, ">"), 
+                (SyntaxKind.LesserThan, "<"),
+                (SyntaxKind.Bang, "!"), 
+            };
+        }
+
+        private static IEnumerable<(SyntaxKind kind, string text)> GetCompoundOperators()
+        {
+            return new[]
+            {
+                (SyntaxKind.DoubleEquals, "=="),
                 (SyntaxKind.PlusPlus, "++"),
                 (SyntaxKind.PlusEquals, "+="),
-                (SyntaxKind.Minus, "-"),
                 (SyntaxKind.MinusMinus, "--"),
                 (SyntaxKind.MinusEquals, "-="),
-                (SyntaxKind.Divide, "/"),
                 (SyntaxKind.DivideEquals, "/="),
-                (SyntaxKind.Multiply, "*"),
                 (SyntaxKind.MultiplyEquals, "*="),
                 (SyntaxKind.Pow, "**"),
-                (SyntaxKind.Percent, "%"),
                 (SyntaxKind.PercentEquals, "%="),
-                (SyntaxKind.Ampersand, "&"),
                 (SyntaxKind.DoubleAmpersand, "&&"),
-                (SyntaxKind.Pipe, "|"),
                 (SyntaxKind.DoublePipe, "||"),
-                (SyntaxKind.Hat, "^"),
                 (SyntaxKind.HatEquals, "^="), 
-                (SyntaxKind.GreaterThan, ">"), 
                 (SyntaxKind.GreaterThanEquals, ">="),
-                (SyntaxKind.LesserThan, "<"),
                 (SyntaxKind.LesserThanEquals, "<="),
-                (SyntaxKind.Bang, "!"), 
                 (SyntaxKind.BangEquals, "!="),
 
             };
