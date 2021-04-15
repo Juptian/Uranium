@@ -22,4 +22,4 @@ jobs:
     - name: Build
       run: dotnet build Uranium.sln --no-restore
     - name: Test
-      run: dotnet test Source/Compiler.Tests --no-build --verbosity normal
+      run: dotnet test Source/Uranium.Tests --no-build --verbosity normal
