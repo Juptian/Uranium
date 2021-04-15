@@ -24,7 +24,7 @@ namespace Compiler.CodeAnalysis.Lexing
 
         public Lexer(string contents)
         {
-            source = contents;
+            _source = contents;
             /*for (var i = 0; i < contents.Length; i++)
             {
                 Console.Write($"{contents[i]}, {i}");
