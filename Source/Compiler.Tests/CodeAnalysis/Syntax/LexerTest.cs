@@ -13,7 +13,7 @@ namespace Compiler.Tests.CodeAnalysis.Syntax
     {
         //This is horrendous, but I couldn't figure out how to make it any better
         private static readonly IEnumerable<(SyntaxKind kind, string text)> _testCases;
-        private static readonly IEnumerable<(SyntaxKind kindLeft, string textLeft, SyntaxKind kindRight, string textRight)> _pairTestCases = GetTokenPairs();
+        private static readonly IEnumerable<(TupleContainer left, TupleContainer right)> _pairTestCases = GetTokenPairs();
 
         //Constructor because
         // private static IEnumerable<(SyntaxKind kind, string text)> _testCases = GetOperatorTokens().Concat(GetSyntacticSymbols()).Concat(GetNumbers()).Concat(GetKeywords());
@@ -32,44 +32,59 @@ namespace Compiler.Tests.CodeAnalysis.Syntax
             var tokens = SyntaxTree.LexTokens(text);
 
             var singleToken = Assert.Single(tokens);
-            Assert.Equal(kind, singleToken.Kind);
-            Assert.Equal(text, singleToken.Text);
+            Assert.Equal(singleToken.Kind, kind);
+            Assert.Equal(singleToken.Text, text);
         }
 
         [Theory]
         [MemberData(nameof(GetTokenPairsData))]
-        public void Lexer_Lexes_TokenPairs
-            ( SyntaxKind kindLeft, string textLeft,
-              SyntaxKind kindRight, string textRight )
+        public void Lexer_Lexes_TokenPairs(TupleContainer left, TupleContainer right)
         {
-            var text = textLeft + textRight;
-            var tokens = SyntaxTree.LexTokens(text).ToArray();
+            var leftText = left.Text;
+            var rightText = right.Text;
 
-            if(tokens[1].Text != textRight)
-                foreach(var t in tokens) { Debug.WriteLine(t); }
+            var leftKind = left.Kind;
+            var rightKind = right.Kind;
+
+            var text = leftText + rightText;
+            var tokens = SyntaxTree.LexTokens(text).ToArray();
             
             Assert.Equal(2, tokens.Length);
 
-            Assert.Equal(tokens[0].Kind, kindLeft);
-            Assert.Equal(tokens[1].Kind, kindRight);
+            Assert.Equal(leftKind, tokens[0].Kind);
+            Assert.Equal(rightKind, tokens[1].Kind);
 
-            Assert.Equal(tokens[0].Text, textLeft);
-            Assert.Equal(tokens[1].Text, textRight);
+            Assert.Equal(leftText, tokens[0].Text);
+            Assert.Equal(rightText, tokens[1].Text);
         }
 
-
-        private static bool RequiresSeparator(SyntaxKind kindLeft, SyntaxKind kindRight)
+        [Theory]
+        [MemberData(nameof(GetTokenPairsWithSeparatorData))]
+        public void Lexer_Lexes_TokenPairsWithSeparators(TupleContainer left, TupleContainer separator, TupleContainer right)
         {
-            var tokensThatRequire = Concatenate(GetSoloOperators(), GetKeywords(), GetNumbers());
-            foreach (var (kind, _) in tokensThatRequire)
-            {
-                if(kind == kindLeft || kind == kindRight)
-                {
-                    return true;
-                }
-            }
-            return false;
+            var leftKind = left.Kind;
+            var separatorKind = separator.Kind;
+            var rightKind = right.Kind;
+
+            var leftText = left.Text;
+            var separatorText = separator.Text;
+            var rightText = right.Text;
+
+
+            var text = leftText + separatorText + rightText;
+            var tokens = SyntaxTree.LexTokens(text).ToArray();
+            
+            Assert.Equal(3, tokens.Length);
+
+            Assert.Equal(leftKind, tokens[0].Kind);
+            Assert.Equal(separatorKind, tokens[1].Kind);
+            Assert.Equal(rightKind, tokens[2].Kind);
+
+            Assert.Equal(leftText, tokens[0].Text);
+            Assert.Equal(separatorText, tokens[1].Text);
+            Assert.Equal(rightText, tokens[2].Text);
         }
+
 
         public static IEnumerable<object[]> GetTokensData()
         {
@@ -81,9 +96,17 @@ namespace Compiler.Tests.CodeAnalysis.Syntax
 
         public static IEnumerable<object[]> GetTokenPairsData()
         {
-            foreach(var (kindLeft, textLeft, kindRight, textRight) in _pairTestCases)
+            foreach(var (left, right) in _pairTestCases)
             {
-                yield return new object[] { kindLeft, textLeft, kindRight, textRight };
+                yield return new[] { left, right };
+            }
+        }
+
+        public static IEnumerable<object[]> GetTokenPairsWithSeparatorData()
+        {
+            foreach(var (left, separator, right) in GetTokenPairsWithSeparators())
+            {
+                yield return new[] { left, separator, right };
             }
         }
 
@@ -170,17 +193,66 @@ namespace Compiler.Tests.CodeAnalysis.Syntax
             };
         }
 
-        //Bottom of the file because it does not need to be revisited
-        private static IEnumerable<(SyntaxKind kindLeft, string textLeft, SyntaxKind kindRight, string textRight)> GetTokenPairs()
+        private static IEnumerable<(SyntaxKind kind, string text)> GetSeparators()
+        {
+            return new[]
+            {
+                (SyntaxKind.WhiteSpace, " "),
+                (SyntaxKind.LineBreak, "\r"),
+                (SyntaxKind.LineBreak, "\n"),
+            };
+        }
+
+        //Bottom of the file because it does not need to be revisited very often
+        private static bool RequiresSeparator(SyntaxKind leftKind, SyntaxKind rightKind)
+        {
+            var tokensThatRequire = Concatenate(GetSoloOperators(), GetKeywords(), GetNumbers());
+            foreach (var (kind, _) in tokensThatRequire)
+            {
+                if(kind == leftKind || kind == rightKind)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        //^^
+        private static IEnumerable<(TupleContainer left, TupleContainer Right)> GetTokenPairs()
         {
             foreach(var (kind, text) in _testCases)
             {
-                foreach(var (kindRight, textRight) in _testCases)
+                foreach(var (rightKind, rightText) in _testCases)
                 {
-                    if(!RequiresSeparator(kind, kindRight))
+                    if(!RequiresSeparator(kind, rightKind))
                     {
-                        yield return new(kind, text, kindRight, textRight);    
+                        var left = new TupleContainer(kind, text);
+                        var right = new TupleContainer(rightKind, rightText);
+                        yield return new(left, right);    
                     }
+                }
+            }    
+        }
+       
+        //^^
+        private static IEnumerable<(TupleContainer left, TupleContainer separator, TupleContainer right)> GetTokenPairsWithSeparators()
+        {
+            foreach(var (leftKind, leftText) in _testCases)
+            {
+                foreach(var (rightKind, rightText) in _testCases)
+                {
+                    if (!RequiresSeparator(leftKind, rightKind))
+                    {
+                        continue;
+                    }
+                    foreach(var (separatorKind, separatorText) in GetSeparators())
+                    {
+                        var Left = new TupleContainer(leftKind, leftText);
+                        var separator = new TupleContainer(separatorKind, separatorText);
+                        var right = new TupleContainer(rightKind, rightText);
+                            
+                        yield return new(Left, separator, right); 
+                    }   
                 }
             }    
         }

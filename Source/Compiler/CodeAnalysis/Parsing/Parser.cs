@@ -22,7 +22,7 @@ namespace Compiler.CodeAnalysis.Parsing
             do
             {
                 token = lexer.Lex();
-                if (token.Kind != SyntaxKind.WhiteSpace || token.Kind != SyntaxKind.BadToken)
+                if (token.Kind is not SyntaxKind.WhiteSpace &&  token.Kind is not SyntaxKind.BadToken)
                 {
                     tokens.Add(token);
                 }

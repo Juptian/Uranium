@@ -9,7 +9,6 @@ namespace Compiler.CodeAnalysis.Lexing
     internal sealed class Lexer
     {
         private readonly string _source;
-        private readonly List<SyntaxToken> _tokens = new();
 
         private char PreviousIndex => Peek(-1);
         private char CurrentIndex => Peek(0);
@@ -39,9 +38,13 @@ namespace Compiler.CodeAnalysis.Lexing
             _current = SyntaxKind.BadToken;
             ReadSpecialChars(false);
             LexToken(CurrentIndex);
+            
+            if(char.IsWhiteSpace(CurrentIndex))
+            {
+                _current = SyntaxKind.WhiteSpace;
+            }
 
-            /*Console.Write($"{_current}, {_text}, ");
-            Console.WriteLine($"{_index}, {CurrentIndex}");*/
+            Console.WriteLine($"{_current}, {_text ?? CurrentIndex.ToString()}, {_index}, {CurrentIndex}");
             return new(_current, _index++, _text ?? PreviousIndex.ToString(), _currentValue);
         }
 
@@ -81,6 +84,7 @@ namespace Compiler.CodeAnalysis.Lexing
                         break;
                     case ' ':
                     case '\t':
+                        _index++;
                         ReadWhitespace();
                         _current = SyntaxKind.WhiteSpace;
                         break;
@@ -91,6 +95,7 @@ namespace Compiler.CodeAnalysis.Lexing
                     default:
                         if (char.IsWhiteSpace(CurrentIndex))
                         {
+                            _index++;
                             ReadWhitespace();
                             _current = SyntaxKind.WhiteSpace;
                         }
@@ -103,8 +108,7 @@ namespace Compiler.CodeAnalysis.Lexing
                 var length = _index - start;
                 if (length > 0)
                 {
-                    var text = _source.Substring(start, length);
-                    _tokens.Add(new(_current, _index, text, text));
+                    _text  = _source.Substring(start, length);
                 }
             }
         }
@@ -322,11 +326,6 @@ namespace Compiler.CodeAnalysis.Lexing
                 //Default
                 default:
                     //It could be a whitespace/linebreak/ect statement, so we just break
-                    if(char.IsLetter(ch))
-                    {
-                        _current = SyntaxKind.Null;
-                    }
-                    _text = ch.ToString();
                     break;
             }
             return _current;
@@ -348,30 +347,31 @@ namespace Compiler.CodeAnalysis.Lexing
 
         private void ReadWhitespace()
         {
-            var done = false;
-
-            while (!done)
+            _current = SyntaxKind.WhiteSpace;
+            while(char.IsWhiteSpace(NextIndex))
             {
-                switch (CurrentIndex)
+                switch(CurrentIndex)
                 {
                     case '\0':
+                        _current = SyntaxKind.EndOfFile;
+                        return;
                     case '\r':
                     case '\n':
-                        done = true;
+                        ReadLineBreak();
+                        //_index++;
                         break;
                     default:
-                        if (!char.IsWhiteSpace(CurrentIndex))
+                        if(!char.IsWhiteSpace(CurrentIndex))
                         {
-                            done = true;
+                            //How even the fuck?
+                            //Not sure how or why but here we are!
+                            return;    
                         }
-                        else
-                        {
-                            _index++;
-                        }
+                        _index++;
+                        _current = SyntaxKind.WhiteSpace;
                         break;
                 }
             }
-            _current = SyntaxKind.WhiteSpace;
         }
 
         private void ReadSingleLineComment()
