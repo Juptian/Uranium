@@ -1,5 +1,5 @@
 <h1 align="center"> Uranium <img src="https://img.shields.io/github/workflow/status/Juptian/Compiler/.NET?style=plastic"></img> <img src="https://img.shields.io/badge/Language-C%23-blue"></img> <img src="https://img.shields.io/github/license/Juptian/Compiler?color=brightgreen&style=plastic"></img> </h1>
-I decided to make a language via C#
+Uranium is a compiler that I decided to make from scratch, it is targetted at the CLR and will hopefully output IL code later. Currently, Uranium isn't finished
 
 <h2 align="center"> Contributing </h2>
 
