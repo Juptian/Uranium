@@ -12,8 +12,8 @@ namespace Compiler.Tests.CodeAnalysis.Syntax
     public class LexerTest
     {
         //This is horrendous, but I couldn't figure out how to make it any better
-        private static IEnumerable<(SyntaxKind kind, string text)> _testCases;
-        private static IEnumerable<(SyntaxKind kind1, string text1, SyntaxKind kind2, string text2)> _pairTestCases = GetTokenPairs();
+        private static readonly IEnumerable<(SyntaxKind kind, string text)> _testCases;
+        private static readonly IEnumerable<(SyntaxKind kindLeft, string textLeft, SyntaxKind kindRight, string textRight)> _pairTestCases = GetTokenPairs();
 
         //Constructor because
         // private static IEnumerable<(SyntaxKind kind, string text)> _testCases = GetOperatorTokens().Concat(GetSyntacticSymbols()).Concat(GetNumbers()).Concat(GetKeywords());
@@ -39,32 +39,31 @@ namespace Compiler.Tests.CodeAnalysis.Syntax
         [Theory]
         [MemberData(nameof(GetTokenPairsData))]
         public void Lexer_Lexes_TokenPairs
-            ( SyntaxKind kind1, string text1,
-              SyntaxKind kind2, string text2 )
+            ( SyntaxKind kindLeft, string textLeft,
+              SyntaxKind kindRight, string textRight )
         {
-            var text = text1 + text2;
+            var text = textLeft + textRight;
             var tokens = SyntaxTree.LexTokens(text).ToArray();
 
-            if(tokens[1].Text != text2)
+            if(tokens[1].Text != textRight)
                 foreach(var t in tokens) { Debug.WriteLine(t); }
             
             Assert.Equal(2, tokens.Length);
 
-            Assert.Equal(tokens[0].Kind, kind1);
-            Assert.Equal(tokens[1].Kind, kind2);
+            Assert.Equal(tokens[0].Kind, kindLeft);
+            Assert.Equal(tokens[1].Kind, kindRight);
 
-            Assert.Equal(tokens[0].Text, text1);
-            Assert.Equal(tokens[1].Text, text2);
+            Assert.Equal(tokens[0].Text, textLeft);
+            Assert.Equal(tokens[1].Text, textRight);
         }
 
 
-        private static bool RequiresSeparator(SyntaxKind kind1, SyntaxKind kind2)
+        private static bool RequiresSeparator(SyntaxKind kindLeft, SyntaxKind kindRight)
         {
             var tokensThatRequire = Concatenate(GetSoloOperators(), GetKeywords(), GetNumbers());
-
-            foreach(var s in tokensThatRequire)
+            foreach (var (kind, _) in tokensThatRequire)
             {
-                if(s.kind == kind1 || s.kind == kind2)
+                if(kind == kindLeft || kind == kindRight)
                 {
                     return true;
                 }
@@ -74,17 +73,17 @@ namespace Compiler.Tests.CodeAnalysis.Syntax
 
         public static IEnumerable<object[]> GetTokensData()
         {
-            foreach(var token in _testCases)
+            foreach(var (kind, text) in _testCases)
             {
-                yield return new object[] { token.kind, token.text };
+                yield return new object[] { kind, text };
             }
         }
 
         public static IEnumerable<object[]> GetTokenPairsData()
         {
-            foreach(var tokenPair in _pairTestCases)
+            foreach(var (kindLeft, textLeft, kindRight, textRight) in _pairTestCases)
             {
-                yield return new object[] { tokenPair.kind1, tokenPair.text1, tokenPair.kind2, tokenPair.text2 };
+                yield return new object[] { kindLeft, textLeft, kindRight, textRight };
             }
         }
 
@@ -151,6 +150,7 @@ namespace Compiler.Tests.CodeAnalysis.Syntax
                 //So it will not be included in the tests.
             };
         }
+
         private static IEnumerable<(SyntaxKind kind, string text)> GetNumbers()
         {
             return new[]
@@ -160,6 +160,7 @@ namespace Compiler.Tests.CodeAnalysis.Syntax
                 (SyntaxKind.NumberToken, "10 000"),
             };
         }
+
         private static IEnumerable<(SyntaxKind kind, string text)> GetKeywords()
         {
             return new[]
@@ -169,28 +170,29 @@ namespace Compiler.Tests.CodeAnalysis.Syntax
             };
         }
 
-        private static IEnumerable<(SyntaxKind kind1, string text1, SyntaxKind kind2, string text2)> GetTokenPairs()
+        //Bottom of the file because it does not need to be revisited
+        private static IEnumerable<(SyntaxKind kindLeft, string textLeft, SyntaxKind kindRight, string textRight)> GetTokenPairs()
         {
-            foreach(var t1 in _testCases)
+            foreach(var (kind, text) in _testCases)
             {
-                foreach(var t2 in _testCases)
+                foreach(var (kindRight, textRight) in _testCases)
                 {
-                    if(!RequiresSeparator(t1.kind, t2.kind))
+                    if(!RequiresSeparator(kind, kindRight))
                     {
-                        yield return new(t1.kind, t1.text, t2.kind, t2.text);    
+                        yield return new(kind, text, kindRight, textRight);    
                     }
                 }
             }    
         }
-
-        //Bottom of the file because it does not need to be revisited
+        
+        //^^
         private static IEnumerable<T> Concatenate<T>(params IEnumerable<T>[] list)
         {
             foreach(var element in list)
             {
-                foreach(T subEl in element)
+                foreach(T subElement in element)
                 {
-                    yield return subEl;
+                    yield return subElement;
                 }
             }
         }
