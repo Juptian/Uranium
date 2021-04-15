@@ -11,6 +11,7 @@ namespace Compiler.CodeAnalysis.Lexing
         private readonly string _source;
         private readonly List<SyntaxToken> _tokens = new();
 
+        private char PreviousIndex => Peek(-1);
         private char CurrentIndex => Peek(0);
         private char NextIndex => Peek(1);
 
@@ -44,16 +45,16 @@ namespace Compiler.CodeAnalysis.Lexing
                 return new(SyntaxKind.EndOfFile, _index, "\0", null);
             }*/
 
-            Console.Write($"{_current}, ");
-            Console.WriteLine($"{_index}, {CurrentIndex}");
-            return new(_current, _index++, _text ?? CurrentIndex.ToString(), _currentValue);
+            /*Console.Write($"{_current}, ");
+            Console.WriteLine($"{_index}, {CurrentIndex}");*/
+            return new(_current, _index++, _text ?? PreviousIndex.ToString(), _currentValue);
         }
 
         private char Peek(int offset)
         {
             var peekIndex = _index + offset;
 
-            return peekIndex == _source.Length ? '\0' : _source[peekIndex];    
+            return peekIndex >= _source.Length ? '\0' : _source[peekIndex];    
         }
 
         private bool Match(char ch, int offset)
