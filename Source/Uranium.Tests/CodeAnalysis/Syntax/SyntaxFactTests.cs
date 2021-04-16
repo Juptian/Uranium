@@ -23,12 +23,10 @@ namespace Uranium.Tests.CodeAnalysis.Syntax
             }
 
             var tokens = SyntaxTree.LexTokens(text);
-
             var token = Assert.Single(tokens);
 
             Assert.Equal(token.Kind, kind);
             Assert.Equal(token.Text, text);
-
         }
 
         [Theory]
@@ -49,7 +47,7 @@ namespace Uranium.Tests.CodeAnalysis.Syntax
             Assert.Equal(token.Text, text);
         }
 
-/*        [Theory]
+        /*[Theory]
         [MemberData(nameof(GetSyntaxKindData))]
         public void SyntaxFactsUnaryOperatorsRoundTrips(SyntaxKind kind)
         {
@@ -61,8 +59,8 @@ namespace Uranium.Tests.CodeAnalysis.Syntax
             var tokens = SyntaxTree.LexTokens(text);
             Assert.Equal(2, tokens.ToArray().Length);
             Assert.Equal(tokens.)
-        }*/
-
+        }
+*/
         public static IEnumerable<object[]> GetSyntaxKindData()
         {
             var syntaxKinds = (SyntaxKind[]) Enum.GetValues(typeof(SyntaxKind));
