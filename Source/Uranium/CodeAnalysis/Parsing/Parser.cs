@@ -1,8 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Linq;
 using Uranium.CodeAnalysis.Lexing;
 using Uranium.CodeAnalysis.Syntax.Expression;
-using System.Collections.Generic;
-using System.Linq;
 using Uranium.CodeAnalysis.Syntax;
 using Uranium.Logging;
 
@@ -70,7 +71,7 @@ namespace Uranium.CodeAnalysis.Parsing
             var expression = ParseExpression();
             var EOFToken = MatchToken(SyntaxKind.EndOfFile);
 
-            return new(_diagnostics, expression, EOFToken);
+            return new(_diagnostics.ToImmutableArray(), expression, EOFToken);
         }
         
         private ExpressionSyntax ParseExpression()
@@ -151,34 +152,45 @@ namespace Uranium.CodeAnalysis.Parsing
         private ExpressionSyntax ParsePrimaryExpression()
         {
             //Converted to switch before we get too many checks
-            switch(Current.Kind)
+            return Current.Kind switch
             {
+                //All extracted into methods for the sake of readability, and reuseability.
                 //Parenthesis
-                case SyntaxKind.OpenParenthesis:
-                    var left = NextToken();
-                    var expression = ParseExpression();
-                    var right = MatchToken(SyntaxKind.CloseParenthesis);
-                    return new ParenthesizedExpressionSyntax(left, expression, right);
-                
+                SyntaxKind.OpenParenthesis => ParseParenthesizedExpression(),
                 //Bools
-                case SyntaxKind.TrueKeyword:
-                case SyntaxKind.FalseKeyword:
-                    var keywordToken = NextToken();
-                    var value = keywordToken.Kind == SyntaxKind.TrueKeyword;
-                    return new LiteralExpressionSyntax(keywordToken, value);
-
+                SyntaxKind.TrueKeyword or SyntaxKind.FalseKeyword => ParseBooleanExpression(),
                 //Identifiers
-                case SyntaxKind.IdentifierToken:
-                    var identifierToken = NextToken();
+                SyntaxKind.NumberToken => ParseNumberLiteral(),
+                //Assuming default is a Name expression
+                _ => ParseNameExpression(),//^^
+            };
+        }
 
-                    return new NameExpressionSyntax(identifierToken);
+        private ExpressionSyntax ParseParenthesizedExpression()
+        {
+            var left = MatchToken(SyntaxKind.OpenParenthesis);
+            var expression = ParseExpression();
+            var right = MatchToken(SyntaxKind.CloseParenthesis);
+            return new ParenthesizedExpressionSyntax(left, expression, right);
+        }
 
-                //Assuming default is a number token
-                default:
-                    var numberToken = MatchToken(SyntaxKind.NumberToken);
-                    return new LiteralExpressionSyntax(numberToken);
+        private ExpressionSyntax ParseBooleanExpression()
+        {
+            var isTrue = Current.Kind == SyntaxKind.TrueKeyword;
+            var keywordToken = isTrue ? MatchToken(SyntaxKind.TrueKeyword) : MatchToken(SyntaxKind.FalseKeyword);
+            return new LiteralExpressionSyntax(keywordToken, isTrue);
+        }
 
-            }       
+        private ExpressionSyntax ParseNumberLiteral()
+        {
+            var numberToken = MatchToken(SyntaxKind.NumberToken);
+            return new LiteralExpressionSyntax(numberToken);
+        }
+
+        private ExpressionSyntax ParseNameExpression()
+        {
+            var identifierToken = MatchToken(SyntaxKind.IdentifierToken);
+            return new NameExpressionSyntax(identifierToken);
         }
 
         public static void PrettyPrint(SyntaxNode node, string indent = "", bool isLast = true)

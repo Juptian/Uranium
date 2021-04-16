@@ -8,18 +8,16 @@ namespace Uranium.CodeAnalysis.Lexing
 {
     internal sealed class Lexer
     {
-        private readonly string _source;
-
         private char PreviousIndex => Peek(-1);
         private char CurrentIndex => Peek(0);
         private char NextIndex => Peek(1);
 
         private int _start;
         private int _index;
+        private readonly string _source;
         private SyntaxKind _current;
         private string? _text;
         private object? _currentValue;
-
 
         private readonly DiagnosticBag _diagnostics = new();
 
@@ -28,7 +26,7 @@ namespace Uranium.CodeAnalysis.Lexing
             _source = contents;
             /*for (var i = 0; i < contents.Length; i++)
             {
-                Console.Write($"{contents[i]}, {i}");
+                Console.WriteLine($"{contents[i]}, {i}");
             }*/
         }
 
@@ -41,7 +39,7 @@ namespace Uranium.CodeAnalysis.Lexing
             ReadSpecialChars(false);
             LexToken(CurrentIndex);
 
-            //Console.WriteLine($"{_current}, `{_text ?? PreviousIndex.ToString()}`, {_index}, {_currentValue}");
+            //Console.WriteLine($"{_current}, `{_text ?? CurrentIndex.ToString()}`, {_index}, {_currentValue}");
             return new(_current, _index++, _text ?? PreviousIndex.ToString(), _currentValue);
         }
 
@@ -275,8 +273,12 @@ namespace Uranium.CodeAnalysis.Lexing
             //This is because Identifier tokens should not be modified.
             if(_current is not SyntaxKind.IdentifierToken && _current is not SyntaxKind.NumberToken)
             {
+                Console.WriteLine(_current);
                 var length = _index - _start;
                 var text = SyntaxFacts.GetText(_current);
+                //If I remove the ` text is null `
+                //The tests fucking die
+                //So we leave it here.
                 if ((text is null && _text is null) || text.Equals("BadToken", StringComparison.OrdinalIgnoreCase))
                 {
                     text = _source.Substring(_start, length);
@@ -284,7 +286,6 @@ namespace Uranium.CodeAnalysis.Lexing
                 _text = text;
             }
         }
-
 
         private void ReadLineBreak()
         {

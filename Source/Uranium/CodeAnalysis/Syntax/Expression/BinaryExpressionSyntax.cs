@@ -19,11 +19,5 @@ namespace Uranium.CodeAnalysis.Syntax.Expression
 
         public override SyntaxKind Kind => SyntaxKind.BinaryExpression;
 
-        public override IEnumerable<SyntaxNode> GetChildren()
-        {
-            yield return Left;
-            yield return OperatorToken;
-            yield return Right;
-        }
     }
 }

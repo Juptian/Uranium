@@ -24,11 +24,6 @@ namespace Uranium.CodeAnalysis.Syntax
 
         public TextSpan Span => new(Position, Text is null ? 0 : Text.Length);
 
-        public override IEnumerable<SyntaxNode> GetChildren()
-        {
-            return Enumerable.Empty<SyntaxNode>();
-        }
-
         public override string ToString()
         {
             return $"{Kind}, {Position}, {Text}";
