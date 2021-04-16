@@ -54,8 +54,9 @@ namespace Uranium.Tests.CodeAnalysis.Expression
         }
         public static IEnumerable<object[]> TestCases()
         {
-            for(int i = 1; i < 250; i++)
+            for(int i = 1; i <= 1_000_000; i++)
             {
+                i = i == 100 ? 999_900 : i;
                 yield return new object[] { $"{i} + {i}", i + i };
                 yield return new object[] { $"{i} + -{i}/2", i + -i / 2 };
                 yield return new object[] { $"{i} * {i}", i * i };

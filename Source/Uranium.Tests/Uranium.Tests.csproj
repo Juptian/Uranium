@@ -17,12 +17,8 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="XunitXML.TestLogger" Version="3.0.66"/>
   </ItemGroup>
-
-<!--  <ItemGroup>
-    <Folder Include="CodeAnalysis\Binding\" />
-    <Folder Include="CodeAnalysis\Syntax"/>
-  </ItemGroup> -->
 
   <ItemGroup>
     <ProjectReference Include="..\Uranium\Uranium.csproj" />

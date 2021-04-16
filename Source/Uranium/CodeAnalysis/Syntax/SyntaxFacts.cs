@@ -68,7 +68,7 @@ namespace Uranium.CodeAnalysis.Syntax
             }
         }
 
-
+        //Gets the syntax token for a specific amount of text
         internal static SyntaxKind GetKeywordKind(string text)
             => text switch
             {
@@ -86,8 +86,10 @@ namespace Uranium.CodeAnalysis.Syntax
                 "enum" => SyntaxKind.EnumKeywrod,
                 "typedef" => SyntaxKind.TypeDefKeyword,
                 "null" => SyntaxKind.Null,
-                _ => SyntaxKind.BadToken,
+                _ => SyntaxKind.IdentifierToken,
             };
+
+        //Gets the text for a specific syntax token
         public static string GetText(SyntaxKind kind) => kind switch
         {
             //Keywords
@@ -145,8 +147,8 @@ namespace Uranium.CodeAnalysis.Syntax
             SyntaxKind.CloseCurlyBrace => "}",
             SyntaxKind.OpenBrackets => "[",
             SyntaxKind.CloseBrackets => "]",
-            
-            _ => "BadToken",
+
+            _ => "BadToken"
         };
     }
 }

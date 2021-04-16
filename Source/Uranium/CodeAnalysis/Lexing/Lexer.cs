@@ -14,6 +14,7 @@ namespace Uranium.CodeAnalysis.Lexing
         private char CurrentIndex => Peek(0);
         private char NextIndex => Peek(1);
 
+        private int _start;
         private int _index;
         private SyntaxKind _current;
         private string? _text;
@@ -35,10 +36,11 @@ namespace Uranium.CodeAnalysis.Lexing
 
         public SyntaxToken Lex()
         {
+            _currentValue = null;
             _current = SyntaxKind.BadToken;
             ReadSpecialChars(false);
             LexToken(CurrentIndex);
-            
+
             //Console.WriteLine($"{_current}, `{_text ?? PreviousIndex.ToString()}`, {_index}, {_currentValue}");
             return new(_current, _index++, _text ?? PreviousIndex.ToString(), _currentValue);
         }
@@ -64,7 +66,7 @@ namespace Uranium.CodeAnalysis.Lexing
         private void ReadSpecialChars(bool keepGoing)
         {
             var finished = false;
-            var start = _index;
+            var _start = _index;
             while (!finished)
             {
                 switch (CurrentIndex)
@@ -82,7 +84,6 @@ namespace Uranium.CodeAnalysis.Lexing
                         _index++;
                         ReadWhitespace();
                         _current = SyntaxKind.WhiteSpace;
-                        //Console.Out.WriteLine(_current);
                         break;
                     case '\0':
                         _current = SyntaxKind.EndOfFile;
@@ -101,10 +102,10 @@ namespace Uranium.CodeAnalysis.Lexing
                         }
                         break;
                 }
-                var length = _index - start;
+                var length = _index - _start;
                 if (length > 0)
                 {
-                    _text  = _source.Substring(start, length);
+                    _text  = _source.Substring(_start, length);
                 }
             }
         }
@@ -113,25 +114,8 @@ namespace Uranium.CodeAnalysis.Lexing
         //Yes this parses keywords
         public void LexToken(char ch)
         {
-            if(char.IsLetter(ch))
-            {
-                var start = _index;
-                while (char.IsLetter(CurrentIndex))
-                {
-                    _index++;
-                }
-                    
-                var length = _index - start;
-                var text = _source.Substring(start, length);
-                var kind = SyntaxFacts.GetKeywordKind(text);
-                _current = kind == SyntaxKind.BadToken ? SyntaxKind.IdentifierToken : kind;
-                _text = text;
-                _index--;
-                return;
-            }
-
+            _start = _index;
             //Using a bool to check conditions with more ease
-            bool matched;
             switch (ch)
             {
                 //Math operators
@@ -139,58 +123,48 @@ namespace Uranium.CodeAnalysis.Lexing
                     if(Match('=', 1))
                     {
                         _current = SyntaxKind.PlusEquals;
-                        _text = "+=";
                     } 
                     else if (Match('+', 1))
                     {
                         _current = SyntaxKind.PlusPlus;
-                        _text = "++";
                     } 
                     else
                     {
                         _current = SyntaxKind.Plus;
-                        _text = "+";
                     }
                     break;
                 case '-':
                     if(Match('=', 1))
                     {
                         _current = SyntaxKind.MinusEquals;
-                        _text = "-=";
                     } 
                     else if (Match('-', 1))
                     {
                         _current = SyntaxKind.MinusMinus;
-                        _text = "--";
                     } 
                     else
                     {
                         _current = SyntaxKind.Minus;
-                        _text = "-";
                     }
                     break;
                 case '*':               
                     if (Match('=', 1))
                     {
                         _current = SyntaxKind.MultiplyEquals;
-                        _text = "*=";
                     }
                     else if (Match('*', 1))
                     {
                         _current = SyntaxKind.Pow;
-                        _text = "**";
                     }
                     else
                     {
                         _current = SyntaxKind.Multiply;
-                        _text = "*";
                     }
                     break;
                 case '/':
                     if (Match('=', 1))
                     {
                         _current = SyntaxKind.DivideEquals;
-                        _text = "/=";
                     }
                     else if (Match('/', 1))
                     {
@@ -205,58 +179,37 @@ namespace Uranium.CodeAnalysis.Lexing
                     else
                     {
                         _current = SyntaxKind.Divide;
-                        _text = "/";
                     }
                         
                     break;
                 case '>':
-                    matched = Match('=', 1);
-                    _text = matched ? ">=" : ">";
-                    _current = matched ? SyntaxKind.GreaterThanEquals : SyntaxKind.GreaterThan;
+                    _current = Match('=', 1) ? SyntaxKind.GreaterThanEquals : SyntaxKind.GreaterThan;
                     break;
                 case '<':
-                    matched = Match('=', 1);
-                    _text = matched ? "<=" : "<";
-                    _current = matched ? SyntaxKind.LesserThanEquals : SyntaxKind.LesserThan;
+                    _current = Match('=', 1) ? SyntaxKind.LesserThanEquals : SyntaxKind.LesserThan;
                     break;
                 case '=':
-                    matched = Match('=', 1);
-                    _text = matched ? "==" : "=";
-                    _current = matched ? SyntaxKind.DoubleEquals : SyntaxKind.Equals;
+                    _current = Match('=', 1) ? SyntaxKind.DoubleEquals : SyntaxKind.Equals;
                     break;
                 case '^':
-                    matched = Match('=', 1);
-                    _text = matched ? "^=" : "^";
-                    _current = matched ? SyntaxKind.HatEquals : SyntaxKind.Hat;
+                    _current = Match('=', 1) ? SyntaxKind.HatEquals : SyntaxKind.Hat;
                     break;
                 case '!':
-                    matched = Match('=', 1);
-                    _text = matched ? "!=" : "!";
-                    _current = matched ? SyntaxKind.BangEquals : SyntaxKind.Bang;
+                    _current = Match('=', 1) ? SyntaxKind.BangEquals : SyntaxKind.Bang;
                     break;
 
                 //Also operators
                 case '|':
-                    matched = Match('|', 1);
-                    _text = matched ? "||" : "|";
-                    _current = matched ? SyntaxKind.DoublePipe : SyntaxKind.Pipe;
+                    _current = Match('|', 1) ? SyntaxKind.DoublePipe : SyntaxKind.Pipe;
                     break;
-
                 case '&':
-                    matched = Match('&', 1);
-                    _text = matched ? "&&" : "&";
-
-                    _current = matched  ? SyntaxKind.DoubleAmpersand : SyntaxKind.Ampersand;
+                    _current = Match('&', 1)  ? SyntaxKind.DoubleAmpersand : SyntaxKind.Ampersand;
                     break;
                 case '%':
-                    matched = Match('=', 1);
-                    _text = matched ? "%=" : "%";
-
-                    _current = matched ? SyntaxKind.PercentEquals : SyntaxKind.Percent;
+                    _current = Match('=', 1) ? SyntaxKind.PercentEquals : SyntaxKind.Percent;
                     break;
                 case '~':
                     _current = SyntaxKind.Tilde;
-                    _text = "~";
                     break;
 
                 //Numbers
@@ -277,58 +230,58 @@ namespace Uranium.CodeAnalysis.Lexing
                 //Pure syntax
                 case ';':
                     _current = SyntaxKind.Semicolon;
-                    _text = ";";
                     break;
                 case '(':
                     _current = SyntaxKind.OpenParenthesis;
-                    _text = "(";
                     break;
                 case ')':
                     _current = SyntaxKind.CloseParenthesis;
-                    _text = ")";
                     break;
                 case '{':
                     _current = SyntaxKind.OpenCurlyBrace;
-                    _text = "{";
                     break;
                 case '}':
                     _current = SyntaxKind.CloseCurlyBrace;
-                    _text = "}";
                     break;
                 case '[':
                     _current = SyntaxKind.OpenBrackets;
-                    _text = "[";
                     break;
                 case ']':
                     _current = SyntaxKind.CloseBrackets;
-                    _text = "]";
                     break;
                 case ',':
                     _current = SyntaxKind.Comma;
-                    _text = ",";
                     break;
                 case '.':
                     _current = SyntaxKind.Dot;
-                    _text = "."; 
                     break;
                 case ':':
                     _current = SyntaxKind.Colon;
-                    _text = ":";
                     break;
-
-                //Special boi, \0 is counted as whitespace, so we just return 
                 case '\0':
                     _current = SyntaxKind.EndOfFile;
                     return;
-
-                //Default
+                //If it matches none of the above, we want to check if it's a character.
+                //This way our identifiers and keywords still work
                 default:
-                    //It could be a whitespace/linebreak/ect statement, so we just break
-                    if(char.IsWhiteSpace(CurrentIndex))
+                    if (char.IsLetter(ch))
                     {
-                        _current = SyntaxKind.WhiteSpace;
+                        ReadIdentifierOrKeyword();
                     }
                     break;
+            }
+
+            //Checking here for if it's an identifier token, this way we don't do anything with it.
+            //This is because Identifier tokens should not be modified.
+            if(_current is not SyntaxKind.IdentifierToken && _current is not SyntaxKind.NumberToken)
+            {
+                var length = _index - _start;
+                var text = SyntaxFacts.GetText(_current);
+                if ((text is null && _text is null) || text.Equals("BadToken", StringComparison.OrdinalIgnoreCase))
+                {
+                    text = _source.Substring(_start, length);
+                }
+                _text = text;
             }
         }
 
@@ -349,7 +302,7 @@ namespace Uranium.CodeAnalysis.Lexing
         private void ReadWhitespace()
         {
             _current = SyntaxKind.WhiteSpace;
-            while(char.IsWhiteSpace(NextIndex))
+            while(char.IsWhiteSpace(CurrentIndex))
             {
                 switch(CurrentIndex)
                 {
@@ -372,7 +325,6 @@ namespace Uranium.CodeAnalysis.Lexing
                         _current = SyntaxKind.WhiteSpace;
                         break;
                 }
-            
             }
         }
 
@@ -380,7 +332,7 @@ namespace Uranium.CodeAnalysis.Lexing
         {
             _index++;
             var finished = false;
-            //var startIndex = _index;
+            // _start = _index;
             while (!finished)
             {
                 switch (CurrentIndex)
@@ -398,23 +350,23 @@ namespace Uranium.CodeAnalysis.Lexing
             _currentValue = SyntaxKind.SingleLineComment;
 
             //Commented out, is here for debug purposes
-            /*var length = _Index - startIndex;
-            Console.WriteLine(_FileContents.Substring(startIndex, length));*/
+            /*var length = _Index - _start;
+            Console.WriteLine(_FileContents.Substring(_start, length));*/
         }
 
         private void ReadMultiLineComment()
         {
             _index++;
             var finished = false;
-            var startIndex = _index;
+            _start = _index; 
             while (!finished)
             {
                 switch (CurrentIndex)
                 {
 
                     case '\0':
-                        var length = _index - startIndex;
-                        _diagnostics.ReportUnfinishedMultiLineComment(new(startIndex, length), length);
+                        var length = _index - _start;
+                        _diagnostics.ReportUnfinishedMultiLineComment(new(_start, length), length);
                         _current = SyntaxKind.EndOfFile;
                         return;
                     case '*':
@@ -433,8 +385,8 @@ namespace Uranium.CodeAnalysis.Lexing
             _currentValue = SyntaxKind.SingleLineComment;
 
             //Commented out, is here for debug purposes
-            /*var length = _Index - startIndex;
-            Console.WriteLine(_FileContents.Substring(startIndex, length));*/
+            /*var length = _Index - _startIndex;
+            Console.WriteLine(_FileContents.Substring(_startIndex, length));*/
         }
 
         private void ReadNum()
@@ -442,7 +394,7 @@ namespace Uranium.CodeAnalysis.Lexing
             var hasSeparator = false;
             var isDecimal = false;
             var hasMultiDecimals = false;
-            var startIndex = _index;
+            _start = _index;
 
             while (char.IsDigit(CurrentIndex) ||
                   (CurrentIndex == '_' || CurrentIndex == ' ') && char.IsDigit(NextIndex) ||
@@ -461,32 +413,32 @@ namespace Uranium.CodeAnalysis.Lexing
                 _index++;
             }
 
-            var length = _index - startIndex;
+            var length = _index - _start;
 
             //Replacing , with . here so that I can parse it into a number
             //This allows a user to chose between , and . as their decimal separator
-            var charArray = _source.Substring(startIndex, length).Replace(',', '.').ToCharArray();
+            var charArray = _source.Substring(_start, length).Replace(',', '.').ToCharArray();
 
-            _text = string.Join("", charArray);
             var text = string.Join("", charArray.Where(e => !char.IsWhiteSpace(e) && !e.Equals('_')));
-            
-            //Numbers cannot start with _ or have multiple . s.
+            _text = text;
+
+            //Numbers cannot _start with _ or have multiple . s.
             if (text.StartsWith('_'))
             {
-                _diagnostics.ReportNumberStartWithUnderscore(new(startIndex, length), text, typeof(int));
+                _diagnostics.ReportNumberStartWithUnderscore(new(_start, length), text, typeof(int));
             }
 
             //Numbers cannot have multiple .s or ,s.
             if (hasMultiDecimals)
             {
-                _diagnostics.ReportInvalidNumber(new(startIndex, length), text, typeof(double));
+                _diagnostics.ReportInvalidNumber(new(_start, length), text, typeof(double));
             }
 
             if (isDecimal)
             {
                 if (!double.TryParse(text, out var value))
                 {
-                    _diagnostics.ReportInvalidNumber(new(startIndex, length), text, typeof(double));
+                    _diagnostics.ReportInvalidNumber(new(_start, length), text, typeof(double));
                 }
                 else
                 {
@@ -504,7 +456,7 @@ namespace Uranium.CodeAnalysis.Lexing
             {
                 if (!ulong.TryParse(text, out var value))
                 {
-                    _diagnostics.ReportInvalidNumber(new(startIndex, length), text, typeof(long));
+                    _diagnostics.ReportInvalidNumber(new(_start, length), text, typeof(long));
                 }
                 else
                 {
@@ -523,7 +475,23 @@ namespace Uranium.CodeAnalysis.Lexing
                 }
             }
             _index--;
-            //Console.WriteLine(_Current);
+
+        }
+   
+        private void ReadIdentifierOrKeyword()
+        {
+            var _start = _index;
+            while (char.IsLetter(CurrentIndex))
+            {
+                _index++;
+            }
+            var length = _index - _start;
+            var text = _source.Substring(_start, length);
+            var kind = SyntaxFacts.GetKeywordKind(text);
+            
+            _current = kind == SyntaxKind.BadToken ? SyntaxKind.IdentifierToken : kind;
+            _text = text;
+            _index--;
         }
     }
 }

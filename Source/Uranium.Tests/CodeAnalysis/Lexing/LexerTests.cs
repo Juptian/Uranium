@@ -24,21 +24,20 @@ namespace Uranium.Tests.CodeAnalysis.Lexing
             _testCases = Concatenate(GetSoloOperators(), GetCompoundOperators(), GetSyntacticSymbols(), GetNumbers(), GetKeywords());
         }
        
-
         [Theory]
         [MemberData(nameof(GetTokensData))] //When GetTokensData returns something, it'll be parsed into here
-        public void Lexer_Lexes_Token(SyntaxKind kind, string text)
+        public void LexerLexesToken(SyntaxKind kind, string text)
         {
             var tokens = SyntaxTree.LexTokens(text);
 
             var singleToken = Assert.Single(tokens);
-            Assert.Equal(singleToken.Kind, kind);
-            Assert.Equal(singleToken.Text, text);
+            Assert.Equal(kind, singleToken.Kind);
+            Assert.Equal(text, singleToken.Text);
         }
 
         [Theory]
         [MemberData(nameof(GetTokenPairsData))]
-        public void Lexer_Lexes_TokenPairs(TupleContainer left, TupleContainer right)
+        public void LexerLexesTokenPairs(TupleContainer left, TupleContainer right)
         {
             var leftText = left.Text;
             var rightText = right.Text;
@@ -145,7 +144,7 @@ namespace Uranium.Tests.CodeAnalysis.Lexing
             {
                 (SyntaxKind.NumberToken, "123.4"),
                 (SyntaxKind.NumberToken, "1"),
-                (SyntaxKind.NumberToken, "10 000"),
+                (SyntaxKind.NumberToken, "10000"),
             };
         }
 
