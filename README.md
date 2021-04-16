@@ -20,8 +20,7 @@ Finally, please be patient as I try to fix it. If it's not fixed quickly, you ca
 <h2 align="center"> Using & Installing </h2>
 
 To use the compiler, please make sure you have .NET 5 installed, once you've done that, do the following steps:
-* Go to the ` test.txt ` file, it is located in the ` Main ` folder of the project, under ` Source `.
-* Add text to that ` test.txt ` file
+* Add text to the ` test.urnm ` file located in the central folder
 * Either run the ` run.bat ` file I have in that same directory, or run it via command line with ` dotnet run test.txt `
 
 <h3 align="center"> Additional arguments: </h3>
