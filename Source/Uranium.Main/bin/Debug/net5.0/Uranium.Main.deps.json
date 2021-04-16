@@ -1,0 +1,36 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v5.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v5.0": {
+      "Uranium.Main/1.0.0": {
+        "dependencies": {
+          "Uranium": "1.0.0"
+        },
+        "runtime": {
+          "Uranium.Main.dll": {}
+        }
+      },
+      "Uranium/1.0.0": {
+        "runtime": {
+          "Uranium.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "Uranium.Main/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Uranium/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}
