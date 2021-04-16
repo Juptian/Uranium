@@ -1,3 +1,5 @@
+<h1 align="center" style="position: relative;">
+<img src="UraniumLogo.png" alt="Uranium Logo" /></h1>
 <h1 align="center"> Uranium </h1>
 <h2 align="center"> <img src="https://img.shields.io/github/workflow/status/Juptian/Compiler/.NET?style=plastic"></img> <img src="https://img.shields.io/badge/Language-C%23-blue"></img> <img src="https://img.shields.io/github/license/Juptian/Compiler?color=brightgreen&style=plastic"></img> </h2>
 Uranium is a compiler that I decided to make from scratch, it is targetted at the CLR and will hopefully output IL code later. Currently, Uranium isn't finished
