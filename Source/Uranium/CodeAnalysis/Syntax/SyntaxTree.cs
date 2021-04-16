@@ -8,31 +8,47 @@ using Uranium.CodeAnalysis.Syntax.Expression;
 using Uranium.CodeAnalysis.Parsing;
 using Uranium.Logging;
 using Uranium.CodeAnalysis.Lexing;
+using Uranium.CodeAnalysis.Text;
 
 namespace Uranium.CodeAnalysis.Syntax
 {
     public sealed class SyntaxTree
     {
-        public SyntaxTree(ImmutableArray<Diagnostic> diagnostics, ExpressionSyntax root, SyntaxToken endOfFileToken)
+        public SyntaxTree(SourceText text, ImmutableArray<Diagnostic> diagnostics, ExpressionSyntax root, SyntaxToken endOfFileToken)
         {
+            Text = text;
             Diagnostics = diagnostics;
             Root = root;
             EndOfFileToken = endOfFileToken;
         }
 
+        public SourceText Text { get; }
         public ImmutableArray<Diagnostic> Diagnostics { get; }
         public ExpressionSyntax Root { get; }
         public SyntaxToken EndOfFileToken { get; }
 
         public static SyntaxTree Parse(string text)
         {
+            var sourceText = SourceText.From(text);
+            return Parse(sourceText);
+        }
+
+        public static SyntaxTree Parse(SourceText text)
+        {
             var parser = new Parser(text);
             return parser.Parse();
         }
 
+
         public static IEnumerable<SyntaxToken> LexTokens(string text)
         {
-            Console.WriteLine(text);
+            var sourceText = SourceText.From(text);
+            return LexTokens(sourceText);
+        }
+
+        public static IEnumerable<SyntaxToken> LexTokens(SourceText text)
+        {
+            //Console.WriteLine(text);
             var lexer = new Lexer(text);
             while(true)
             {
@@ -44,5 +60,6 @@ namespace Uranium.CodeAnalysis.Syntax
                 yield return token;
             }
         }
+
     }
 }

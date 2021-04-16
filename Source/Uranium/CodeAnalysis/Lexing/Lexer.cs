@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Uranium.Logging;
 using Uranium.CodeAnalysis.Syntax;
+using Uranium.CodeAnalysis.Text;
 
 namespace Uranium.CodeAnalysis.Lexing
 {
@@ -14,14 +15,14 @@ namespace Uranium.CodeAnalysis.Lexing
 
         private int _start;
         private int _index;
-        private readonly string _source;
         private SyntaxKind _current;
         private string? _text;
         private object? _currentValue;
 
+        private readonly SourceText _source;
         private readonly DiagnosticBag _diagnostics = new();
 
-        public Lexer(string contents)
+        public Lexer(SourceText contents)
         {
             _source = contents;
             /*for (var i = 0; i < contents.Length; i++)
@@ -29,7 +30,7 @@ namespace Uranium.CodeAnalysis.Lexing
                 Console.WriteLine($"{contents[i]}, {i}");
             }*/
         }
-
+        
         public DiagnosticBag Diagnostics => _diagnostics;
 
         public SyntaxToken Lex()
@@ -103,7 +104,7 @@ namespace Uranium.CodeAnalysis.Lexing
                 var length = _index - _start;
                 if (length > 0)
                 {
-                    _text  = _source.Substring(_start, length);
+                    _text  = _source.ToString(_start, length);
                 }
             }
         }
@@ -281,7 +282,7 @@ namespace Uranium.CodeAnalysis.Lexing
                 //So we leave it here.
                 if ((text is null && _text is null) || text.Equals("BadToken", StringComparison.OrdinalIgnoreCase))
                 {
-                    text = _source.Substring(_start, length);
+                    text = _source.ToString(_start, length);
                 }
                 _text = text;
             }
@@ -352,7 +353,7 @@ namespace Uranium.CodeAnalysis.Lexing
 
             //Commented out, is here for debug purposes
             /*var length = _Index - _start;
-            Console.WriteLine(_FileContents.Substring(_start, length));*/
+            Console.WriteLine(_FileContents.ToString(_start, length));*/
         }
 
         private void ReadMultiLineComment()
@@ -387,7 +388,7 @@ namespace Uranium.CodeAnalysis.Lexing
 
             //Commented out, is here for debug purposes
             /*var length = _Index - _startIndex;
-            Console.WriteLine(_FileContents.Substring(_startIndex, length));*/
+            Console.WriteLine(_FileContents.ToString(_startIndex, length));*/
         }
 
         private void ReadNum()
@@ -418,7 +419,7 @@ namespace Uranium.CodeAnalysis.Lexing
 
             //Replacing , with . here so that I can parse it into a number
             //This allows a user to chose between , and . as their decimal separator
-            var charArray = _source.Substring(_start, length).Replace(',', '.').ToCharArray();
+            var charArray = _source.ToString(_start, length).Replace(',', '.').ToCharArray();
 
             var text = string.Join("", charArray.Where(e => !char.IsWhiteSpace(e) && !e.Equals('_')));
             _text = text;
@@ -487,7 +488,7 @@ namespace Uranium.CodeAnalysis.Lexing
                 _index++;
             }
             var length = _index - _start;
-            var text = _source.Substring(_start, length);
+            var text = _source.ToString(_start, length);
             var kind = SyntaxFacts.GetKeywordKind(text);
             
             _current = kind == SyntaxKind.BadToken ? SyntaxKind.IdentifierToken : kind;

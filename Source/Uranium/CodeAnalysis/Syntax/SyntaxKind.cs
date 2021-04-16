@@ -82,6 +82,7 @@
         DoubleKeyword,
         LongKeyword,
         VarKeyword,
+        CharKeyword,
         StringKeyword,
         BoolKeyword,
         TypeDefKeyword,

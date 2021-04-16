@@ -22,7 +22,7 @@ namespace Uranium.CodeAnalysis.Syntax
         public string? Text { get; }
         public object? Value { get; }
 
-        public TextSpan Span => new(Position, Text is null ? 0 : Text.Length);
+        public override TextSpan Span => new(Position, Text?.Length ?? 0);
 
         public override string ToString()
         {

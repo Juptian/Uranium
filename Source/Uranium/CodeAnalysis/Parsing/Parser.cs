@@ -5,6 +5,7 @@ using System.Linq;
 using Uranium.CodeAnalysis.Lexing;
 using Uranium.CodeAnalysis.Syntax.Expression;
 using Uranium.CodeAnalysis.Syntax;
+using Uranium.CodeAnalysis.Text;
 using Uranium.Logging;
 
 namespace Uranium.CodeAnalysis.Parsing
@@ -13,9 +14,10 @@ namespace Uranium.CodeAnalysis.Parsing
     {
         private readonly SyntaxToken[] _tokens;
         private int _position;
+        private readonly SourceText _text;
         private readonly DiagnosticBag _diagnostics = new();
 
-        public Parser(string text)
+        public Parser(SourceText text)
         {
             var tokens = new List<SyntaxToken>();
             var lexer = new Lexer(text);
@@ -29,6 +31,8 @@ namespace Uranium.CodeAnalysis.Parsing
                 }
             }
             while (token.Kind != SyntaxKind.EndOfFile);
+
+            _text = text;
             _tokens = tokens.ToArray();
             _diagnostics.Concat(lexer.Diagnostics);
         }
@@ -71,7 +75,7 @@ namespace Uranium.CodeAnalysis.Parsing
             var expression = ParseExpression();
             var EOFToken = MatchToken(SyntaxKind.EndOfFile);
 
-            return new(_diagnostics.ToImmutableArray(), expression, EOFToken);
+            return new(_text, _diagnostics.ToImmutableArray(), expression, EOFToken);
         }
         
         private ExpressionSyntax ParseExpression()
@@ -193,24 +197,5 @@ namespace Uranium.CodeAnalysis.Parsing
             return new NameExpressionSyntax(identifierToken);
         }
 
-        public static void PrettyPrint(SyntaxNode node, string indent = "", bool isLast = true)
-        {
-            var marker = isLast ? "└───" : "├───";
-
-            Console.Write(indent + marker + node.Kind);
-
-            if (node is SyntaxToken token && token.Value is not null)
-            {
-                Console.Write(" " + token.Value);
-            }
-            Console.WriteLine();
-            indent += isLast ? "    " : "│   ";
-
-            var lastChild = node.GetChildren().LastOrDefault();
-            foreach (var child in node.GetChildren())
-            {
-                PrettyPrint(child, indent, child == lastChild);
-            }
-        }
     }
 }

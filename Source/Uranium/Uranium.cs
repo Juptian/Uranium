@@ -58,8 +58,8 @@ namespace Uranium
             //Displaying the tree if the program is ran with --#showTree
             if(showTree)
             {
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Parser.PrettyPrint(syntaxTree.Root);
+                Console.ForegroundColor = ConsoleColor.Green;
+                syntaxTree.Root.WriteTo(Console.Out);
                 Console.ResetColor();    
             }
 
@@ -71,6 +71,7 @@ namespace Uranium
             } 
             else
             {
+                var treeText = syntaxTree.Text;
                 Console.ForegroundColor = ConsoleColor.Red;
                 
                 Console.WriteLine();
@@ -78,7 +79,25 @@ namespace Uranium
                 //to give us all of the errors
                 foreach (var diag in diagnostics)
                 {
-                    Console.WriteLine(diag);
+                    var lineIndex = treeText.GetLineIndex(diag.Span.Start);
+                    var lineNumber = lineIndex + 1;
+                    var character = diag.Span.Start - treeText.Lines[lineIndex].Start + 1;
+
+                    Console.WriteLine();
+                    Console.Write($"({lineNumber}, {character}),");
+                    Console.WriteLine($"{diag}");
+
+                    var prefix = text.Substring(0, diag.Span.Start);
+                    var error = text.Substring(diag.Span.Start, diag.Span.Length);
+                    var suffix = text.Substring(diag.Span.End);
+
+                    Console.ResetColor();
+                    Console.Write($"     {prefix}");
+
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.Write(error);
+                    Console.ResetColor();
+                    Console.Write(suffix);
                 }
                 //Reset the color so that it doesn't look bad
                 Console.ResetColor(); 

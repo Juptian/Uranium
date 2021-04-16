@@ -42,7 +42,8 @@ namespace Uranium.Logging
 
         public void ReportInvalidToken(TextSpan span, SyntaxToken actualKind, SyntaxKind expectedKind)
         {
-            var message = $"JC0003: Unexpected token: {actualKind}. Expected: {expectedKind}.";
+            var expectedText = expectedKind == SyntaxKind.EndOfFile ? "Expected the file to end" : $"Expected: {SyntaxFacts.GetText(expectedKind)}";
+            var message = $"JC0003: Unexpected token: `{actualKind.Text}`. `{expectedText}`.";
             Report(span, message);
         }
 

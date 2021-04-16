@@ -145,6 +145,8 @@ namespace Uranium.Tests.CodeAnalysis.Lexing
                 (SyntaxKind.NumberToken, "123.4"),
                 (SyntaxKind.NumberToken, "1"),
                 (SyntaxKind.NumberToken, "10000"),
+                (SyntaxKind.NumberToken, "10.04"),
+                (SyntaxKind.NumberToken, "10")
             };
         }
 
@@ -155,6 +157,7 @@ namespace Uranium.Tests.CodeAnalysis.Lexing
                 (SyntaxKind.TrueKeyword, "true"),
                 (SyntaxKind.FalseKeyword, "false"),
                 (SyntaxKind.DoubleKeyword, "double"),
+                (SyntaxKind.CharKeyword, "char"),
                 (SyntaxKind.StringKeyword, "string"),
                 (SyntaxKind.FloatKeyword, "float"),
                 (SyntaxKind.LongKeyword, "long"),

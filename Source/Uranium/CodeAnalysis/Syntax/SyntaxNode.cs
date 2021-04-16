@@ -1,5 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Linq;
+using System.Collections.Generic;
 using System.Reflection;
+using System.IO;
+using Uranium.CodeAnalysis.Text;
 
 namespace Uranium.CodeAnalysis.Syntax
 {
@@ -7,6 +11,20 @@ namespace Uranium.CodeAnalysis.Syntax
     {
         public abstract SyntaxKind Kind { get; }
 
+        public virtual TextSpan Span
+        {
+            get
+            {
+                var first = GetChildren().First().Span;
+                var last = GetChildren().Last().Span;
+                return TextSpan.FromBounds(first.Start, last.End);
+            }
+        }
+
+        //Why forcefully override when I can don't
+        //This method works on all children of the class
+        //This also allows for a central method, instead of 20 million implementations.
+        //This should work fine because metadata
         public IEnumerable<SyntaxNode> GetChildren()
         {
             var properties = GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
@@ -27,6 +45,40 @@ namespace Uranium.CodeAnalysis.Syntax
                     }
                 }
             }
+        }
+
+        private static void PrettyPrint(TextWriter writer, SyntaxNode node, string indent = "", bool isLast = true)
+        {
+            var marker = isLast ? "└───" : "├───";
+
+            writer.Write(indent + marker + node.Kind);
+
+            if (node is SyntaxToken token && token.Value is not null)
+            {
+                writer.Write(" " + token.Value);
+            }
+            writer.WriteLine();
+            indent += isLast ? "    " : "│   ";
+
+            var lastChild = node.GetChildren().LastOrDefault();
+            foreach (var child in node.GetChildren())
+            {
+                PrettyPrint(writer, child, indent, child == lastChild);
+            }
+        }
+
+        public void WriteTo(TextWriter writer)
+        {
+            PrettyPrint(writer, this);
+        }
+
+        public override string ToString()
+        {
+            using var writer = new StringWriter();
+
+            WriteTo(writer);
+
+            return writer.ToString();
         }
     }
 }
