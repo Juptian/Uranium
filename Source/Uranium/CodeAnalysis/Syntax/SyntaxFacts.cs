@@ -9,6 +9,8 @@ namespace Uranium.CodeAnalysis.Syntax
     public static class SyntaxFacts
     {
         private static readonly int _minusValue = 4;
+
+        //Binary operators
         public static int GetBinaryOperatorPrecedence(this SyntaxKind kind)
             => kind switch
             {
@@ -24,6 +26,19 @@ namespace Uranium.CodeAnalysis.Syntax
                 _ => 0,
             };
 
+        public static IEnumerable<SyntaxKind> GetBinaryOperators()
+        {
+            var kinds = (SyntaxKind[])Enum.GetValues(typeof(SyntaxKind));
+            foreach(var kind in kinds)
+            {
+                if(GetBinaryOperatorPrecedence(kind) > 0)
+                {
+                    yield return kind;
+                }
+            }
+        }
+
+        //Unary operators
         public static int GetUnaryOperatorPrecedence(this SyntaxKind kind)
             => kind switch
             {
@@ -40,6 +55,19 @@ namespace Uranium.CodeAnalysis.Syntax
                 SyntaxKind.Plus or SyntaxKind.Minus or SyntaxKind.Bang => _minusValue + 3,
                 _ => 0,
             };
+ 
+        public static IEnumerable<SyntaxKind> GetUnaryOperators()
+        {
+            var kinds = (SyntaxKind[])Enum.GetValues(typeof(SyntaxKind));
+            foreach(var kind in kinds)
+            {
+                if(GetUnaryOperatorPrecedence(kind) > 0)
+                {
+                    yield return kind;
+                }
+            }
+        }
+
 
         internal static SyntaxKind GetKeywordKind(string text)
             => text switch
