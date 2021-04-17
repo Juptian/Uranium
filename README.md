@@ -4,8 +4,8 @@
 <h2 align="center"> <img src="https://img.shields.io/github/workflow/status/Juptian/Uranium/Windows?label=Windows%20Build&style=plastic"/> 
   <img src="https://img.shields.io/github/workflow/status/Juptian/Uranium/MacOS?label=MacOS%20Build&style=plastic"/>
   <img src="https://img.shields.io/github/workflow/status/Juptian/Uranium/Ubuntu?label=Ubuntu&style=plastic"/>
-  <img src="https://img.shields.io/badge/Language-C%23-success&style=plastic"/> 
-  <img src="https://img.shields.io/github/license/Juptian/Compiler?color=brightgreen&style=plastic"/>
+  <img src="https://img.shields.io/badge/Language-C%23-success?color=success&style=plastic"/> 
+  <img src="https://img.shields.io/github/license/Juptian/Uranium?color=success&style=plastic"/>
 </h2>
 Uranium is a compiler that I decided to make from scratch, it is targetted at the CLR and will hopefully output IL code later. Currently, Uranium isn't finished
 
