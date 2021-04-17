@@ -49,15 +49,29 @@ namespace Uranium.CodeAnalysis.Syntax
 
         private static void PrettyPrint(TextWriter writer, SyntaxNode node, string indent = "", bool isLast = true)
         {
+            var isToConsole = writer == Console.Out;
             var marker = isLast ? "└───" : "├───";
 
-            writer.Write(indent + marker + node.Kind);
+            writer.Write(indent);
+                
+            if(isToConsole)
+            {
+                Console.ForegroundColor = ConsoleColor.Gray; 
+                writer.Write(marker);  
+                Console.ForegroundColor = node is SyntaxToken ? ConsoleColor.Green : ConsoleColor.Cyan;
+            }
+
+            writer.Write(node.Kind);
 
             if (node is SyntaxToken token && token.Value is not null)
             {
                 writer.Write(" " + token.Value);
             }
+
             writer.WriteLine();
+
+            if (isToConsole) Console.ResetColor();
+
             indent += isLast ? "    " : "│   ";
 
             var lastChild = node.GetChildren().LastOrDefault();
