@@ -63,6 +63,7 @@
 
         //Specifiers
         ConstKeyword,
+        LetConstKeyword,
         ReturnKeyword,
         ThisKeyword,
         ToKeyword,

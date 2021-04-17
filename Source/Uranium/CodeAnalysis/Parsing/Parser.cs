@@ -30,6 +30,7 @@ namespace Uranium.CodeAnalysis.Parsing
                 {
                     tokens.Add(token);
                 }
+                Console.WriteLine(token);
             }
             while (token.Kind is not SyntaxKind.EndOfFile);
 
@@ -73,14 +74,17 @@ namespace Uranium.CodeAnalysis.Parsing
 
         public CompilationUnitSyntax ParseCompilationUnit()
         {
+            //Console.WriteLine("Parse compilation unit");
             var statement = ParseStatement();
             var EOFToken = MatchToken(SyntaxKind.EndOfFile);
 
+            //Console.WriteLine("Return compilation unit");
             return new(statement, EOFToken);
         }
 
         private StatementSyntax ParseStatement()
         {
+            //Console.WriteLine(Current.Kind);
             if(Current.Kind is SyntaxKind.OpenCurlyBrace)
             {
                 return ParseBlockStatement();
@@ -126,7 +130,7 @@ namespace Uranium.CodeAnalysis.Parsing
             //    b  5
             //Checking for an identifier token, and a double equals
             //this way we can actually assign two identifiers
-            
+            //Console.WriteLine("ParseAssignment");
             if(Current.Kind == SyntaxKind.IdentifierToken &&
                 Peek(1).Kind == SyntaxKind.Equals)
             {
@@ -158,26 +162,25 @@ namespace Uranium.CodeAnalysis.Parsing
             {
                 left = ParsePrimaryExpression();
             }
-            
+
             //Keep looping until our precedence is <= parent precedence, or == 0;
             while(true)
             {
                 var precedence = Current.Kind.GetBinaryOperatorPrecedence();
-                
+
                 if(precedence == 0 || precedence <= parentPrecedence)
                 {
                     break;
                 }
-                
+
                 //Taking the current token, and moving the index
                 var operatorToken = NextToken();
                 //Recursively calling the ParseExpression with the current precedence
                 var right = ParseBinaryExpression(precedence);
-
                 //Making left a New BinaryExpressionSyntax
                 left = new BinaryExpressionSyntax(left, operatorToken, right);
-
             }
+            //Console.WriteLine(left);
             return left;
         }
 
@@ -222,7 +225,8 @@ namespace Uranium.CodeAnalysis.Parsing
 
         private ExpressionSyntax ParseNameExpression()
         {
-            var identifierToken = MatchToken(SyntaxKind.IdentifierToken);
+            //Console.WriteLine(Current);
+            var identifierToken = NextToken();//MatchToken(SyntaxKind.IdentifierToken);
             return new NameExpressionSyntax(identifierToken);
         }
 

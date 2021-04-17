@@ -67,6 +67,7 @@ namespace Uranium.CodeAnalysis.Syntax.Expression
 
         private void EvaluateStatement(BoundStatement statement)
         {
+            Console.WriteLine("EvaluateStatement called");
             switch(statement.Kind)
             {
                 case BoundNodeKind.BlockStatement:

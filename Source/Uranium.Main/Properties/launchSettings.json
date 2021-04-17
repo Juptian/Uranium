@@ -2,7 +2,7 @@
   "profiles": {
     "Main": {
       "commandName": "Project",
-      "commandLineArgs": "..\\..\\Test.urnm --#showtree"
+      "commandLineArgs": "../../Test.urnm --#showtree"
     }
   }
 }
