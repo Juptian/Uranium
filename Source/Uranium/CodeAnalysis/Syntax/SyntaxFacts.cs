@@ -87,6 +87,13 @@ namespace Uranium.CodeAnalysis.Syntax
                 "enum" => SyntaxKind.EnumKeywrod,
                 "typedef" => SyntaxKind.TypeDefKeyword,
                 "null" => SyntaxKind.Null,
+                "break" => SyntaxKind.BreakStatement,
+                "continue" => SyntaxKind.ContinueStatement,
+                "while" => SyntaxKind.WhileStatement,
+                "for" => SyntaxKind.ForStatement,
+                "if" => SyntaxKind.IfStatement,
+                "else" => SyntaxKind.ElseKeyword,
+                "return" => SyntaxKind.ReturnStatement,
                 _ => SyntaxKind.IdentifierToken,
             };
 

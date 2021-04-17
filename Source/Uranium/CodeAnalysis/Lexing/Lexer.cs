@@ -40,7 +40,7 @@ namespace Uranium.CodeAnalysis.Lexing
             ReadSpecialChars(false);
             LexToken(CurrentIndex);
 
-            //Console.WriteLine($"{_current}, `{_text ?? CurrentIndex.ToString()}`, {_index}, {_currentValue}");
+            //Console.WriteLine($"{_current}, {_text ?? CurrentIndex.ToString()}, {_index}, {_currentValue}");
             return new(_current, _index++, _text ?? PreviousIndex.ToString(), _currentValue);
         }
 
@@ -272,22 +272,38 @@ namespace Uranium.CodeAnalysis.Lexing
 
             //Checking here for if it's an identifier token, this way we don't do anything with it.
             //This is because Identifier tokens should not be modified.
-            if(_current is not SyntaxKind.IdentifierToken && _current is not SyntaxKind.NumberToken)
+            switch(_current)
             {
-                //Console.WriteLine(_current);
-                var length = _index - _start;
-                var text = SyntaxFacts.GetText(_current);
-                //If I remove the ` text is null `
-                //The tests fucking die
-                //So we leave it here.
+                case SyntaxKind.IdentifierToken:
+                case SyntaxKind.NumberToken:
+                case SyntaxKind.BlockStatement:
+                case SyntaxKind.ContinueStatement:
+                case SyntaxKind.DoWhileStatement:
+                case SyntaxKind.ExpressionStatement:
+                case SyntaxKind.ForStatement:
+                case SyntaxKind.IfStatement:
+                case SyntaxKind.ElseKeyword:
+                case SyntaxKind.MemberBlockStatement:
+                case SyntaxKind.ReturnStatement:
+                case SyntaxKind.WhileStatement:
+                    break;
+                default:
+                    //Console.WriteLine(_current);
+                    var length = _index - _start;
+                    var text = SyntaxFacts.GetText(_current);
+
+                    //If I remove the ` text is null `
+                    //The tests fucking die
+                    //So we leave it here.
 #pragma warning disable CS8602 // Dereference of a possibly null reference.
-                //That's why I'm checking if it's null now fuck off vs
-                if ((text is null && _text is null) || text.Equals("BadToken", StringComparison.OrdinalIgnoreCase))
-#pragma warning restore CS8602 // Dereference of a possibly null reference.
-                {
-                    text = _source.ToString(_start, length);
-                }
-                _text = text;
+                    //That's why I'm checking if it's null now fuck off vs
+                    if ((text is null && _text is null) || text.Equals("BadToken", StringComparison.OrdinalIgnoreCase))
+                    {
+                        text = _source.ToString(_start, length);
+                    }
+                    _text = text;
+                    break;
+#pragma warning restore CS8602 
             }
         }
 
@@ -496,6 +512,7 @@ namespace Uranium.CodeAnalysis.Lexing
             
             _current = kind == SyntaxKind.BadToken ? SyntaxKind.IdentifierToken : kind;
             _text = text;
+            //Console.WriteLine(_text);
             _index--;
         }
     }

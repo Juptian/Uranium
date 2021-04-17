@@ -5,6 +5,7 @@ using System.Linq;
 using Uranium.CodeAnalysis.Lexing;
 using Uranium.CodeAnalysis.Syntax.Expression;
 using Uranium.CodeAnalysis.Syntax;
+using Uranium.CodeAnalysis.Syntax.Statement;
 using Uranium.CodeAnalysis.Text;
 using Uranium.Logging;
 
@@ -72,12 +73,40 @@ namespace Uranium.CodeAnalysis.Parsing
 
         public CompilationUnitSyntax ParseCompilationUnit()
         {
-            var expression = ParseExpression();
+            var statement = ParseStatement();
             var EOFToken = MatchToken(SyntaxKind.EndOfFile);
 
-            return new(expression, EOFToken);
+            return new(statement, EOFToken);
         }
-        
+
+        private StatementSyntax ParseStatement()
+        {
+            if(Current.Kind is SyntaxKind.OpenCurlyBrace)
+            {
+                return ParseBlockStatement();
+            }
+            return ParseExpressionStatement();
+        }
+
+        private ExpressionStatementSyntax ParseExpressionStatement() => new(ParseExpression());
+
+        private BlockStatementSyntax ParseBlockStatement()
+        {
+            var statements = ImmutableArray.CreateBuilder<StatementSyntax>();
+            var openBraceToken = MatchToken(SyntaxKind.OpenCurlyBrace);
+
+            while(Current.Kind is not SyntaxKind.EndOfFile &&
+                  Current.Kind is not SyntaxKind.CloseCurlyBrace)
+            {
+                var statement = ParseStatement();
+                statements.Add(statement);
+            }
+
+            var closeBraceToken = MatchToken(SyntaxKind.CloseCurlyBrace);
+
+            return new(openBraceToken, statements.ToImmutable(), closeBraceToken);
+        }
+
         private ExpressionSyntax ParseExpression()
         {
             return ParseAssignmentExpression();

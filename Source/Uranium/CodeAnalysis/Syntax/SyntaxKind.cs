@@ -91,17 +91,18 @@
         WhileKeyword,
         DoKeyword,
 
-        //Statements
-        IfStatement,
+        // Statements
+        BlockStatement,
         BreakStatement,
         ContinueStatement,
-        VariableDeclaration,
-        ForStatement,
-        ExpressionStatement,
-        ReturnStatement,
-        WhileStatement,
         DoWhileStatement,
-
+        ExpressionStatement,
+        ForStatement,
+        IfStatement,
+        MemberBlockStatement,
+        ReturnStatement,
+        VariableDeclaration,
+        WhileStatement,
 
         // Expressions
         AssignmentExpression,

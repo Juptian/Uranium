@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using Uranium.Logging;
 using Uranium.CodeAnalysis.Text;
 using Uranium.CodeAnalysis.Binding.NodeKinds;
+using Uranium.CodeAnalysis.Binding.Statements;
+
 
 namespace Uranium.CodeAnalysis.Binding
 {
@@ -16,17 +18,17 @@ namespace Uranium.CodeAnalysis.Binding
             BoundGlobalScope? previous,
             ImmutableArray<Diagnostic> diagnostics, 
             ImmutableArray<VariableSymbol> variables, 
-            BoundExpression expression)
+            BoundStatement statement)
         {
             Previous = previous;
             Diagnostics = diagnostics;
             Variables = variables;
-            Expression = expression;
+            Statement = statement;
         }
 
         public BoundGlobalScope? Previous { get; }
         public ImmutableArray<Diagnostic> Diagnostics { get; }
         public ImmutableArray<VariableSymbol> Variables { get; }
-        public BoundExpression Expression { get; }
+        public BoundStatement Statement { get; }
     }
 }

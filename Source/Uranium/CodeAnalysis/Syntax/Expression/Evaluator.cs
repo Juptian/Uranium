@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Uranium.CodeAnalysis.Binding;
+using Uranium.CodeAnalysis.Binding.Statements;
 using Uranium.CodeAnalysis.Binding.NodeKinds;
 using Uranium.CodeAnalysis.Text;
 
@@ -11,9 +12,12 @@ namespace Uranium.CodeAnalysis.Syntax.Expression
     //It just evaluates
     internal sealed class Evaluator
     {
-        private readonly BoundExpression _root;
+        private readonly BoundStatement _root;
         private readonly Dictionary<VariableSymbol, object> _variables;
-        public Evaluator(BoundExpression root, Dictionary<VariableSymbol, object> variables)
+
+        private object _lastValue;
+
+        public Evaluator(BoundStatement root, Dictionary<VariableSymbol, object> variables)
         {
             _root = root;
             _variables = variables;
@@ -21,7 +25,8 @@ namespace Uranium.CodeAnalysis.Syntax.Expression
 
         public object Evaluate()
         {
-            return EvaluateExpression(_root);
+            EvaluateStatement(_root);
+            return _lastValue;
         }
 
         private object EvaluateExpression(BoundExpression node)
@@ -59,6 +64,33 @@ namespace Uranium.CodeAnalysis.Syntax.Expression
             //Same as above ^^
             throw new($"Unexpected node {node.Kind}");
         }
+
+        private void EvaluateStatement(BoundStatement statement)
+        {
+            switch(statement.Kind)
+            {
+                case BoundNodeKind.BlockStatement:
+                    EvaluateBlockStatement((BoundBlockStatement)statement);
+                    return;
+
+                case BoundNodeKind.ExpressionStatement:
+                    EvaluateExpressionStatement((BoundExpressionStatement)statement);
+                    return;
+                default:
+                    //Exhausted all our options, time to call it quits!
+                    throw new($"Unexpected statement {statement}");
+            }
+        }
+
+        private void EvaluateBlockStatement(BoundBlockStatement statement)
+        {
+            foreach(var item in statement.Statements)
+            {
+                EvaluateStatement(item);
+            }
+        }
+
+        private void EvaluateExpressionStatement(BoundExpressionStatement statement) => _lastValue = EvaluateExpression(statement.Expression); 
 
         private object EvaluateBoundUnaryExpression(BoundUnaryExpression u)
         {

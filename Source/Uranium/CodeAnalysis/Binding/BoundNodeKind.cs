@@ -9,10 +9,15 @@ namespace Uranium.CodeAnalysis.Binding
     //Literally an enum, what else would it be 
    internal enum BoundNodeKind
    {
+        //Expressions
         UnaryExpression,
         LiteralExpression,
         BinaryExpression,
         VariableExpression,
-        AssignmentExpression
+        AssignmentExpression,
+
+        //Statements
+        BlockStatement,
+        ExpressionStatement
     }
 }

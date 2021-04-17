@@ -94,14 +94,14 @@ namespace Uranium
                 //to give us all of the errors
                 foreach (var diag in diagnostics)
                 {
-                    PrintDiagnostic(diag, treeText, _syntaxTree.Text.ToString());
+                    PrintDiagnostic(diag, treeText);
                 }
                 //Reset the color so that it doesn't look bad
                 Console.ResetColor(); 
             }
         }
 
-        private static void PrintDiagnostic(Diagnostic diag, SourceText treeText, string text)
+        private static void PrintDiagnostic(Diagnostic diag, SourceText treeText)
         {
             var lineIndex = treeText.GetLineIndex(diag.Span.Start);
             var lineNumber = lineIndex + 1;

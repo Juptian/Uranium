@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using Uranium.CodeAnalysis.Syntax;
-using Uranium.CodeAnalysis.Binding.NodeKinds;
 using Uranium.CodeAnalysis.Syntax.Expression;
+using Uranium.CodeAnalysis.Syntax.Statement;
 using Uranium.CodeAnalysis.Text;
 using Uranium.Logging;
+using Uranium.CodeAnalysis.Binding.NodeKinds;
+using Uranium.CodeAnalysis.Binding.Statements;
 
 namespace Uranium.CodeAnalysis.Binding
 {
@@ -19,7 +21,7 @@ namespace Uranium.CodeAnalysis.Binding
 
         //Diagnostics, pretty neat not gonna lie
         private readonly DiagnosticBag _diagnostics = new();
-        private readonly BoundScope _scope;
+        private BoundScope _scope;
 
         public static BoundGlobalScope BindGlobalScope(BoundGlobalScope? previous, CompilationUnitSyntax syntax)
         {
@@ -30,7 +32,7 @@ namespace Uranium.CodeAnalysis.Binding
             //So if parent scope is null, that's perfectly fine!
             var binder = new Binder(parentScope);
 
-            var expression = binder.BindExpression(syntax.Expression);
+            var statement = binder.BindStatement(syntax.Statement);
             //Getting declared variables to allow us to properly report errors of already defined variables
             var variables = binder._scope.GetDeclaredVariables();
             
@@ -42,7 +44,7 @@ namespace Uranium.CodeAnalysis.Binding
                 diagnostics = diagnostics.InsertRange(0, previous.Diagnostics);
             }
 
-            return new(previous, diagnostics, variables, expression);
+            return new(previous, diagnostics, variables, statement);
         }
 
         private static BoundScope? CreateParentScopes(BoundGlobalScope? previous)
@@ -73,8 +75,12 @@ namespace Uranium.CodeAnalysis.Binding
             return parent;
         }
         
+
+        //Public diagnostics that nobody can edit :C
+        public DiagnosticBag Diagnostics => _diagnostics;
+
         //Binding the expression
-        public BoundExpression BindExpression(ExpressionSyntax syntax)
+        private BoundExpression BindExpression(ExpressionSyntax syntax)
             => syntax.Kind switch // Calling the correct function based off of the syntax kind and returning it's value.
             {
                 //Base expressions
@@ -89,11 +95,39 @@ namespace Uranium.CodeAnalysis.Binding
                 _ => throw new($"Unexpected syntax {syntax.Kind}"),
             };
 
+        //Binding the Statement 
+        private BoundStatement BindStatement(StatementSyntax syntax)
+            => syntax.Kind switch // Calling the correct function based off of the syntax kind and returning it's value.
+            {
+                //Base expressions
+                SyntaxKind.BlockStatement => BindBlockStatement((BlockStatementSyntax)syntax),
+                SyntaxKind.ExpressionStatement => BindExpressionStatement((ExpressionStatementSyntax)syntax),
+                _ => throw new($"Unexpected syntax {syntax.Kind}"),
+            };
+
+        private BoundStatement BindBlockStatement(BlockStatementSyntax syntax)
+        {
+            var statements = ImmutableArray.CreateBuilder<BoundStatement>();
+
+            _scope = new BoundScope(_scope);
+
+            foreach(var statementSyntax in syntax.Statements)
+            {
+                var statement = BindStatement(statementSyntax);
+                statements.Add(statement);
+            }
+
+            _scope = _scope.Parent ?? _scope;
+
+            return new BoundBlockStatement(statements.ToImmutable());
+        }
 
 
-        //Public diagnostics that nobody can edit :C
-        public DiagnosticBag Diagnostics => _diagnostics;
-
+        private BoundStatement BindExpressionStatement(ExpressionStatementSyntax syntax)
+        {
+            var expression = BindExpression(syntax.Expression);
+            return new BoundExpressionStatement(expression);
+        }
 
         //Value is being parsed into a nullable int
         //That then gets checked to see if it's null, and gets assigned to 0 if it is.

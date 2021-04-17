@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Xunit;
 using Uranium.CodeAnalysis.Syntax;
 using Uranium.CodeAnalysis.Syntax.Expression;
+using Uranium.CodeAnalysis.Syntax.Statement;
 
 namespace Uranium.Tests.CodeAnalysis.Parsing
 {
@@ -149,7 +150,8 @@ namespace Uranium.Tests.CodeAnalysis.Parsing
         {
             var syntaxTree = SyntaxTree.Parse(text);
             var root = syntaxTree.Root;
-            return root.Expression;
+            var statement = root.Statement;
+            return Assert.IsType<ExpressionStatementSyntax>(statement).Expression;
         }
 
         public static IEnumerable<object[]> GetBinaryOperatorPairsData()

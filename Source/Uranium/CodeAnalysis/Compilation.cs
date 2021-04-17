@@ -17,7 +17,7 @@ namespace Uranium.CodeAnalysis
 {
     public sealed class Compilation
     {
-        private BoundGlobalScope _globalScope;
+        private BoundGlobalScope? _globalScope;
         public Compilation(SyntaxTree syntax)
             : this(null, syntax)
         {
@@ -60,7 +60,7 @@ namespace Uranium.CodeAnalysis
                 return new(diagnostics, null);
             }
 
-            var evaluator = new Evaluator(globalScope.Expression, variables);
+            var evaluator = new Evaluator(globalScope.Statement, variables);
             var value = evaluator.Evaluate();
             return new(ImmutableArray<Diagnostic>.Empty, value);
         }
