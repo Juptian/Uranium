@@ -67,15 +67,15 @@ namespace Uranium.CodeAnalysis.Parsing
 
             _diagnostics.ReportInvalidToken(Current.Span, Current, kind);
 
-            return new(kind, Current.Position, null, null);
+            return new(kind, Current.Position, Current.Text, null);
         }
 
-        public SyntaxTree Parse()
+        public CompilationUnitSyntax ParseCompilationUnit()
         {
             var expression = ParseExpression();
             var EOFToken = MatchToken(SyntaxKind.EndOfFile);
 
-            return new(_text, _diagnostics.ToImmutableArray(), expression, EOFToken);
+            return new(expression, EOFToken);
         }
         
         private ExpressionSyntax ParseExpression()

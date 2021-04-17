@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using Uranium.CodeAnalysis.Syntax;
 using Uranium.CodeAnalysis.Binding.NodeKinds;
@@ -11,6 +12,67 @@ namespace Uranium.CodeAnalysis.Binding
 {
     internal sealed class Binder
     {
+        public Binder(BoundScope? parent = null)
+        {
+            _scope = new(parent);
+        }
+
+        //Diagnostics, pretty neat not gonna lie
+        private readonly DiagnosticBag _diagnostics = new();
+        private readonly BoundScope _scope;
+
+        public static BoundGlobalScope BindGlobalScope(BoundGlobalScope? previous, CompilationUnitSyntax syntax)
+        {
+            //This method allows for scope!
+            var parentScope = CreateParentScopes(previous);
+
+            //When binding to the global scope, there is no parent to the binder
+            //So if parent scope is null, that's perfectly fine!
+            var binder = new Binder(parentScope);
+
+            var expression = binder.BindExpression(syntax.Expression);
+            //Getting declared variables to allow us to properly report errors of already defined variables
+            var variables = binder._scope.GetDeclaredVariables();
+            
+            //Making the diagnostics immutable allows for less potential bugs
+            var diagnostics = binder.Diagnostics.ToImmutableArray();
+        
+            if(previous is not null)
+            {
+                diagnostics = diagnostics.InsertRange(0, previous.Diagnostics);
+            }
+
+            return new(previous, diagnostics, variables, expression);
+        }
+
+        private static BoundScope? CreateParentScopes(BoundGlobalScope? previous)
+        {
+            var stack = new Stack<BoundGlobalScope>();
+            
+            //Pushing our previous scopes onto the stack this way we can get them into reverse order
+            while(previous is not null)
+            {
+                stack.Push(previous);
+                previous = previous.Previous ?? null;
+            }
+
+            BoundScope? parent = null;
+
+            //Removing the items from stack, while also declaring variables
+            while (stack.Count > 0)
+            {
+                previous = stack.Pop();
+                var scope = new BoundScope(parent);
+                foreach(var variable in previous.Variables)
+                {
+                    scope.TryDeclare(variable);
+                }
+
+                parent = scope;
+            }
+            return parent;
+        }
+        
         //Binding the expression
         public BoundExpression BindExpression(ExpressionSyntax syntax)
             => syntax.Kind switch // Calling the correct function based off of the syntax kind and returning it's value.
@@ -27,14 +89,7 @@ namespace Uranium.CodeAnalysis.Binding
                 _ => throw new($"Unexpected syntax {syntax.Kind}"),
             };
 
-        //Diagnostics, pretty neat not gonna lie
-        private readonly DiagnosticBag _diagnostics = new();
-        private readonly Dictionary<VariableSymbol, object> _variables;
 
-        public Binder(Dictionary<VariableSymbol, object> variables)
-        {
-            _variables = variables;
-        }
 
         //Public diagnostics that nobody can edit :C
         public DiagnosticBag Diagnostics => _diagnostics;
@@ -87,16 +142,14 @@ namespace Uranium.CodeAnalysis.Binding
         {
             var name = syntax.IdentifierToken.Text;
 
-            var variables = _variables.Keys.FirstOrDefault(v => v.Name == name);
-
             //Trying to get the value, if it returns then great, if not we report it
-            if (variables is null)
+            if (!_scope.TryLookup(name, out var variable))
             {
                 _diagnostics.ReportUndefinedName(syntax.IdentifierToken.Span, name ?? "name is null");
                 return new BoundLiteralExpression(0);
             }
 
-            return new BoundVariableExpression(variables);
+            return new BoundVariableExpression(variable);
         }
 
         private BoundExpression BindAssignmentExpression(AssignmentExpressionSyntax syntax)
@@ -104,16 +157,19 @@ namespace Uranium.CodeAnalysis.Binding
             var name = syntax.IdentifierToken.Text;
             var boundExpression = BindExpression(syntax.Expression);
 
-            var existingVariable = _variables.Keys.FirstOrDefault(v => v.Name == name);
-
-            //removing existing variables
-            if(existingVariable is not null)
+            if(!_scope.TryLookup(name, out var variable))
             {
-                _variables.Remove(existingVariable);
+                //Null check on the name so that we can find the object
+                variable = new VariableSymbol(name ?? $"{syntax.IdentifierToken}s name is null", boundExpression.Type);
+                _scope.TryDeclare(variable);
             }
 
-            //Null check on the name so that we can find the object
-            var variable = new VariableSymbol(name ?? $"{syntax.IdentifierToken}s name is null", boundExpression.Type);
+            //A variable cannot have their type reassigned.
+            if(boundExpression.Type != variable.Type)
+            {
+                _diagnostics.ReportCannotConvert(syntax.Expression.Span, boundExpression.Type, variable.Type);
+                return boundExpression;
+            }
 
             return new BoundAssignmentExpression(variable, boundExpression);
         }

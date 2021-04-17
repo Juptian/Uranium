@@ -59,15 +59,27 @@ namespace Uranium.Logging
             Report(span, message);
         }
 
-        internal void ReportUndefinedBinaryOperator(TextSpan span, string? operatorText, Type leftType, Type rightType)
+        public void ReportUndefinedBinaryOperator(TextSpan span, string? operatorText, Type leftType, Type rightType)
         {
             var message = $"JC0006: Binary operator {operatorText} is undefined for {leftType} and {rightType}";
             Report(span, message);
         }
 
-        internal void ReportUndefinedName(TextSpan span, string name)
+        public void ReportUndefinedName(TextSpan span, string name)
         {
             var message = $"JC0007: The type or namespace {name} does not exist";
+            Report(span, message);
+        }
+
+        public void ReportVariableAlreadyDeclared(TextSpan span, string name)
+        {
+            var message = $"JC0008: The variable {name} already exists in the current scope!";
+            Report(span, message);
+        }
+
+        public void ReportCannotConvert(TextSpan span, Type converterType, Type converteetype)
+        {
+            var message = $"JC0009: Cannot convert from type '{converterType}' to type '{converteetype}'";
             Report(span, message);
         }
     }

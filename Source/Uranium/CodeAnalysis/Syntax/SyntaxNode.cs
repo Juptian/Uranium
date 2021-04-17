@@ -34,14 +34,21 @@ namespace Uranium.CodeAnalysis.Syntax
                 if (typeof(SyntaxNode).IsAssignableFrom(property.PropertyType))
                 {
                     var child = property.GetValue(this) as SyntaxNode;
-                    yield return child;
+                    if(child is not null)
+                    {
+                        yield return child;
+                    }
+                    continue;
                 }
                 else if (typeof(IEnumerable<SyntaxKind>).IsAssignableFrom(property.PropertyType))
                 {
                     var values = property.GetValue(this) as IEnumerable<SyntaxNode>;
-                    foreach (var child in values)
+                    if(values is not null)
                     {
-                        yield return child;
+                        foreach (var child in values)
+                        {
+                            yield return child;
+                        }
                     }
                 }
             }
@@ -49,18 +56,23 @@ namespace Uranium.CodeAnalysis.Syntax
 
         private static void PrettyPrint(TextWriter writer, SyntaxNode node, string indent = "", bool isLast = true)
         {
+            //Variable to not bother changing the console colour if we're not printing to the console
+            //That just makes no sense!
             var isToConsole = writer == Console.Out;
             var marker = isLast ? "└───" : "├───";
 
             writer.Write(indent);
-                
+            
             if(isToConsole)
             {
                 Console.ForegroundColor = ConsoleColor.Gray; 
-                writer.Write(marker);  
-                Console.ForegroundColor = node is SyntaxToken ? ConsoleColor.Green : ConsoleColor.Cyan;
             }
 
+            writer.Write(marker);  
+            if(isToConsole)
+            {
+                Console.ForegroundColor = node is SyntaxToken ? ConsoleColor.Green : ConsoleColor.Cyan;
+            }
             writer.Write(node.Kind);
 
             if (node is SyntaxToken token && token.Value is not null)
@@ -83,6 +95,7 @@ namespace Uranium.CodeAnalysis.Syntax
 
         public void WriteTo(TextWriter writer)
         {
+            writer.WriteLine();
             PrettyPrint(writer, this);
         }
 

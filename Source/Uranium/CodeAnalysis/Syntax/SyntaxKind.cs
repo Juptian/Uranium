@@ -116,6 +116,8 @@
         NamespaceDeclaration,
         NumberExpression,
 
+        //Compilation Unit
+        CompilationUnit,
         //End of file
         EndOfFile,
 

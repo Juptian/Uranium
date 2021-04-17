@@ -17,6 +17,10 @@ namespace Uranium
 {
     public static class Uranium
     {
+        private static bool _showTree = false;
+        private static SyntaxTree _syntaxTree;
+        private static readonly string _text;
+        private static Compilation? _previous = null;
         public static void Emit(string[] args)
         {
             if(args.Length == 0)
@@ -24,11 +28,34 @@ namespace Uranium
                 Console.WriteLine("You must specify a file, or an input string");
                 return;
             }
-            
-            var text = OpenFile(args[0]);
-            var variables = new Dictionary<VariableSymbol, object>();
-            var showTree = false;
+            else if (args.Length >= 1)
+            {
+                ReadArgs(args);
+            }
 
+            var _text = OpenFile(args[0]);
+            var variables = new Dictionary<VariableSymbol, object>();
+
+            _syntaxTree = SyntaxTree.Parse(_text);
+            var compilation = _previous?.ContinueWith(_syntaxTree) ?? new Compilation(_syntaxTree);
+
+            _previous = compilation;
+
+
+            var result = compilation.Evaluate(variables);
+            result.DealWithDiagnostics();
+            
+            //Displaying the tree if the program is ran with --#_showTree
+            if(_showTree)
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+                _syntaxTree.Root.WriteTo(Console.Out);
+                Console.ResetColor();    
+            }
+        }
+
+        private static void ReadArgs(string[] args)
+        {
             //Looping over the args to check if they want to show the tree
             for(int i = 1; i < args.Length; i++)
             {
@@ -36,28 +63,18 @@ namespace Uranium
                 switch(args[i].ToUpper())
                 {
                     case "--#SHOWTREE":
-                        showTree = true;
-                        Console.WriteLine(showTree ? "Now showing syntax tree" : "No longer showing syntax tree"); 
+                        _showTree = true;
                         break;
                     default:
                         break;
                 }
             }
+        }
 
-            var syntaxTree = SyntaxTree.Parse(text);
-            var compilation = new Compilation(syntaxTree);
-
-            var result = compilation.Evaluate(variables);
-
+        private static void DealWithDiagnostics(this EvaluationResult result)
+        {
             //We concat the binder's diagnostics, and the syntax tree's diagnostics in case of ANY errors
-            var diagnostics = result.Diagnostics;            
-            //Displaying the tree if the program is ran with --#showTree
-            if(showTree)
-            {
-                Console.ForegroundColor = ConsoleColor.Green;
-                syntaxTree.Root.WriteTo(Console.Out);
-                Console.ResetColor();    
-            }
+            var diagnostics = result.Diagnostics;   
 
             //If there are any diagnostics, we print them in red
             if(!diagnostics.Any())
@@ -69,7 +86,7 @@ namespace Uranium
             } 
             else
             {
-                var treeText = syntaxTree.Text;
+                var treeText = _syntaxTree.Text;
                 Console.ForegroundColor = ConsoleColor.Red;
                 
                 Console.WriteLine();
@@ -77,13 +94,11 @@ namespace Uranium
                 //to give us all of the errors
                 foreach (var diag in diagnostics)
                 {
-                    PrintDiagnostic(diag, treeText, text);
+                    PrintDiagnostic(diag, treeText, _syntaxTree.Text.ToString());
                 }
                 //Reset the color so that it doesn't look bad
                 Console.ResetColor(); 
-
             }
-        
         }
 
         private static void PrintDiagnostic(Diagnostic diag, SourceText treeText, string text)
@@ -95,23 +110,8 @@ namespace Uranium
             Console.WriteLine();
             Console.Write($"({lineNumber}, {character}),");
             Console.WriteLine($"{diag}");
-
-            //This is all just stuff to make it print out nicely
-            //Doing this because it's easier to identify errors if you do
-            var prefix = text.Substring(0, diag.Span.Start);
-            var error = text.Substring(diag.Span.Start, diag.Span.Length);
-            var suffix = text[diag.Span.End..];
-
-            Console.ResetColor();
-            Console.Write($"     {prefix}");
-
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.Write(error);
-            Console.ResetColor();
-            Console.Write(suffix);
         }
         
-        //As the title would suggest, it opens a file, and returns it's contents
         private static string OpenFile(string filePath)
         {
             if (string.IsNullOrWhiteSpace(filePath))

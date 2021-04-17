@@ -274,13 +274,16 @@ namespace Uranium.CodeAnalysis.Lexing
             //This is because Identifier tokens should not be modified.
             if(_current is not SyntaxKind.IdentifierToken && _current is not SyntaxKind.NumberToken)
             {
-                Console.WriteLine(_current);
+                //Console.WriteLine(_current);
                 var length = _index - _start;
                 var text = SyntaxFacts.GetText(_current);
                 //If I remove the ` text is null `
                 //The tests fucking die
                 //So we leave it here.
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
+                //That's why I'm checking if it's null now fuck off vs
                 if ((text is null && _text is null) || text.Equals("BadToken", StringComparison.OrdinalIgnoreCase))
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
                 {
                     text = _source.ToString(_start, length);
                 }
