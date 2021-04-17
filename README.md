@@ -38,6 +38,6 @@ The current command line arguments accepted are:
 This will show the syntax tree that is produced.
 
 <h3 align="center"> How to use additional arguments: </h3>
-To use additional arguments, simply type ` dotnet run test.txt ` then add each argument, separated by a space, so for example:
+To use additional arguments, simply type `dotnet run test.txt` then add each argument, separated by a space, so for example:
 
 * ` dotnet run test.txt --#showtree `
