@@ -1,15 +1,15 @@
-name: .NET
+name: Build and Tests macos
 
 on:
   push:
-    branches: [ Testing ]
+    branches: [ main ]
   pull_request:
-    branches: [ Testing ]
+    branches: [ main ]
 
 jobs:
   build:
 
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
 
     steps:
     - uses: actions/checkout@v2
@@ -18,7 +18,7 @@ jobs:
       with:
         dotnet-version: 5.0.x
     - name: Restore dependencies
-      run: dotnet restore
+      run: dotnet restore Uranium.sln
     - name: Build
       run: dotnet build Uranium.sln --no-restore
     - name: Test
