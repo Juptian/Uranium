@@ -1,7 +1,12 @@
 <h1 align="center" style="position: relative;">
 <img width="500" style="border-radius: 50%;" src="UraniumLogo.png" alt="Uranium Logo" /></h1>
 <h1 align="center"> Uranium </h1>
-<h2 align="center"> <img src="https://img.shields.io/github/workflow/status/Juptian/Compiler/.NET?style=plastic"></img> <img src="https://img.shields.io/badge/Language-C%23-blue"></img> <img src="https://img.shields.io/github/license/Juptian/Compiler?color=brightgreen&style=plastic"></img> </h2>
+<h2 align="center"> <img src="https://img.shields.io/github/workflow/status/Juptian/Uranium/Windows?label=Windows%20Build&style=plastic"/> 
+  <img src="https://img.shields.io/github/workflow/status/Juptian/Uranium/MacOS?label=MacOS%20Build&style=plastic"/>
+  <img src="https://img.shields.io/github/workflow/status/Juptian/Uranium/Ubuntu?label=Ubuntu&style=plastic"/>
+  <img src="https://img.shields.io/badge/Language-C%23-success&style=plastic"/> 
+  <img src="https://img.shields.io/github/license/Juptian/Compiler?color=brightgreen&style=plastic"/>
+</h2>
 Uranium is a compiler that I decided to make from scratch, it is targetted at the CLR and will hopefully output IL code later. Currently, Uranium isn't finished
 
 <h2 align="center"> Contributing </h2>
