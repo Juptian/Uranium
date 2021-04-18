@@ -18,6 +18,7 @@ namespace Uranium.CodeAnalysis.Binding
 
         //Statements
         BlockStatement,
-        ExpressionStatement
+        ExpressionStatement,
+        VariableDeclaration,
     }
 }

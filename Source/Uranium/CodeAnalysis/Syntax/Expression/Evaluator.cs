@@ -67,7 +67,6 @@ namespace Uranium.CodeAnalysis.Syntax.Expression
 
         private void EvaluateStatement(BoundStatement statement)
         {
-            Console.WriteLine("EvaluateStatement called");
             switch(statement.Kind)
             {
                 case BoundNodeKind.BlockStatement:
@@ -77,11 +76,16 @@ namespace Uranium.CodeAnalysis.Syntax.Expression
                 case BoundNodeKind.ExpressionStatement:
                     EvaluateExpressionStatement((BoundExpressionStatement)statement);
                     return;
+
+                case BoundNodeKind.VariableDeclaration:
+                    EvaluateVariableDeclaration((BoundVariableDeclaration)statement);
+                    return;
                 default:
                     //Exhausted all our options, time to call it quits!
                     throw new($"Unexpected statement {statement}");
             }
         }
+
 
         private void EvaluateBlockStatement(BoundBlockStatement statement)
         {
@@ -92,6 +96,13 @@ namespace Uranium.CodeAnalysis.Syntax.Expression
         }
 
         private void EvaluateExpressionStatement(BoundExpressionStatement statement) => _lastValue = EvaluateExpression(statement.Expression); 
+
+        private void EvaluateVariableDeclaration(BoundVariableDeclaration statement)
+        {
+            var value = EvaluateExpression(statement.Initializer);
+            _variables[statement.Variable] = value;
+            _lastValue = value;
+        }
 
         private object EvaluateBoundUnaryExpression(BoundUnaryExpression u)
         {

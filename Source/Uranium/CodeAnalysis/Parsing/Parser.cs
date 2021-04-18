@@ -15,7 +15,7 @@ namespace Uranium.CodeAnalysis.Parsing
     {
         private readonly SyntaxToken[] _tokens;
         private int _position;
-        private readonly SourceText _text;
+        //private readonly SourceText _text;
         private readonly DiagnosticBag _diagnostics = new();
 
         public Parser(SourceText text)
@@ -30,11 +30,11 @@ namespace Uranium.CodeAnalysis.Parsing
                 {
                     tokens.Add(token);
                 }
-                Console.WriteLine(token);
+                //Console.WriteLine(token);
             }
             while (token.Kind is not SyntaxKind.EndOfFile);
 
-            _text = text;
+            //_text = text;
             _tokens = tokens.ToArray();
             _diagnostics.Concat(lexer.Diagnostics);
         }
@@ -74,22 +74,30 @@ namespace Uranium.CodeAnalysis.Parsing
 
         public CompilationUnitSyntax ParseCompilationUnit()
         {
-            //Console.WriteLine("Parse compilation unit");
             var statement = ParseStatement();
             var EOFToken = MatchToken(SyntaxKind.EndOfFile);
 
-            //Console.WriteLine("Return compilation unit");
             return new(statement, EOFToken);
         }
 
         private StatementSyntax ParseStatement()
-        {
-            //Console.WriteLine(Current.Kind);
-            if(Current.Kind is SyntaxKind.OpenCurlyBrace)
+            => Current.Kind switch
             {
-                return ParseBlockStatement();
-            }
-            return ParseExpressionStatement();
+                SyntaxKind.OpenCurlyBrace => ParseBlockStatement(),
+                SyntaxKind.LetConstKeyword or 
+                SyntaxKind.ConstKeyword or 
+                SyntaxKind.VarKeyword => ParseVariableDeclaration(),
+                _ => ParseExpressionStatement(),
+            };
+
+        private StatementSyntax ParseVariableDeclaration()
+        {
+            var expected = Current.Kind;
+            var keyword = MatchToken(expected);
+            var identifier = MatchToken(SyntaxKind.IdentifierToken);
+            var equals = MatchToken(SyntaxKind.Equals);
+            var initializer = ParseExpression();
+            return new VariableDeclarationSyntax(keyword, identifier, equals, initializer);
         }
 
         private ExpressionStatementSyntax ParseExpressionStatement() => new(ParseExpression());
@@ -102,6 +110,12 @@ namespace Uranium.CodeAnalysis.Parsing
             while(Current.Kind is not SyntaxKind.EndOfFile &&
                   Current.Kind is not SyntaxKind.CloseCurlyBrace)
             {
+                if(Current.Kind is SyntaxKind.LineBreak || Current.Kind is SyntaxKind.Semicolon)
+                {
+                    _position++;
+                    continue;
+                }
+
                 var statement = ParseStatement();
                 statements.Add(statement);
             }
@@ -172,7 +186,6 @@ namespace Uranium.CodeAnalysis.Parsing
                 {
                     break;
                 }
-
                 //Taking the current token, and moving the index
                 var operatorToken = NextToken();
                 //Recursively calling the ParseExpression with the current precedence
@@ -226,7 +239,7 @@ namespace Uranium.CodeAnalysis.Parsing
         private ExpressionSyntax ParseNameExpression()
         {
             //Console.WriteLine(Current);
-            var identifierToken = NextToken();//MatchToken(SyntaxKind.IdentifierToken);
+            var identifierToken = MatchToken(SyntaxKind.IdentifierToken);
             return new NameExpressionSyntax(identifierToken);
         }
 

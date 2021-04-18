@@ -19,7 +19,6 @@ namespace Uranium
     {
         private static bool _showTree = false;
         private static SyntaxTree _syntaxTree;
-        private static readonly string _text;
         private static Compilation? _previous = null;
         public static void Emit(string[] args)
         {

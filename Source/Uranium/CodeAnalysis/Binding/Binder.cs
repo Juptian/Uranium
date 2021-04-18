@@ -23,6 +23,36 @@ namespace Uranium.CodeAnalysis.Binding
         private readonly DiagnosticBag _diagnostics = new();
         private BoundScope _scope;
 
+        //Public diagnostics that nobody can edit :C
+        public DiagnosticBag Diagnostics => _diagnostics;
+
+        //Binding the expression
+        private BoundExpression BindExpression(ExpressionSyntax syntax)
+            => syntax.Kind switch // Calling the correct function based off of the syntax kind and returning it's value.
+            {
+                //Base expressions
+                SyntaxKind.BinaryExpression => BindBinaryExpression((BinaryExpressionSyntax)syntax),
+                SyntaxKind.UnaryExpression => BindUnaryExpression((UnaryExpressionSyntax)syntax),
+                SyntaxKind.LiteralExpression => BindLiteralExpression((LiteralExpressionSyntax)syntax),
+                SyntaxKind.ParenthesizedExpression => BindParenthesizedExpression((ParenthesizedExpressionSyntax)syntax),
+
+                //Name + Assignments
+                SyntaxKind.NameExpression => BindNameExpression((NameExpressionSyntax)syntax),
+                SyntaxKind.AssignmentExpression => BindAssignmentExpression((AssignmentExpressionSyntax)syntax),
+                _ => throw new($"Unexpected syntax {syntax.Kind}"),
+            };
+
+        //Binding the Statement 
+        private BoundStatement BindStatement(StatementSyntax syntax)
+            => syntax.Kind switch // Calling the correct function based off of the syntax kind and returning it's value.
+            {
+                //Base expressions
+                SyntaxKind.BlockStatement => BindBlockStatement((BlockStatementSyntax)syntax),
+                SyntaxKind.ExpressionStatement => BindExpressionStatement((ExpressionStatementSyntax)syntax),
+                SyntaxKind.VariableDeclaration => BindVariableDeclaration((VariableDeclarationSyntax)syntax),
+                _ => throw new($"Unexpected syntax {syntax.Kind}"),
+            };
+
         public static BoundGlobalScope BindGlobalScope(BoundGlobalScope? previous, CompilationUnitSyntax syntax)
         {
             //This method allows for scope!
@@ -76,52 +106,36 @@ namespace Uranium.CodeAnalysis.Binding
         }
         
 
-        //Public diagnostics that nobody can edit :C
-        public DiagnosticBag Diagnostics => _diagnostics;
-
-        //Binding the expression
-        private BoundExpression BindExpression(ExpressionSyntax syntax)
-            => syntax.Kind switch // Calling the correct function based off of the syntax kind and returning it's value.
+        private BoundStatement BindVariableDeclaration(VariableDeclarationSyntax syntax)
+        {
+            var name = syntax.Identifier.Text;
+            var isReadOnly = syntax.KeywordToken.Kind == SyntaxKind.LetConstKeyword || syntax.KeywordToken.Kind == SyntaxKind.ConstKeyword;
+            var initializer = BindExpression(syntax.Initializer);
+            var variable = new VariableSymbol(name, isReadOnly, initializer.Type);
+            
+            if(!_scope.TryDeclare(variable))
             {
-                //Base expressions
-                SyntaxKind.BinaryExpression => BindBinaryExpression((BinaryExpressionSyntax)syntax),
-                SyntaxKind.UnaryExpression => BindUnaryExpression((UnaryExpressionSyntax)syntax),
-                SyntaxKind.LiteralExpression => BindLiteralExpression((LiteralExpressionSyntax)syntax),
-                SyntaxKind.ParenthesizedExpression => BindParenthesizedExpression((ParenthesizedExpressionSyntax)syntax),
+                _diagnostics.ReportVariableAlreadyDeclared(syntax.Identifier.Span, name);
+            }
 
-                //Name + Assignments
-                SyntaxKind.NameExpression => BindNameExpression((NameExpressionSyntax)syntax),
-                SyntaxKind.AssignmentExpression => BindAssignmentExpression((AssignmentExpressionSyntax)syntax),
-                _ => throw new($"Unexpected syntax {syntax.Kind}"),
-            };
-
-        //Binding the Statement 
-        private BoundStatement BindStatement(StatementSyntax syntax)
-            => syntax.Kind switch // Calling the correct function based off of the syntax kind and returning it's value.
-            {
-                //Base expressions
-                SyntaxKind.BlockStatement => BindBlockStatement((BlockStatementSyntax)syntax),
-                SyntaxKind.ExpressionStatement => BindExpressionStatement((ExpressionStatementSyntax)syntax),
-                _ => throw new($"Unexpected syntax {syntax.Kind}"),
-            };
+            return new BoundVariableDeclaration(variable, initializer);
+        }
 
         private BoundStatement BindBlockStatement(BlockStatementSyntax syntax)
         {
             var statements = ImmutableArray.CreateBuilder<BoundStatement>();
 
-            _scope = new BoundScope(_scope);
+            var nextScope = new BoundScope(_scope);
+            _scope = nextScope;
 
             foreach(var statementSyntax in syntax.Statements)
             {
                 var statement = BindStatement(statementSyntax);
                 statements.Add(statement);
             }
-
             _scope = _scope.Parent ?? _scope;
-
             return new BoundBlockStatement(statements.ToImmutable());
         }
-
 
         private BoundStatement BindExpressionStatement(ExpressionStatementSyntax syntax)
         {
@@ -146,10 +160,8 @@ namespace Uranium.CodeAnalysis.Binding
                 _diagnostics.ReportUndefinedUnaryOperator(syntax.OperatorToken.Span, syntax.OperatorToken.Text ?? "null", boundOperand.Type);
                 return boundOperand;
             }
-
             return new BoundUnaryExpression(boundOperatorKind, boundOperand);
         }
-
 
         private BoundExpression BindBinaryExpression(BinaryExpressionSyntax syntax)
         {
@@ -165,7 +177,6 @@ namespace Uranium.CodeAnalysis.Binding
                 _diagnostics.ReportUndefinedBinaryOperator(syntax.OperatorToken.Span, syntax.OperatorToken.Text, boundLeft.Type, boundRight.Type);
                 return boundLeft;
             }
-
             return new BoundBinaryExpression(boundLeft, boundOperatorKind, boundRight);
         }
 
@@ -182,7 +193,6 @@ namespace Uranium.CodeAnalysis.Binding
                 _diagnostics.ReportUndefinedName(syntax.IdentifierToken.Span, name ?? "name is null");
                 return new BoundLiteralExpression(0);
             }
-
             return new BoundVariableExpression(variable);
         }
 
@@ -194,8 +204,13 @@ namespace Uranium.CodeAnalysis.Binding
             if(!_scope.TryLookup(name, out var variable))
             {
                 //Null check on the name so that we can find the object
-                variable = new VariableSymbol(name ?? $"{syntax.IdentifierToken}s name is null", boundExpression.Type);
-                _scope.TryDeclare(variable);
+                _diagnostics.ReportUndefinedName(syntax.IdentifierToken.Span, name);
+                return boundExpression;
+            }
+
+            if(variable.IsReadOnly)
+            {
+                _diagnostics.ReportCannotAssign(syntax.IdentifierToken.Span, syntax.EqualsToken.Span, name);
             }
 
             //A variable cannot have their type reassigned.
@@ -204,7 +219,6 @@ namespace Uranium.CodeAnalysis.Binding
                 _diagnostics.ReportCannotConvert(syntax.Expression.Span, boundExpression.Type, variable.Type);
                 return boundExpression;
             }
-
             return new BoundAssignmentExpression(variable, boundExpression);
         }
     }
