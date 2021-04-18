@@ -35,11 +35,19 @@ namespace Uranium
             var _text = OpenFile(args[0]);
             var variables = new Dictionary<VariableSymbol, object>();
 
+            //This is the important line
+            //It gets shit into motion
             _syntaxTree = SyntaxTree.Parse(_text);
+            //Then we make a compilation
+            //the _previous?.ContinueWith(_syntaxTree) ?? new Compilation(_syntaxTree);
+            //breaks down to:
+            //  _previous may be null
+            //  So we try to continue with it.
+            //  If _previous is null null, just make a new compilation
             var compilation = _previous?.ContinueWith(_syntaxTree) ?? new Compilation(_syntaxTree);
 
+            //We assign previous here
             _previous = compilation;
-
 
             var result = compilation.Evaluate(variables);
             result.DealWithDiagnostics();

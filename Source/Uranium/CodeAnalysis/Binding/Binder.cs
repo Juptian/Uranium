@@ -43,6 +43,7 @@ namespace Uranium.CodeAnalysis.Binding
             };
 
         //Binding the Statement 
+        //After making the binder, we call to bind the statement
         private BoundStatement BindStatement(StatementSyntax syntax)
             => syntax.Kind switch // Calling the correct function based off of the syntax kind and returning it's value.
             {
@@ -50,9 +51,12 @@ namespace Uranium.CodeAnalysis.Binding
                 SyntaxKind.BlockStatement => BindBlockStatement((BlockStatementSyntax)syntax),
                 SyntaxKind.ExpressionStatement => BindExpressionStatement((ExpressionStatementSyntax)syntax),
                 SyntaxKind.VariableDeclaration => BindVariableDeclaration((VariableDeclarationSyntax)syntax),
+                //We can throw here because this is all that we allow for now
+                //And if we get here, we've exhausted all our options
                 _ => throw new($"Unexpected syntax {syntax.Kind}"),
             };
 
+        //It calls this method
         public static BoundGlobalScope BindGlobalScope(BoundGlobalScope? previous, CompilationUnitSyntax syntax)
         {
             //This method allows for scope!
@@ -105,7 +109,35 @@ namespace Uranium.CodeAnalysis.Binding
             return parent;
         }
         
+        //Scoping
+        private BoundStatement BindBlockStatement(BlockStatementSyntax syntax)
+        {
+            //Creating a new immutable array builder
+            //So that we can return a BoundBlockStatement with an immutable array parameter
+            var statements = ImmutableArray.CreateBuilder<BoundStatement>();
 
+            var nextScope = new BoundScope(_scope);
+            _scope = nextScope;
+
+            //Adding each and every thing within the current syntax's statements 
+            //Into the array before making it immutable
+            foreach(var statementSyntax in syntax.Statements)
+            {
+                var statement = BindStatement(statementSyntax);
+                statements.Add(statement);
+            }
+            _scope = _scope.Parent ?? _scope;
+            return new BoundBlockStatement(statements.ToImmutable());
+        }
+
+        //Expressions
+        private BoundStatement BindExpressionStatement(ExpressionStatementSyntax syntax)
+        {
+            var expression = BindExpression(syntax.Expression);
+            return new BoundExpressionStatement(expression);
+        }
+
+        //Variable declaration
         private BoundStatement BindVariableDeclaration(VariableDeclarationSyntax syntax)
         {
             var name = syntax.Identifier.Text;
@@ -119,28 +151,6 @@ namespace Uranium.CodeAnalysis.Binding
             }
 
             return new BoundVariableDeclaration(variable, initializer);
-        }
-
-        private BoundStatement BindBlockStatement(BlockStatementSyntax syntax)
-        {
-            var statements = ImmutableArray.CreateBuilder<BoundStatement>();
-
-            var nextScope = new BoundScope(_scope);
-            _scope = nextScope;
-
-            foreach(var statementSyntax in syntax.Statements)
-            {
-                var statement = BindStatement(statementSyntax);
-                statements.Add(statement);
-            }
-            _scope = _scope.Parent ?? _scope;
-            return new BoundBlockStatement(statements.ToImmutable());
-        }
-
-        private BoundStatement BindExpressionStatement(ExpressionStatementSyntax syntax)
-        {
-            var expression = BindExpression(syntax.Expression);
-            return new BoundExpressionStatement(expression);
         }
 
         //Value is being parsed into a nullable int

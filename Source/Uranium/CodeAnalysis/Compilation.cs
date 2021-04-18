@@ -37,6 +37,7 @@ namespace Uranium.CodeAnalysis
             {
                 if(_globalScope is null)
                 {
+                    //We make a new global scope by default, because initially it will always be null
                     var scope = Binder.BindGlobalScope(Previous?.GlobalScope, Syntax.Root);
                     //Only allowing _globalScope to be assigned to scope when it's null
                     Interlocked.CompareExchange(ref _globalScope, scope, null);
