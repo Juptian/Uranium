@@ -17,7 +17,6 @@ namespace Uranium.CodeAnalysis.Parsing
         private int _position;
         private readonly DiagnosticBag _diagnostics = new();
 
-        //Then this is called
         public Parser(SourceText text)
         {
             var tokens = new List<SyntaxToken>();
@@ -26,7 +25,6 @@ namespace Uranium.CodeAnalysis.Parsing
             do
             {
                 token = lexer.Lex();
-                //We ignore the bad tokens and whitespace as it's not needed
                 if (token.Kind is not SyntaxKind.WhiteSpace &&  token.Kind is not SyntaxKind.BadToken)
                 {
                     tokens.Add(token);

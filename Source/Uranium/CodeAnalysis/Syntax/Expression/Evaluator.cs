@@ -170,9 +170,9 @@ namespace Uranium.CodeAnalysis.Syntax.Expression
 
         private static int Pow(int number, int power)
         {
-            if(power == 2)
+            if(power == 1)
             {
-                return number * number;
+                return number;
             }
             //Another default case in case someone tries to be funny
             else if(power <= 0) 

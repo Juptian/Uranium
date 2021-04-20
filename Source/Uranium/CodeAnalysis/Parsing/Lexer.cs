@@ -111,67 +111,16 @@ namespace Uranium.CodeAnalysis.Lexing
             {
                 //Math operators
                 case '+':
-                    if(Match('=', 1))
-                    {
-                        _current = SyntaxKind.PlusEquals;
-                    } 
-                    else if (Match('+', 1))
-                    {
-                        _current = SyntaxKind.PlusPlus;
-                    } 
-                    else
-                    {
-                        _current = SyntaxKind.Plus;
-                    }
+                    PlusSign();
                     break;
                 case '-':
-                    if(Match('=', 1))
-                    {
-                        _current = SyntaxKind.MinusEquals;
-                    } 
-                    else if (Match('-', 1))
-                    {
-                        _current = SyntaxKind.MinusMinus;
-                    } 
-                    else
-                    {
-                        _current = SyntaxKind.Minus;
-                    }
+                    MinusSign();
                     break;
-                case '*':               
-                    if (Match('=', 1))
-                    {
-                        _current = SyntaxKind.MultiplyEquals;
-                    }
-                    else if (Match('*', 1))
-                    {
-                        _current = SyntaxKind.Pow;
-                    }
-                    else
-                    {
-                        _current = SyntaxKind.Multiply;
-                    }
+                case '*':
+                    MultiplySign();
                     break;
                 case '/':
-                    if (Match('=', 1))
-                    {
-                        _current = SyntaxKind.DivideEquals;
-                    }
-                    else if (Match('/', 1))
-                    {
-                        ReadSingleLineComment();
-                        _current = SyntaxKind.SingleLineComment;
-                    }
-                    else if (Match('*', 1))
-                    {
-                        ReadMultiLineComment();
-                        _current = SyntaxKind.MultiLineComment;
-                    }
-                    else
-                    {
-                        _current = SyntaxKind.Divide;
-                    }
-                        
+                    DivideSign();
                     break;
                 case '>':
                     _current = Match('=', 1) ? SyntaxKind.GreaterThanEquals : SyntaxKind.GreaterThan;
@@ -261,40 +210,7 @@ namespace Uranium.CodeAnalysis.Lexing
                     }
                     break;
             }
-
-            //Checking here for if it's an identifier token, this way we don't do anything with it.
-            //This is because Identifier tokens should not be modified.
-            switch(_current)
-            {
-                //We don't want to override any of these so we just stop.
-                case SyntaxKind.IdentifierToken:
-                case SyntaxKind.NumberToken:
-                case SyntaxKind.BlockStatement:
-                case SyntaxKind.ContinueStatement:
-                case SyntaxKind.DoWhileStatement:
-                case SyntaxKind.ExpressionStatement:
-                case SyntaxKind.ForStatement:
-                case SyntaxKind.IfStatement:
-                case SyntaxKind.ElseKeyword:
-                case SyntaxKind.MemberBlockStatement:
-                case SyntaxKind.ReturnStatement:
-                case SyntaxKind.WhileStatement:
-                    break;
-                default:
-                    //Console.WriteLine(_current);
-                    var length = _index - _start;
-                    var text = SyntaxFacts.GetText(_current);
-
-                    //If I remove the ` text is null `
-                    //The tests fucking die
-                    //So we leave it here.
-                    if ((text is null && _text is null) || text.Equals("BadToken", StringComparison.OrdinalIgnoreCase))
-                    {
-                        text = _source.ToString(_start, length);
-                    }
-                    _text = text;
-                    break;
-            }
+            GetText();
         }
 
         private void ReadLineBreak()
@@ -504,6 +420,113 @@ namespace Uranium.CodeAnalysis.Lexing
             _text = text;
             //Console.WriteLine(_text);
             _index--;
+        }
+
+        private void PlusSign()
+        {
+            if(Match('=', 1))
+            {
+                _current = SyntaxKind.PlusEquals;
+            } 
+            else if (Match('+', 1))
+            {
+                _current = SyntaxKind.PlusPlus;
+            } 
+            else
+            {
+                _current = SyntaxKind.Plus;
+             }
+        }
+
+        private void MinusSign()
+        {
+            if(Match('=', 1))
+            {
+                _current = SyntaxKind.MinusEquals;
+            } 
+            else if (Match('-', 1))
+            {
+                _current = SyntaxKind.MinusMinus;
+            } 
+            else
+            {
+                _current = SyntaxKind.Minus;
+            }
+        }
+
+        private void MultiplySign()
+        {
+            if (Match('=', 1))
+            {
+                _current = SyntaxKind.MultiplyEquals;
+            }
+            else if (Match('*', 1))
+            {
+                _current = SyntaxKind.Pow;
+            }
+            else
+            {
+                _current = SyntaxKind.Multiply;
+            }
+        }
+
+        private void DivideSign()
+        {
+            if (Match('=', 1))
+            {
+                _current = SyntaxKind.DivideEquals;
+            }
+            else if (Match('/', 1))
+            {
+                ReadSingleLineComment();
+                _current = SyntaxKind.SingleLineComment;
+            }
+            else if (Match('*', 1))
+            {
+                ReadMultiLineComment();
+                _current = SyntaxKind.MultiLineComment;
+            }
+            else
+            {
+                _current = SyntaxKind.Divide;
+            }
+        }
+
+        private void GetText()
+        {
+            //Checking here for if it's an identifier token, this way we don't do anything with it.
+            //This is because Identifier tokens should not be modified.
+            switch(_current)
+            {
+                //We don't want to override any of these so we just stop.
+                case SyntaxKind.IdentifierToken:
+                case SyntaxKind.NumberToken:
+                case SyntaxKind.BlockStatement:
+                case SyntaxKind.ContinueStatement:
+                case SyntaxKind.DoWhileStatement:
+                case SyntaxKind.ExpressionStatement:
+                case SyntaxKind.ForStatement:
+                case SyntaxKind.IfStatement:
+                case SyntaxKind.ElseKeyword:
+                case SyntaxKind.MemberBlockStatement:
+                case SyntaxKind.ReturnStatement:
+                case SyntaxKind.WhileStatement:
+                    break;
+                default:
+                    //Console.WriteLine(_current);
+                    var length = _index - _start;
+                    var text = SyntaxFacts.GetText(_current);
+
+                    //If I remove the ` text is null `
+                    //The tests fucking die
+                    //So we leave it here.
+                    if ((text is null && _text is null) || text.Equals("BadToken", StringComparison.OrdinalIgnoreCase))
+                    {
+                        text = _source.ToString(_start, length);
+                    }
+                    _text = text;
+                    break;
+            }
         }
     }
 }
