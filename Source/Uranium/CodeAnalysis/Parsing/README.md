@@ -57,7 +57,7 @@ These two are simply wrapper functions, though, `ParseExpressionStatement()` ret
 
 In this method, I have a visual graph of how I want to do assignment. I have a simple assignment expression, that I make a tree for. Here is the comment:
 
-```
+```cs
 //Assignments will be done like this:
 //
 //a = b = 5
@@ -80,7 +80,7 @@ If it returns false, we call `ParseBinaryExpression`
 At the beginning of the method, we declare an `ExpressionSyntax` called left, this is so that we can assign it later based off of what is going on.
 
 Here's the first part of the function
-```csharp
+```cs
 //Checking to see if it's a unary operator
 var unaryOperatorPrecedence = Current.Kind.GetUnaryOperatorPrecedence();
 //Allowing for unary operator precedence
