@@ -31,14 +31,14 @@ namespace Uranium.CodeAnalysis.Binding
             => syntax.Kind switch // Calling the correct function based off of the syntax kind and returning it's value.
             {
                 //Base expressions
-                SyntaxKind.BinaryExpression => BindBinaryExpression((BinaryExpressionSyntax)syntax),
-                SyntaxKind.UnaryExpression => BindUnaryExpression((UnaryExpressionSyntax)syntax),
-                SyntaxKind.LiteralExpression => BindLiteralExpression((LiteralExpressionSyntax)syntax),
-                SyntaxKind.ParenthesizedExpression => BindParenthesizedExpression((ParenthesizedExpressionSyntax)syntax),
+                SyntaxKind.BinaryExpression => BindBinaryExpression( (BinaryExpressionSyntax)syntax ),
+                SyntaxKind.UnaryExpression => BindUnaryExpression( (UnaryExpressionSyntax)syntax ),
+                SyntaxKind.LiteralExpression => BindLiteralExpression( (LiteralExpressionSyntax)syntax ),
+                SyntaxKind.ParenthesizedExpression => BindParenthesizedExpression( (ParenthesizedExpressionSyntax)syntax ),
 
                 //Name + Assignments
-                SyntaxKind.NameExpression => BindNameExpression((NameExpressionSyntax)syntax),
-                SyntaxKind.AssignmentExpression => BindAssignmentExpression((AssignmentExpressionSyntax)syntax),
+                SyntaxKind.NameExpression => BindNameExpression( (NameExpressionSyntax)syntax ),
+                SyntaxKind.AssignmentExpression => BindAssignmentExpression( (AssignmentExpressionSyntax)syntax ),
                 _ => throw new($"Unexpected syntax {syntax.Kind}"),
             };
 
@@ -48,9 +48,9 @@ namespace Uranium.CodeAnalysis.Binding
             => syntax.Kind switch // Calling the correct function based off of the syntax kind and returning it's value.
             {
                 //Base expressions
-                SyntaxKind.BlockStatement => BindBlockStatement((BlockStatementSyntax)syntax),
-                SyntaxKind.ExpressionStatement => BindExpressionStatement((ExpressionStatementSyntax)syntax),
-                SyntaxKind.VariableDeclaration => BindVariableDeclaration((VariableDeclarationSyntax)syntax),
+                SyntaxKind.BlockStatement => BindBlockStatement( (BlockStatementSyntax)syntax ),
+                SyntaxKind.ExpressionStatement => BindExpressionStatement( (ExpressionStatementSyntax)syntax ),
+                SyntaxKind.VariableDeclaration => BindVariableDeclaration( (VariableDeclarationSyntax)syntax ),
                 //We can throw here because this is all that we allow for now
                 //And if we get here, we've exhausted all our options
                 _ => throw new($"Unexpected syntax {syntax.Kind}"),

@@ -22,14 +22,7 @@ namespace Uranium.CodeAnalysis.Lexing
         private readonly SourceText _source;
         private readonly DiagnosticBag _diagnostics = new();
 
-        public Lexer(SourceText contents)
-        {
-            _source = contents;
-            /*for (var i = 0; i < contents.Length; i++)
-            {
-                Console.WriteLine($"{contents[i]}, {i}");
-            }*/
-        }
+        public Lexer(SourceText contents) => _source = contents;
         
         public DiagnosticBag Diagnostics => _diagnostics;
 
@@ -47,7 +40,6 @@ namespace Uranium.CodeAnalysis.Lexing
         private char Peek(int offset)
         {
             var peekIndex = _index + offset;
-
             return peekIndex >= _source.Length ? '\0' : _source[peekIndex];    
         }
 
@@ -110,7 +102,7 @@ namespace Uranium.CodeAnalysis.Lexing
         }
 
         //Literally lexes a single token
-        //Yes this parses keywords
+        //Yes this lexes keywords
         public void LexToken(char ch)
         {
             _start = _index;
@@ -274,6 +266,7 @@ namespace Uranium.CodeAnalysis.Lexing
             //This is because Identifier tokens should not be modified.
             switch(_current)
             {
+                //We don't want to override any of these so we just stop.
                 case SyntaxKind.IdentifierToken:
                 case SyntaxKind.NumberToken:
                 case SyntaxKind.BlockStatement:
@@ -295,15 +288,12 @@ namespace Uranium.CodeAnalysis.Lexing
                     //If I remove the ` text is null `
                     //The tests fucking die
                     //So we leave it here.
-#pragma warning disable CS8602 // Dereference of a possibly null reference.
-                    //That's why I'm checking if it's null now fuck off vs
                     if ((text is null && _text is null) || text.Equals("BadToken", StringComparison.OrdinalIgnoreCase))
                     {
                         text = _source.ToString(_start, length);
                     }
                     _text = text;
                     break;
-#pragma warning restore CS8602 
             }
         }
 

@@ -23,7 +23,7 @@ namespace Uranium.CodeAnalysis.Syntax
             }
         }
 
-        //Why forcefully override when I can don't
+        //Why forcefully override when I can avoid it 
         //This method works on all children of the class
         //This also allows for a central method, instead of 20 million implementations.
         //This should work fine because metadata

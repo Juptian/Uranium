@@ -15,38 +15,33 @@ namespace Uranium.CodeAnalysis.Parsing
     {
         private readonly SyntaxToken[] _tokens;
         private int _position;
-        //private readonly SourceText _text;
         private readonly DiagnosticBag _diagnostics = new();
 
         //Then this is called
         public Parser(SourceText text)
         {
-            //Then we make a list of tokens so that we can add our lexed tokens into it
             var tokens = new List<SyntaxToken>();
             var lexer = new Lexer(text);
             SyntaxToken token;
             do
             {
-                //We lex the current index in the lexer
                 token = lexer.Lex();
                 //We ignore the bad tokens and whitespace as it's not needed
                 if (token.Kind is not SyntaxKind.WhiteSpace &&  token.Kind is not SyntaxKind.BadToken)
                 {
-                    //Then we add it if it's none of the above
                     tokens.Add(token);
                 }
-                //Console.WriteLine(token);
             }
             while (token.Kind is not SyntaxKind.EndOfFile);
-            //We repeat the lexing until we hit the end of the file
-            //_text = text;
-            //Then we put all the tokens into an array
+            
             _tokens = tokens.ToArray();
-            //And take the lexers diagnostics, and add them to our current ones
+            //Doing this to keep all our previous diagnostics
+            //So that we don't lose them
             _diagnostics.Concat(lexer.Diagnostics);
         }
 
         private SyntaxToken Current => Peek(0);
+        private SyntaxToken Next => Peek(1);
         public DiagnosticBag Diagnostics => _diagnostics;
         
         private SyntaxToken Peek(int offset)
@@ -79,14 +74,12 @@ namespace Uranium.CodeAnalysis.Parsing
             return new(kind, Current.Position, Current.Text, null);
         }
 
-        //Which just runs this method
         public CompilationUnitSyntax ParseCompilationUnit()
         {
-            //Which then calls to parse the current statement
             var statement = ParseStatement();
-            var EOFToken = MatchToken(SyntaxKind.EndOfFile);
+            var EndOfFileToken = MatchToken(SyntaxKind.EndOfFile);
 
-            return new(statement, EOFToken);
+            return new(statement, EndOfFileToken);
         }
 
         //If it doesn't fit any of our current conditions, we take it as an expression
@@ -97,7 +90,6 @@ namespace Uranium.CodeAnalysis.Parsing
                 SyntaxKind.LetConstKeyword or 
                 SyntaxKind.ConstKeyword or 
                 SyntaxKind.VarKeyword => ParseVariableDeclaration(),
-                // _ => is just fancy for default
                 _ => ParseExpressionStatement(),
             };
 
@@ -126,6 +118,7 @@ namespace Uranium.CodeAnalysis.Parsing
 
         private StatementSyntax ParseVariableDeclaration()
         {
+            //Could remove expected and inline it, but I find this is cleaner
             var expected = Current.Kind;
             var keyword = MatchToken(expected);
             var identifier = MatchToken(SyntaxKind.IdentifierToken);
@@ -134,16 +127,12 @@ namespace Uranium.CodeAnalysis.Parsing
             return new VariableDeclarationSyntax(keyword, identifier, equals, initializer);
         }
 
-        //This just calls parse expression
         private ExpressionStatementSyntax ParseExpressionStatement() => new(ParseExpression());
 
         //This is just another wrapper function to go through our heirarchy
-        private ExpressionSyntax ParseExpression()
-        {
-            return ParseAssignmentExpression();
-        }
+        //Debating removing this but it keeps the code clear imo
+        private ExpressionSyntax ParseExpression() => ParseAssignmentExpression();
 
-        //ParseExpression calls this
         private ExpressionSyntax ParseAssignmentExpression()
         {
             //Assignments will be done like this:
@@ -162,7 +151,7 @@ namespace Uranium.CodeAnalysis.Parsing
             //If it's an identifier, we parse it as one, if not, we go to our next level
             //Binary expressions
             if(Current.Kind == SyntaxKind.IdentifierToken &&
-                Peek(1).Kind == SyntaxKind.Equals)
+                Next.Kind == SyntaxKind.Equals)
             {
                 //Despite knowing the token, we want to consume it, to avoid loops
                 var identifierToken = NextToken();
@@ -177,13 +166,9 @@ namespace Uranium.CodeAnalysis.Parsing
         //Allowing for proper operator precedence
         private ExpressionSyntax ParseBinaryExpression(int parentPrecedence = 0)
         {
-            //Declaring left so that we can use it in the entire method
             ExpressionSyntax left;
-
-            //Checking to see if it's a unary operator
             var unaryOperatorPrecedence = Current.Kind.GetUnaryOperatorPrecedence();
 
-            //Allowing for unary operator precedence
             if(unaryOperatorPrecedence != 0 && unaryOperatorPrecedence >= parentPrecedence)
             {
                 var operatorToken = NextToken();
@@ -192,12 +177,9 @@ namespace Uranium.CodeAnalysis.Parsing
             }
             else
             {
-                //If UnareOperatorPrecedence is greater than or equal to ParentPrecedence, we don't get here, if it isn't
-                //we then walk the left side of our tree again
                 left = ParsePrimaryExpression();
             }
 
-            //Keep looping until our precedence is <= parent precedence, or == 0;
             while(true)
             {
                 var precedence = Current.Kind.GetBinaryOperatorPrecedence();
@@ -206,11 +188,10 @@ namespace Uranium.CodeAnalysis.Parsing
                 {
                     break;
                 }
-                //Taking the current token, and moving the index
+                
                 var operatorToken = NextToken();
-                //Recursively calling the ParseExpression with the current precedence
                 var right = ParseBinaryExpression(precedence);
-                //Making left a New BinaryExpressionSyntax
+                
                 left = new BinaryExpressionSyntax(left, operatorToken, right);
             }
             //Console.WriteLine(left);
@@ -219,24 +200,13 @@ namespace Uranium.CodeAnalysis.Parsing
 
 
         private ExpressionSyntax ParsePrimaryExpression()
-            //Then we go here
             =>  Current.Kind switch
             {
-                //All extracted into methods for the sake of readability, and reuseability.
-                //Parenthesis
                 SyntaxKind.OpenParenthesis => ParseParenthesizedExpression(),
-                //Bools
                 SyntaxKind.TrueKeyword or SyntaxKind.FalseKeyword => ParseBooleanExpression(),
-                //Identifiers
                 SyntaxKind.NumberToken => ParseNumberLiteral(),
-                //Assuming default is a Name expression
-                _ => ParseNameExpression(),//^^
+                _ => ParseNameExpression(),
             };
-        //This leaves us with a split road, we can parse either a:
-        //  Number literal (ie 1234, 512, 12039)
-        //  A parenthesized expression (ie 1 + (2 * 3))
-        //  A bool (true/false)
-        //  Or by default we assume it's a name expression.
 
         private ExpressionSyntax ParseParenthesizedExpression()
         {
@@ -261,7 +231,6 @@ namespace Uranium.CodeAnalysis.Parsing
 
         private ExpressionSyntax ParseNameExpression()
         {
-            //Console.WriteLine(Current);
             var identifierToken = MatchToken(SyntaxKind.IdentifierToken);
             return new NameExpressionSyntax(identifierToken);
         }

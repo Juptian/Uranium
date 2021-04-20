@@ -70,15 +70,15 @@ namespace Uranium.CodeAnalysis.Syntax.Expression
             switch(statement.Kind)
             {
                 case BoundNodeKind.BlockStatement:
-                    EvaluateBlockStatement((BoundBlockStatement)statement);
+                    EvaluateBlockStatement( (BoundBlockStatement)statement);
                     return;
 
                 case BoundNodeKind.ExpressionStatement:
-                    EvaluateExpressionStatement((BoundExpressionStatement)statement);
+                    EvaluateExpressionStatement( (BoundExpressionStatement)statement);
                     return;
 
                 case BoundNodeKind.VariableDeclaration:
-                    EvaluateVariableDeclaration((BoundVariableDeclaration)statement);
+                    EvaluateVariableDeclaration( (BoundVariableDeclaration)statement);
                     return;
                 default:
                     //Exhausted all our options, time to call it quits!
@@ -110,9 +110,9 @@ namespace Uranium.CodeAnalysis.Syntax.Expression
             switch(u.Op.Kind)
             {
                 case BoundUnaryOperatorKind.Identity:
-                return (int)operand;
+                    return (int)operand;
                 case BoundUnaryOperatorKind.Negation:
-                   return -(int)operand;
+                    return -(int)operand;
                 case BoundUnaryOperatorKind.LogicalNegation:
                     return !(bool)operand;
             }
@@ -173,6 +173,11 @@ namespace Uranium.CodeAnalysis.Syntax.Expression
             if(power == 2)
             {
                 return number * number;
+            }
+            //Another default case in case someone tries to be funny
+            else if(power <= 0) 
+            {
+                return 0;
             }
             return number * Pow(number, --power);
         }

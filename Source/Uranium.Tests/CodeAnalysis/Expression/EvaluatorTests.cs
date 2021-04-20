@@ -7,6 +7,7 @@ using Xunit;
 using Uranium.CodeAnalysis.Syntax;
 using Uranium.CodeAnalysis.Text;
 using Uranium.CodeAnalysis;
+using Uranium.Tests.CodeAnalysis.Other;
 
 namespace Uranium.Tests.CodeAnalysis.Expression
 {
@@ -43,20 +44,20 @@ namespace Uranium.Tests.CodeAnalysis.Expression
         {
             var syntaxTree = SyntaxTree.Parse(text);
             var compilation = new Compilation(syntaxTree);
-            var variables = new Dictionary<VariableSymbol, object>(); 
+            var variables = new Dictionary<VariableSymbol, object>();
             var actualResult = compilation.Evaluate(variables);
 
-            if(text.Equals("BadToken"))
+            if (text.Equals("BadToken"))
             {
                 return;
             }
-            
+
             Assert.Empty(actualResult.Diagnostics);
             Assert.Equal(expectedResult, actualResult.Value);
         }
         public static IEnumerable<object[]> TestCases()
         {
-            for(int i = 1; i <= 1_000_000; i++)
+            for (int i = 1; i <= 1_000_000; i++)
             {
                 i = i == 100 ? 999_900 : i;
                 yield return new object[] { $"{i} + {i}", i + i };
@@ -66,5 +67,6 @@ namespace Uranium.Tests.CodeAnalysis.Expression
                 yield return new object[] { $"let a = {i}", i };
             }
         }
+
     }
 }

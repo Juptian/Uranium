@@ -8,14 +8,15 @@ namespace Uranium.CodeAnalysis.Syntax
 {
     public static class SyntaxFacts
     {
+        //Bare minimum should be the minus value, everything seems to revolve around it imo
+        //So here it makes it easy to increase values or decrease them
+        //I should realistically inline all of these values though
         private static readonly int _minusValue = 4;
 
         //Binary operators
         public static int GetBinaryOperatorPrecedence(this SyntaxKind kind)
             => kind switch
             {
-                //Just operator precedence
-
                 SyntaxKind.DoublePipe => _minusValue - 3,
                 SyntaxKind.DoubleAmpersand => _minusValue - 2, 
                 SyntaxKind.DoubleEquals or SyntaxKind.BangEquals => _minusValue - 1,
@@ -68,7 +69,6 @@ namespace Uranium.CodeAnalysis.Syntax
             }
         }
 
-        //Gets the syntax token for a specific amount of text
         internal static SyntaxKind GetKeywordKind(string text)
             => text switch
             {
@@ -99,7 +99,6 @@ namespace Uranium.CodeAnalysis.Syntax
                 _ => SyntaxKind.IdentifierToken,
             };
 
-        //Gets the text for a specific syntax token
         public static string GetText(SyntaxKind kind) => kind switch
         {
             //Keywords
