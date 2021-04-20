@@ -5,7 +5,7 @@ This is the main file, this gets everything started, once the ` Emit() ` functio
 As we walk through it, we can see that I check for the arguments parsed in via command line. If we have some, we treat the properly, if we have none, we return immediately, and tell the user they must specify a file or an input string.
 
 Once we hit line 40, we hit the line that truly starts the entire process...
-```csharp
+```cs
 _syntaxTree = SyntaxTree.Parse(_text); 
 ```
 
@@ -13,25 +13,25 @@ This line calls for the syntax tree to parse the input text, which makes it so t
 
 Once the lexer and the parser are done doing their job, we get to the next important line.
 
-```csharp
+```cs
 var compilation = _previous?.ContinueWith(_syntaxTree) ?? new Compilation(_syntaxTree);
 ```
 This line is relatively complex, so let's break it down into two parts.
 
-```csharp
+```cs
 _previous?.ContinueWith(_syntaxTree)
 ```
 This line states that `_previous` may be `null`, but if it isn't, we call `ContinueWith(_syntaxTree)`
 
 The next part is 
 
-```csharp
+```cs
 ?? new Compilation(_syntaxTree)
 ```
 
 This states that if `_previous` is null, we make a new `Compilation(_syntaxTree)`, this way we can run the following line:
 
-```csharp
+```cs
 var result = compilation.Evaluate(variables);
 ```
 
