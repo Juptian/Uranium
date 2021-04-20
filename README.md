@@ -25,6 +25,9 @@ If you have issues, please do the following:
 
 Finally, please be patient as I try to fix it. If it's not fixed quickly, you can always contribute to the repo by making a PR for it
 
+<h2 align="center"> Not understand a part of the code? </h2>
+Feel free to open an issue asking about it, asking for specifications or asking me to write a `README` about it, I'll be more than happy to respond!
+
 <h2 align="center"> Using & Installing </h2>
 
 To use the compiler, please make sure you have .NET 5 installed, once you've done that, do the following steps:
