@@ -47,7 +47,7 @@ We don't want either of these to occur, because if we do not advance tokens, we 
 
 <h4 align="center"> Variable Declarations </h4>
 
-This method is pretty short, all we do, is match a keyword, match an identifier (the variable name), and then match the equals token. Then, we read whatever expression is on the other side of the equals sign. After that, we symply return a new `VariableDeclarationSyntax` with all of our variables.
+This method is pretty short, all we do, is match a keyword, match an identifier (the variable name), and then match the equals token. Then, we read whatever expression is on the other side of the equals sign. After that, we simply return a new `VariableDeclarationSyntax` with all of our variables.
 
 <h4 align="center"> ParseExpressionStatement and ParseExpression </h4>
 
