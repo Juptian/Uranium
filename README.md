@@ -37,17 +37,23 @@ To use the compiler, please make sure you have .NET 5 installed, once you've don
 <h3 align="center"> Additional arguments: </h3>
 The current command line arguments accepted are:
 
-* --#showtree
+```
+--#showtree
+```
 This will show the syntax tree that is produced.
 
 <h3 align="center"> How to use additional arguments: </h3>
 To use additional arguments, simply type 
 
-* `dotnet run test.txt` 
+```
+dotnet run test.txt
+``` 
  
 then add each argument, separated by a space, so for example:
 
-* ` dotnet run test.txt --#showtree `
+``` 
+dotnet run test.txt --#showtree 
+```
 
 
 <h3 align="center">This repository is a part of the <b><a href="https://github.com/salty-sweet/TLoDLiBSsf">The List of Developing Languages in Brackeys Server so far</a> I recommend you go check out the others</h4>
