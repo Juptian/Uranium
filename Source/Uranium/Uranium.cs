@@ -83,7 +83,7 @@ namespace Uranium
                 var treeText = _syntaxTree.Text;
                 Console.ForegroundColor = ConsoleColor.Red;
                 
-                //A;pwomg fpr 
+                //Whitespace to divide the errors more clearly from everything else 
                 Console.WriteLine();
 
                 foreach (var diag in diagnostics)
