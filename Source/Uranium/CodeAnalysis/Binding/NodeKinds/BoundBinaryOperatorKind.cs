@@ -19,6 +19,10 @@ namespace Uranium.CodeAnalysis.Binding.NodeKinds
         LogicalXOREquals,
         LogicalXOR,
         LogicalEquals,
-        NotEquals
+        NotEquals,
+        LesserThan,
+        LesserThanEquals,
+        GreaterThan,
+        GreaterThanEquals,
     }
 }

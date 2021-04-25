@@ -164,10 +164,11 @@ namespace Uranium.CodeAnalysis.Parsing
         //Allowing for proper operator precedence
         private ExpressionSyntax ParseBinaryExpression(int parentPrecedence = 0)
         {
-            ExpressionSyntax left;
+            const int MIN_PRECEDENCE = 0;
+            ExpressionSyntax left;  
             var unaryOperatorPrecedence = Current.Kind.GetUnaryOperatorPrecedence();
 
-            if(unaryOperatorPrecedence != 0 && unaryOperatorPrecedence >= parentPrecedence)
+            if(unaryOperatorPrecedence != MIN_PRECEDENCE && unaryOperatorPrecedence >= parentPrecedence)
             {
                 var operatorToken = NextToken();
                 var operand = ParseBinaryExpression(unaryOperatorPrecedence);
@@ -182,7 +183,7 @@ namespace Uranium.CodeAnalysis.Parsing
             {
                 var precedence = Current.Kind.GetBinaryOperatorPrecedence();
 
-                if(precedence == 0 || precedence <= parentPrecedence)
+                if(precedence == MIN_PRECEDENCE || precedence <= parentPrecedence)
                 {
                     break;
                 }

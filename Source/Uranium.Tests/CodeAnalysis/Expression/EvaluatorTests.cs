@@ -39,6 +39,12 @@ namespace Uranium.Tests.CodeAnalysis.Expression
         [InlineData("let a = 10 * 10", 100)]
         [InlineData("var a = 10 * 10", 100)]
         [InlineData("const a = 10 * 10", 100)]
+        [InlineData("3 == true", true)]
+        [InlineData("100 == false", false)]
+        [InlineData("0 == false", true)]
+        [InlineData("0 != false", false)]
+        [InlineData("false == 0", true)]
+        [InlineData("true == 1", true)]
         [MemberData(nameof(TestCases))]
         public void SyntaxFactGetTextRoundTrips(string text, object expectedResult)
         {
@@ -65,6 +71,10 @@ namespace Uranium.Tests.CodeAnalysis.Expression
                 yield return new object[] { $"{i} * {i}", i * i };
                 yield return new object[] { $"{i} * 2 / {i}", 2 };
                 yield return new object[] { $"let a = {i}", i };
+                yield return new object[] { $"{i} <= {i + 1}", true };
+                yield return new object[] { $"{i} < {i}", false };
+                yield return new object[] { $"{i + 1} > {i}", true };
+                yield return new object[] { $"{i - 1} >= {i}", false };
             }
         }
 

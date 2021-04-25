@@ -15,7 +15,7 @@ namespace Uranium.CodeAnalysis.Syntax.Expression
         private readonly BoundStatement _root;
         private readonly Dictionary<VariableSymbol, object> _variables;
 
-        private object _lastValue;
+        private object? _lastValue;
 
         public Evaluator(BoundStatement root, Dictionary<VariableSymbol, object> variables)
         {
@@ -128,9 +128,9 @@ namespace Uranium.CodeAnalysis.Syntax.Expression
             {
                 //Universal
                 case BoundBinaryOperatorKind.LogicalEquals:
-                    return Equals(left, right); 
+                    return LeftEqualsRight(left, right); 
                 case BoundBinaryOperatorKind.NotEquals:
-                    return !Equals(left, right);
+                    return !LeftEqualsRight(left, right);
 
                 //Int
                 case BoundBinaryOperatorKind.Addition:
@@ -141,7 +141,17 @@ namespace Uranium.CodeAnalysis.Syntax.Expression
                     return (int)left * (int)right;
                 case BoundBinaryOperatorKind.Division:
                     return (int)left / (int)right;
-                
+
+                case BoundBinaryOperatorKind.LesserThan:
+                    return (int)left < (int)right;
+                case BoundBinaryOperatorKind.LesserThanEquals:
+                    return (int)left <= (int)right;
+                case BoundBinaryOperatorKind.GreaterThan:
+                    return (int)left > (int)right;
+                case BoundBinaryOperatorKind.GreaterThanEquals:
+                    return (int)left >= (int)right;
+
+
                 //C# doesn't like casting a double ot an int, so I had to work around it...
                 //Which I decided was to make my own recursive Pow function
                 case BoundBinaryOperatorKind.Pow:
@@ -166,6 +176,34 @@ namespace Uranium.CodeAnalysis.Syntax.Expression
                     //on the stack trace :)
                     throw new($"Unexpected binary operator {b.Op.Kind}");
             }
+        }
+
+        private static bool LeftEqualsRight(object left, object right)
+        {
+            if(left.GetType() == typeof(int) && right.GetType() == typeof(bool))
+            {
+                if((int)left == 0)
+                {
+                    return (bool)right == false;
+                }
+                else
+                {
+                    return (bool)right == true;
+                }
+            }
+            else if(left.GetType() == typeof(bool) && right.GetType() == typeof(int))
+            {
+                if((int)right == 0)
+                {
+                    return (bool)left == false;
+                }
+                else
+                {
+                    return (bool)left == true;
+                }
+
+            }
+            return Equals(left, right);
         }
 
         private static int Pow(int number, int power)

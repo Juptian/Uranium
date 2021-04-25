@@ -19,6 +19,8 @@ namespace Uranium.CodeAnalysis.Lexing
         private string? _text;
         private object? _currentValue;
 
+        private const bool _debug = false;
+
         private readonly SourceText _source;
         private readonly DiagnosticBag _diagnostics = new();
 
@@ -33,7 +35,10 @@ namespace Uranium.CodeAnalysis.Lexing
             ReadSpecialChars(false);
             LexToken(CurrentIndex);
 
-            //Console.WriteLine($"{_current}, {_text ?? CurrentIndex.ToString()}, {_index}, {_currentValue}");
+            if (_debug)
+            {
+                Console.WriteLine($"{_current}, {_text ?? CurrentIndex.ToString()}, {_index}, {_currentValue}");
+            }
             return new(_current, _index++, _text ?? PreviousIndex.ToString(), _currentValue);
         }
 
@@ -259,7 +264,10 @@ namespace Uranium.CodeAnalysis.Lexing
         {
             _index++;
             var finished = false;
-            // _start = _index;
+            if(_debug)
+            {
+                _start = _index;
+            }
             while (!finished)
             {
                 switch (CurrentIndex)
@@ -276,9 +284,11 @@ namespace Uranium.CodeAnalysis.Lexing
             }
             _currentValue = SyntaxKind.SingleLineComment;
 
-            //Commented out, is here for debug purposes
-            /*var length = _Index - _start;
-            Console.WriteLine(_FileContents.ToString(_start, length));*/
+            if(_debug)
+            {
+                var length = _index - _start;
+                Console.WriteLine(_source.ToString(_start, length));
+            }
         }
 
         private void ReadMultiLineComment()
@@ -311,9 +321,11 @@ namespace Uranium.CodeAnalysis.Lexing
             }
             _currentValue = SyntaxKind.SingleLineComment;
 
-            //Commented out, is here for debug purposes
-            /*var length = _Index - _startIndex;
-            Console.WriteLine(_FileContents.ToString(_startIndex, length));*/
+            if (_debug)
+            {
+                var length = _index - _start;
+                Console.WriteLine(_source.ToString(_start, length));
+            }
         }
 
         private void ReadNum()
@@ -513,14 +525,13 @@ namespace Uranium.CodeAnalysis.Lexing
                 case SyntaxKind.WhileStatement:
                     break;
                 default:
-                    //Console.WriteLine(_current);
                     var length = _index - _start;
                     var text = SyntaxFacts.GetText(_current);
 
-                    //If I remove the ` text is null `
+                    //If I remove the "text is null"
                     //The tests fucking die
                     //So we leave it here.
-                    if ((text is null && _text is null) || text.Equals("BadToken", StringComparison.OrdinalIgnoreCase))
+                    if ((text is null && _text is null) || text!.Equals("BadToken", StringComparison.OrdinalIgnoreCase))
                     {
                         text = _source.ToString(_start, length);
                     }

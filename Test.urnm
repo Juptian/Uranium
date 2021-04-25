@@ -2,6 +2,6 @@
 	let x = 10;
 	{
 		const x = 10;
-		var b = x * 2
+		var b = 2 == true
 	}
 }

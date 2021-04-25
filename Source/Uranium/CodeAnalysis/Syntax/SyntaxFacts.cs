@@ -19,7 +19,10 @@ namespace Uranium.CodeAnalysis.Syntax
             {
                 SyntaxKind.DoublePipe => _minusValue - 3,
                 SyntaxKind.DoubleAmpersand => _minusValue - 2, 
-                SyntaxKind.DoubleEquals or SyntaxKind.BangEquals => _minusValue - 1,
+
+                SyntaxKind.DoubleEquals or SyntaxKind.BangEquals or
+                SyntaxKind.LesserThan or SyntaxKind.LesserThanEquals or
+                SyntaxKind.GreaterThan or SyntaxKind.GreaterThanEquals => _minusValue - 1,
 
                 SyntaxKind.Plus or SyntaxKind.Minus => _minusValue,
                 SyntaxKind.Multiply or SyntaxKind.Divide => _minusValue + 1,

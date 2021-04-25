@@ -44,10 +44,23 @@ namespace Uranium.CodeAnalysis.Binding.NodeKinds
             new BoundBinaryOperator(SyntaxKind.DoubleEquals, BoundBinaryOperatorKind.LogicalEquals, typeof(int), typeof(bool)),
             new BoundBinaryOperator(SyntaxKind.BangEquals, BoundBinaryOperatorKind.NotEquals, typeof(int), typeof(bool)),
 
+            new BoundBinaryOperator(SyntaxKind.LesserThan, BoundBinaryOperatorKind.LesserThan, typeof(int), typeof(bool)),
+            new BoundBinaryOperator(SyntaxKind.LesserThanEquals, BoundBinaryOperatorKind.LesserThanEquals, typeof(int), typeof(bool)),
+            new BoundBinaryOperator(SyntaxKind.GreaterThan, BoundBinaryOperatorKind.GreaterThan, typeof(int), typeof(bool)),
+            new BoundBinaryOperator(SyntaxKind.GreaterThanEquals, BoundBinaryOperatorKind.GreaterThanEquals, typeof(int), typeof(bool)),
+
             new BoundBinaryOperator(SyntaxKind.DoubleAmpersand, BoundBinaryOperatorKind.LogicalAND, typeof(bool)),
             new BoundBinaryOperator(SyntaxKind.DoublePipe, BoundBinaryOperatorKind.LogicalOR, typeof(bool)),
+
             new BoundBinaryOperator(SyntaxKind.DoubleEquals, BoundBinaryOperatorKind.LogicalEquals, typeof(bool)),
             new BoundBinaryOperator(SyntaxKind.BangEquals, BoundBinaryOperatorKind.NotEquals, typeof(bool)),
+
+            new BoundBinaryOperator(SyntaxKind.DoubleEquals, BoundBinaryOperatorKind.LogicalEquals, typeof(int), typeof(bool), typeof(bool)),
+            new BoundBinaryOperator(SyntaxKind.BangEquals, BoundBinaryOperatorKind.NotEquals, typeof(int), typeof(bool), typeof(bool)),
+
+            new BoundBinaryOperator(SyntaxKind.DoubleEquals, BoundBinaryOperatorKind.LogicalEquals, typeof(bool), typeof(int), typeof(bool)),
+            new BoundBinaryOperator(SyntaxKind.BangEquals, BoundBinaryOperatorKind.NotEquals, typeof(bool), typeof(int), typeof(bool)),
+
         };
 
         public static BoundBinaryOperator? Bind(SyntaxKind syntaxKind, Type leftType, Type rightType)
