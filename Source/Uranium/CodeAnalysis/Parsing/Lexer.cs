@@ -247,8 +247,6 @@ namespace Uranium.CodeAnalysis.Lexing
                     default:
                         if(!char.IsWhiteSpace(CurrentIndex))
                         {
-                            //How even the fuck?
-                            //Not sure how or why but here we are!
                             return;    
                         }
                         _index++;
@@ -283,7 +281,7 @@ namespace Uranium.CodeAnalysis.Lexing
 
 #if DEBUG
             var length = _index - _start;
-                Console.WriteLine(_source.ToString(_start, length));
+            Console.WriteLine(_source.ToString(_start, length));
 #endif
         }
 
@@ -497,35 +495,19 @@ namespace Uranium.CodeAnalysis.Lexing
         {
             //Checking here for if it's an identifier token, this way we don't do anything with it.
             //This is because Identifier tokens should not be modified.
-            switch(_current)
+            if(!SyntaxFacts.GetText(_current).Equals("BadToken", StringComparison.OrdinalIgnoreCase))
             {
-                //We don't want to override any of these so we just stop.
-                case SyntaxKind.IdentifierToken:
-                case SyntaxKind.NumberToken:
-                case SyntaxKind.BlockStatement:
-                case SyntaxKind.ContinueStatement:
-                case SyntaxKind.DoWhileStatement:
-                case SyntaxKind.ExpressionStatement:
-                case SyntaxKind.ForStatement:
-                case SyntaxKind.IfStatement:
-                case SyntaxKind.ElseKeyword:
-                case SyntaxKind.MemberBlockStatement:
-                case SyntaxKind.ReturnStatement:
-                case SyntaxKind.WhileStatement:
-                    break;
-                default:
-                    var length = _index - _start;
-                    var text = SyntaxFacts.GetText(_current);
+                var length = _index - _start;
+                var text = SyntaxFacts.GetText(_current);
 
-                    //If I remove the "text is null"
-                    //The tests fucking die
-                    //So we leave it here.
-                    if ((text is null && _text is null) || text!.Equals("BadToken", StringComparison.OrdinalIgnoreCase))
-                    {
-                        text = _source.ToString(_start, length);
-                    }
-                    _text = text;
-                    break;
+                //If I remove the "text is null"
+                //The tests fucking die
+                //So we leave it here.
+                if ((text is null && _text is null) || text!.Equals("BadToken", StringComparison.OrdinalIgnoreCase))
+                {
+                    text = _source.ToString(_start, length);
+                }
+                _text = text;
             }
         }
     }
