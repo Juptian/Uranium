@@ -26,7 +26,7 @@ namespace Uranium.CodeAnalysis.Syntax.Expression
         public object Evaluate()
         {
             EvaluateStatement(_root);
-            return _lastValue;
+            return _lastValue!;
         }
 
         private object EvaluateExpression(BoundExpression node)
@@ -76,10 +76,18 @@ namespace Uranium.CodeAnalysis.Syntax.Expression
                 case BoundNodeKind.ExpressionStatement:
                     EvaluateExpressionStatement( (BoundExpressionStatement)statement);
                     return;
-
                 case BoundNodeKind.VariableDeclaration:
                     EvaluateVariableDeclaration( (BoundVariableDeclaration)statement);
                     return;
+
+                case BoundNodeKind.IfStatement:
+                    EvaluateIfStatement( (BoundIfStatement)statement );
+                    return;
+
+                case BoundNodeKind.WhileStatement:
+                    EvaluateWhileStatement( (BoundWhileStatement)statement );
+                    return;
+
                 default:
                     //Exhausted all our options, time to call it quits!
                     throw new($"Unexpected statement {statement}");
@@ -102,6 +110,26 @@ namespace Uranium.CodeAnalysis.Syntax.Expression
             var value = EvaluateExpression(statement.Initializer);
             _variables[statement.Variable] = value;
             _lastValue = value;
+        }
+
+        private void EvaluateIfStatement(BoundIfStatement statement)
+        {
+            if( (bool)EvaluateExpression(statement.Condition) )
+            {
+                EvaluateStatement(statement.Statement);
+            }
+            else if(statement.ElseStatement is not null)
+            {
+                EvaluateStatement(statement.ElseStatement);
+            }
+        }
+
+        private void EvaluateWhileStatement(BoundWhileStatement statement)
+        {
+            while( (bool)EvaluateExpression(statement.Condition))
+            {
+                EvaluateStatement(statement.Body);
+            }
         }
 
         private object EvaluateBoundUnaryExpression(BoundUnaryExpression u)

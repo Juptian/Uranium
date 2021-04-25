@@ -20,5 +20,8 @@ namespace Uranium.CodeAnalysis.Binding
         BlockStatement,
         ExpressionStatement,
         VariableDeclaration,
+        IfStatement,
+        ElseStatement,
+        WhileStatement,
     }
 }

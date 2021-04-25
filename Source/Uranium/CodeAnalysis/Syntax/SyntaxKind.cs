@@ -91,6 +91,7 @@
         //Loop keywords
         WhileKeyword,
         DoKeyword,
+        ForKeyword,
 
         // Statements
         BlockStatement,
@@ -100,6 +101,7 @@
         ExpressionStatement,
         ForStatement,
         IfStatement,
+        ElseStatement,
         MemberBlockStatement,
         ReturnStatement,
         VariableDeclaration,

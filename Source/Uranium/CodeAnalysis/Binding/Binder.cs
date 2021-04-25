@@ -42,6 +42,15 @@ namespace Uranium.CodeAnalysis.Binding
                 _ => throw new($"Unexpected syntax {syntax.Kind}"),
             };
 
+        private BoundExpression BindExpression(ExpressionSyntax syntax, Type targetType)
+        {
+            var result = BindExpression(syntax);
+            if (result.Type != targetType)
+            {
+                _diagnostics.ReportCannotConvert(syntax.Span, result.GetType(), targetType);
+            }
+            return result;
+        }
         //Binding the Statement 
         //After making the binder, we call to bind the statement
         private BoundStatement BindStatement(StatementSyntax syntax)
@@ -51,6 +60,8 @@ namespace Uranium.CodeAnalysis.Binding
                 SyntaxKind.BlockStatement => BindBlockStatement( (BlockStatementSyntax)syntax ),
                 SyntaxKind.ExpressionStatement => BindExpressionStatement( (ExpressionStatementSyntax)syntax ),
                 SyntaxKind.VariableDeclaration => BindVariableDeclaration( (VariableDeclarationSyntax)syntax ),
+                SyntaxKind.IfStatement => BindIfStatement( (IfStatementSyntax)syntax ),
+                SyntaxKind.WhileStatement => BindWhileStatement( (WhileStatementSyntax)syntax ),
                 //We can throw here because this is all that we allow for now
                 //And if we get here, we've exhausted all our options
                 _ => throw new($"Unexpected syntax {syntax.Kind}"),
@@ -151,6 +162,22 @@ namespace Uranium.CodeAnalysis.Binding
             }
 
             return new BoundVariableDeclaration(variable, initializer);
+        }
+
+        private BoundStatement BindIfStatement(IfStatementSyntax syntax)
+        {
+            var condition = BindExpression(syntax.Condition, typeof(bool));
+            var thenStatement = BindStatement(syntax.ThenStatement);
+            var elseStatement = syntax.ElseClause is null ? null : BindStatement(syntax.ElseClause.ElseStatement);
+            return new BoundIfStatement(condition, thenStatement, elseStatement);
+        }
+        
+        private BoundStatement BindWhileStatement(WhileStatementSyntax syntax)
+        {
+            var condition = BindExpression(syntax.Expression, typeof(bool));
+            var body = BindStatement(syntax.Body);
+            return new BoundWhileStatement(condition, body);
+
         }
 
         //Value is being parsed into a nullable int

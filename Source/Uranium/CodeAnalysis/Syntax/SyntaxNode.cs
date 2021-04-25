@@ -30,26 +30,26 @@ namespace Uranium.CodeAnalysis.Syntax
         public IEnumerable<SyntaxNode> GetChildren()
         {
             var properties = GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
-
-            foreach(var property in properties)
+            foreach (var property in properties)
             {
                 if (typeof(SyntaxNode).IsAssignableFrom(property.PropertyType))
                 {
-                    var child = property.GetValue(this) as SyntaxNode;
-                    if(child is not null)
+                    if (property.GetValue(this) is SyntaxNode child)
                     {
                         yield return child;
                     }
-                    continue;
                 }
-                else if (typeof(IEnumerable<SyntaxKind>).IsAssignableFrom(property.PropertyType))
+                else if (typeof(IEnumerable<SyntaxNode>).IsAssignableFrom(property.PropertyType))
                 {
-                    var values = property.GetValue(this) as IEnumerable<SyntaxNode>;
-                    if(values is not null)
+                    var children = property.GetValue(this) as IEnumerable<SyntaxNode>;
+                    if(children is not null)
                     {
-                        foreach (var child in values)
+                        foreach(var child in children)
                         {
-                            yield return child;
+                            if(child is not null)
+                            {
+                                yield return child;
+                            }
                         }
                     }
                 }
@@ -63,14 +63,15 @@ namespace Uranium.CodeAnalysis.Syntax
             var isToConsole = writer == Console.Out;
             var marker = isLast ? "└───" : "├───";
 
-            writer.Write(indent);
             
             if(isToConsole)
             {
                 Console.ForegroundColor = ConsoleColor.Gray; 
             }
 
-            writer.Write(marker);  
+            writer.Write(indent);
+            writer.Write(marker);
+            
             if(isToConsole)
             {
                 Console.ForegroundColor = node is SyntaxToken ? ConsoleColor.Green : ConsoleColor.Cyan;

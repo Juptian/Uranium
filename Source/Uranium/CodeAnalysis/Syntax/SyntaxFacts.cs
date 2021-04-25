@@ -92,13 +92,13 @@ namespace Uranium.CodeAnalysis.Syntax
                 "enum" => SyntaxKind.EnumKeywrod,
                 "typedef" => SyntaxKind.TypeDefKeyword,
                 "null" => SyntaxKind.Null,
-                "break" => SyntaxKind.BreakStatement,
-                "continue" => SyntaxKind.ContinueStatement,
-                "while" => SyntaxKind.WhileStatement,
-                "for" => SyntaxKind.ForStatement,
-                "if" => SyntaxKind.IfStatement,
+                "break" => SyntaxKind.BreakKeyword,
+                "continue" => SyntaxKind.ContinueKeyword,
+                "while" => SyntaxKind.WhileKeyword,
+                "for" => SyntaxKind.ForKeyword,
+                "if" => SyntaxKind.IfKeyword,
                 "else" => SyntaxKind.ElseKeyword,
-                "return" => SyntaxKind.ReturnStatement,
+                "return" => SyntaxKind.ReturnKeyword,
                 _ => SyntaxKind.IdentifierToken,
             };
 
@@ -122,6 +122,13 @@ namespace Uranium.CodeAnalysis.Syntax
             SyntaxKind.EnumKeywrod => "enum",
             SyntaxKind.TypeDefKeyword => "typedef",
             SyntaxKind.Null => "null",
+            SyntaxKind.BreakKeyword => "break",
+            SyntaxKind.ContinueKeyword => "continue",
+            SyntaxKind.WhileKeyword => "while",
+            SyntaxKind.ForKeyword => "for",
+            SyntaxKind.IfKeyword => "if",
+            SyntaxKind.ElseKeyword => "else",
+            SyntaxKind.ReturnKeyword => "return",
 
             //Symbols
             SyntaxKind.Equals => "=",

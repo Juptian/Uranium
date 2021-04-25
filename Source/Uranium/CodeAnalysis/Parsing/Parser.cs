@@ -25,7 +25,7 @@ namespace Uranium.CodeAnalysis.Parsing
             do
             {
                 token = lexer.Lex();
-                if (token.Kind is not SyntaxKind.WhiteSpace &&  token.Kind is not SyntaxKind.BadToken)
+                if (token.Kind is not SyntaxKind.WhiteSpace && token.Kind is not SyntaxKind.BadToken && token.Kind is not SyntaxKind.LineBreak)
                 {
                     tokens.Add(token);
                 }
@@ -66,7 +66,6 @@ namespace Uranium.CodeAnalysis.Parsing
             {
                 return NextToken();
             }
-
             _diagnostics.ReportInvalidToken(Current.Span, Current, kind);
 
             return new(kind, Current.Position, Current.Text, null);
@@ -88,6 +87,8 @@ namespace Uranium.CodeAnalysis.Parsing
                 SyntaxKind.LetConstKeyword or 
                 SyntaxKind.ConstKeyword or 
                 SyntaxKind.VarKeyword => ParseVariableDeclaration(),
+                SyntaxKind.IfKeyword => ParseIfStatement(),
+                SyntaxKind.WhileKeyword => ParseWhileStatement(),
                 _ => ParseExpressionStatement(),
             };
 
@@ -123,6 +124,35 @@ namespace Uranium.CodeAnalysis.Parsing
             var equals = MatchToken(SyntaxKind.Equals);
             var initializer = ParseExpression();
             return new VariableDeclarationSyntax(keyword, identifier, equals, initializer);
+        }
+
+        private StatementSyntax ParseIfStatement()
+        {
+            var keyword = MatchToken(SyntaxKind.IfKeyword);
+            var condition = ParseExpression();
+            var statement = ParseStatement();
+            var elseClause = ParseElseClause();
+            return new IfStatementSyntax(keyword, condition, statement, elseClause);
+        }
+
+        private StatementSyntax ParseWhileStatement()
+        {
+            var keyword = MatchToken(SyntaxKind.WhileKeyword);
+            var condition = ParseExpression();
+            var body = ParseStatement();
+            return new WhileStatementSyntax(keyword, condition, body);
+        }
+
+        private ElseClauseSyntax? ParseElseClause()
+        {
+            if(Current.Kind != SyntaxKind.ElseKeyword)
+            {
+                return null;
+            }
+            var keyword = NextToken();
+            var statement = ParseStatement();
+
+            return new(keyword, statement);
         }
 
         private ExpressionStatementSyntax ParseExpressionStatement() => new(ParseExpression());
@@ -193,7 +223,6 @@ namespace Uranium.CodeAnalysis.Parsing
                 
                 left = new BinaryExpressionSyntax(left, operatorToken, right);
             }
-            //Console.WriteLine(left);
             return left;
         }
 
@@ -233,6 +262,5 @@ namespace Uranium.CodeAnalysis.Parsing
             var identifierToken = MatchToken(SyntaxKind.IdentifierToken);
             return new NameExpressionSyntax(identifierToken);
         }
-
     }
 }

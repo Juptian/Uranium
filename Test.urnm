@@ -1,7 +1,8 @@
 ﻿{
-	let x = 10;
+	var i = 10
+	while i > 0
 	{
-		const x = 10;
-		var b = 2 == true
+		i = i - 1
 	}
+	i
 }
