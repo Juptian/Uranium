@@ -9,11 +9,13 @@ namespace Uranium.CodeAnalysis.Syntax.Statement
 {
     public sealed class IfStatementSyntax : StatementSyntax
     {
-        public IfStatementSyntax(
+        public IfStatementSyntax
+            (
             SyntaxToken ifKeyword, 
             SyntaxToken openParenthesis, ExpressionSyntax condition, SyntaxToken closeParenthesis,
             BlockStatementSyntax body, 
-            ElseClauseSyntax? elseClause)
+            ElseClauseSyntax? elseClause
+            )
         {
             IfKeyword = ifKeyword;
             OpenParenthesis = openParenthesis;

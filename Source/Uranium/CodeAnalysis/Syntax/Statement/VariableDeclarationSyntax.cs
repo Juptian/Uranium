@@ -9,11 +9,13 @@ namespace Uranium.CodeAnalysis.Syntax.Statement
 {
     public sealed class VariableDeclarationSyntax : StatementSyntax
     {
-        public VariableDeclarationSyntax(
+        public VariableDeclarationSyntax
+            (
             SyntaxToken keywordToken,
             SyntaxToken identifier, 
             SyntaxToken equalsToken, 
-            ExpressionSyntax initializer)
+            ExpressionSyntax initializer
+            )
         {
             KeywordToken = keywordToken;
             Identifier = identifier;

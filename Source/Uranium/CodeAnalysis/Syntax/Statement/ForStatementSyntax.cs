@@ -10,7 +10,8 @@ namespace Uranium.CodeAnalysis.Syntax.Statement
     public sealed class ForStatementSyntax : StatementSyntax
     {
         //for var a = 10; a < 11; a = a + 1
-        public ForStatementSyntax(
+        public ForStatementSyntax
+            (
             SyntaxToken forKeyword, SyntaxToken openParenthesisToken,
             StatementSyntax? variable, SyntaxToken initializeSemicolon,
             ExpressionSyntax? condition, SyntaxToken conditionSemicolon,
