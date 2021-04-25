@@ -88,6 +88,9 @@ namespace Uranium.CodeAnalysis.Syntax.Expression
                     EvaluateWhileStatement( (BoundWhileStatement)statement );
                     return;
 
+                case BoundNodeKind.ForStatement:
+                    EvaluateForStatement((BoundForStatement)statement);
+                    break;
                 default:
                     //Exhausted all our options, time to call it quits!
                     throw new($"Unexpected statement {statement}");
@@ -129,6 +132,23 @@ namespace Uranium.CodeAnalysis.Syntax.Expression
             while( (bool)EvaluateExpression(statement.Condition))
             {
                 EvaluateStatement(statement.Body);
+            }
+        }
+
+        private void EvaluateForStatement(BoundForStatement statement)
+        {
+            if(statement.VariableDeclaration is not null)
+            {
+                EvaluateStatement(statement.VariableDeclaration);
+            }
+
+            while(statement.Condition is null || (bool)EvaluateExpression(statement.Condition))
+            {
+                EvaluateStatement(statement.Body);
+                if(statement.Increment is not null)
+                {
+                    EvaluateExpression(statement.Increment);
+                }
             }
         }
 

@@ -45,22 +45,65 @@ namespace Uranium.Tests.CodeAnalysis.Expression
         [InlineData("0 != false", false)]
         [InlineData("false == 0", true)]
         [InlineData("true == 1", true)]
-        [InlineData("{ var a = 10 if a == 10 a = 100 }", 100)]
-        [InlineData("{ var a = 10 if a == 5 a = 19 }", 10)]
-        [InlineData("{ var a = 10 if a == 10 a = 100 else a = 0 }", 100)]
-        [InlineData("{ var a = 10 if a == 5 a = 100 else a = 0 }", 0)]
+        [InlineData(@"
+{ 
+    var a = 10 
+    if(a == 10) 
+    {
+        a = 100
+    }
+}", 100)]
+        [InlineData(@"
+{ 
+    var a = 10 
+    if (a == 5)
+    {
+        a = 19
+    }
+}", 10)]
+        [InlineData(@"
+{ 
+    var a = 10 
+    if (a == 10) 
+    {
+        a = 100 
+    }
+    else
+    {
+        a = 0 
+    }
+}", 100)]
+        [InlineData(@"
+{ 
+    var a = 10 
+    if(a == 5)
+    {
+        a = 100 
+    }    
+    else 
+    {
+        a = 0 
+    }
+}", 0)]
         [InlineData(@"
 { 
     var i = 10 
     var result = 0 
-    while i > 0 
+    while (i > 0) 
     {
         result = result + i
         i = i - 1
     }
     result
 }", 55)]
-
+        [InlineData(@"
+{
+    for(var i = 0; i <= 10; i = i + 1)
+    {
+        i
+    }
+}
+", 10)]
         [MemberData(nameof(TestCases))]
         public void SyntaxFactGetTextRoundTrips(string text, object expectedResult)
         {

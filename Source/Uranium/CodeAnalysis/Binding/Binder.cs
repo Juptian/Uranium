@@ -62,6 +62,7 @@ namespace Uranium.CodeAnalysis.Binding
                 SyntaxKind.VariableDeclaration => BindVariableDeclaration( (VariableDeclarationSyntax)syntax ),
                 SyntaxKind.IfStatement => BindIfStatement( (IfStatementSyntax)syntax ),
                 SyntaxKind.WhileStatement => BindWhileStatement( (WhileStatementSyntax)syntax ),
+                SyntaxKind.ForStatement => BindForStatement( (ForStatementSyntax)syntax ),
                 //We can throw here because this is all that we allow for now
                 //And if we get here, we've exhausted all our options
                 _ => throw new($"Unexpected syntax {syntax.Kind}"),
@@ -167,9 +168,9 @@ namespace Uranium.CodeAnalysis.Binding
         private BoundStatement BindIfStatement(IfStatementSyntax syntax)
         {
             var condition = BindExpression(syntax.Condition, typeof(bool));
-            var thenStatement = BindStatement(syntax.ThenStatement);
+            var body = BindBlockStatement(syntax.Body);
             var elseStatement = syntax.ElseClause is null ? null : BindStatement(syntax.ElseClause.ElseStatement);
-            return new BoundIfStatement(condition, thenStatement, elseStatement);
+            return new BoundIfStatement(condition, body, elseStatement);
         }
         
         private BoundStatement BindWhileStatement(WhileStatementSyntax syntax)
@@ -178,6 +179,16 @@ namespace Uranium.CodeAnalysis.Binding
             var body = BindStatement(syntax.Body);
             return new BoundWhileStatement(condition, body);
 
+        }
+
+        private BoundStatement BindForStatement(ForStatementSyntax syntax)
+        {
+            var variable = syntax.Variable is null ? null : BindStatement(syntax.Variable);
+            var condition = syntax.Condition is null ? null : BindExpression(syntax.Condition);
+            var increment = syntax.Incrementation is null ? null : BindExpression(syntax.Incrementation);
+            var block = BindBlockStatement(syntax.Body) as BoundBlockStatement;
+
+            return new BoundForStatement(variable, condition, increment, block!);
         }
 
         //Value is being parsed into a nullable int

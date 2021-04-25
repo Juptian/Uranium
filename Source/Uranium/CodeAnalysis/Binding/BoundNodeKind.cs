@@ -23,5 +23,6 @@ namespace Uranium.CodeAnalysis.Binding
         IfStatement,
         ElseStatement,
         WhileStatement,
+        ForStatement,
     }
 }

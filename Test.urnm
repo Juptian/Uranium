@@ -1,8 +1,13 @@
 ﻿{
-	var i = 10
-	while i > 0
+	for(var i = 0; i < 10; i = i + 1)
 	{
-		i = i - 1
+		if(i == false) 
+		{
+			i = i + 1
+		}
+		else if (i == true)
+		{
+			i = i + 10
+		}
 	}
-	i
 }

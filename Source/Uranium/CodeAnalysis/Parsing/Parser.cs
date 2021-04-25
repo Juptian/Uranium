@@ -89,6 +89,7 @@ namespace Uranium.CodeAnalysis.Parsing
                 SyntaxKind.VarKeyword => ParseVariableDeclaration(),
                 SyntaxKind.IfKeyword => ParseIfStatement(),
                 SyntaxKind.WhileKeyword => ParseWhileStatement(),
+                SyntaxKind.ForKeyword => ParseForStatement(),
                 _ => ParseExpressionStatement(),
             };
 
@@ -129,18 +130,45 @@ namespace Uranium.CodeAnalysis.Parsing
         private StatementSyntax ParseIfStatement()
         {
             var keyword = MatchToken(SyntaxKind.IfKeyword);
+            var openParen = MatchToken(SyntaxKind.OpenParenthesis);
             var condition = ParseExpression();
-            var statement = ParseStatement();
+            var closeParen = MatchToken(SyntaxKind.CloseParenthesis);
+            var body = ParseBlockStatement();
             var elseClause = ParseElseClause();
-            return new IfStatementSyntax(keyword, condition, statement, elseClause);
+            return new IfStatementSyntax(keyword, openParen, condition, closeParen, body, elseClause);
         }
 
         private StatementSyntax ParseWhileStatement()
         {
             var keyword = MatchToken(SyntaxKind.WhileKeyword);
+            var openParen = MatchToken(SyntaxKind.OpenParenthesis);
             var condition = ParseExpression();
-            var body = ParseStatement();
-            return new WhileStatementSyntax(keyword, condition, body);
+            var closeParen = MatchToken(SyntaxKind.CloseParenthesis);
+            var body = ParseBlockStatement();
+            return new WhileStatementSyntax(keyword, openParen, condition, closeParen, body);
+        }
+
+        private StatementSyntax ParseForStatement()
+        {
+            var keyword = MatchToken(SyntaxKind.ForKeyword);
+            var openParenthesis = MatchToken(SyntaxKind.OpenParenthesis);
+            var variable = Current.Kind == SyntaxKind.Semicolon ? null : ParseVariableDeclaration();
+            var initializeSemi = MatchToken(SyntaxKind.Semicolon);
+            var condition = Current.Kind == SyntaxKind.Semicolon ? null : ParseExpression();
+            var conditionSemi = MatchToken(SyntaxKind.Semicolon);
+            var incrementation = Current.Kind == SyntaxKind.CloseParenthesis ? null : ParseExpression();
+            var closeParenthesis = MatchToken(SyntaxKind.CloseParenthesis);
+            var block = ParseBlockStatement();
+            return new ForStatementSyntax
+                (
+                    keyword, 
+                    openParenthesis, 
+                        variable, initializeSemi, 
+                        condition, conditionSemi, 
+                        incrementation, 
+                    closeParenthesis,
+                    block
+                );
         }
 
         private ElseClauseSyntax? ParseElseClause()

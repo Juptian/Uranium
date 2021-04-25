@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Collections.Generic;
 using System.Linq;
 using Uranium.Logging;
@@ -19,8 +20,6 @@ namespace Uranium.CodeAnalysis.Lexing
         private string? _text;
         private object? _currentValue;
 
-        private const bool _debug = false;
-
         private readonly SourceText _source;
         private readonly DiagnosticBag _diagnostics = new();
 
@@ -35,10 +34,9 @@ namespace Uranium.CodeAnalysis.Lexing
             ReadSpecialChars(false);
             LexToken(CurrentIndex);
 
-            if (_debug)
-            {
-                Console.WriteLine($"{_current}, {_text ?? CurrentIndex.ToString()}, {_index}, {_currentValue}");
-            }
+#if DEBUG
+            Debug.WriteLine($"{_current}, {_text ?? CurrentIndex.ToString()}, {_index}, {_currentValue}");
+#endif
             return new(_current, _index++, _text ?? PreviousIndex.ToString(), _currentValue);
         }
 
@@ -264,10 +262,9 @@ namespace Uranium.CodeAnalysis.Lexing
         {
             _index++;
             var finished = false;
-            if(_debug)
-            {
-                _start = _index;
-            }
+#if DEBUG
+            _start = _index;
+#endif
             while (!finished)
             {
                 switch (CurrentIndex)
@@ -284,11 +281,10 @@ namespace Uranium.CodeAnalysis.Lexing
             }
             _currentValue = SyntaxKind.SingleLineComment;
 
-            if(_debug)
-            {
-                var length = _index - _start;
+#if DEBUG
+            var length = _index - _start;
                 Console.WriteLine(_source.ToString(_start, length));
-            }
+#endif
         }
 
         private void ReadMultiLineComment()
@@ -320,12 +316,6 @@ namespace Uranium.CodeAnalysis.Lexing
                 }
             }
             _currentValue = SyntaxKind.SingleLineComment;
-
-            if (_debug)
-            {
-                var length = _index - _start;
-                Console.WriteLine(_source.ToString(_start, length));
-            }
         }
 
         private void ReadNum()
@@ -430,7 +420,6 @@ namespace Uranium.CodeAnalysis.Lexing
             
             _current = kind == SyntaxKind.BadToken ? SyntaxKind.IdentifierToken : kind;
             _text = text;
-            //Console.WriteLine(_text);
             _index--;
         }
 

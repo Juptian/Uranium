@@ -13,12 +13,12 @@ namespace Uranium.CodeAnalysis.Syntax.Statement
             SyntaxToken keywordToken,
             SyntaxToken identifier, 
             SyntaxToken equalsToken, 
-            ExpressionSyntax Initializer)
+            ExpressionSyntax initializer)
         {
             KeywordToken = keywordToken;
             Identifier = identifier;
             EqualsToken = equalsToken;
-            this.Initializer = Initializer;
+            Initializer = initializer;
         }
 
         public override SyntaxKind Kind => SyntaxKind.VariableDeclaration;
