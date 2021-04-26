@@ -247,7 +247,7 @@ namespace Uranium.CodeAnalysis.Syntax.Expression
                     _variables[a.Variable] = (int)_variables[a.Variable] / value;
                     break;
                 case SyntaxKind.PowEquals:
-                    _variables[a.Variable] = (int)Pow((int)_variables[a.Variable], value);
+                    _variables[a.Variable] = Pow((int)_variables[a.Variable], value);
                     return;
             }
         }
