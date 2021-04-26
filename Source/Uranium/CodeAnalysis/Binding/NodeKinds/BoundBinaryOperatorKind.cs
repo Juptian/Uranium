@@ -14,6 +14,12 @@ namespace Uranium.CodeAnalysis.Binding.NodeKinds
         Multiplication,
         Division,
         Pow,
+
+        AdditionEquals,
+        SubtractionEquals,
+        MultiplicationEquals,
+        DivisionEquals,
+
         LogicalAND,
         LogicalOR,
         LogicalXOREquals,

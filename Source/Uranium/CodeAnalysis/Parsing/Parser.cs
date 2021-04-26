@@ -55,9 +55,8 @@ namespace Uranium.CodeAnalysis.Parsing
 
         private SyntaxToken NextToken()
         {
-            var current = Current;
             _position++;
-            return current;
+            return Peek(-1);
         }
 
         private SyntaxToken MatchToken(SyntaxKind kind)
@@ -118,13 +117,13 @@ namespace Uranium.CodeAnalysis.Parsing
 
         private StatementSyntax ParseVariableDeclaration()
         {
-            //Could remove expected and inline it, but I find this is cleaner
-            var expected = Current.Kind;
-            var keyword = MatchToken(expected);
+            var keyword = NextToken();
             var identifier = MatchToken(SyntaxKind.IdentifierToken);
             var equals = MatchToken(SyntaxKind.Equals);
             var initializer = ParseExpression();
-            return new VariableDeclarationSyntax(keyword, identifier, equals, initializer);
+            var semicolon = MatchToken(SyntaxKind.Semicolon);
+
+            return new VariableDeclarationSyntax(keyword, identifier, equals, initializer, semicolon);
         }
 
         private StatementSyntax ParseIfStatement()
@@ -135,6 +134,7 @@ namespace Uranium.CodeAnalysis.Parsing
             var closeParen = MatchToken(SyntaxKind.CloseParenthesis);
             var body = ParseBlockStatement();
             var elseClause = ParseElseClause();
+
             return new IfStatementSyntax(keyword, openParen, condition, closeParen, body, elseClause);
         }
 
@@ -145,6 +145,7 @@ namespace Uranium.CodeAnalysis.Parsing
             var condition = ParseExpression();
             var closeParen = MatchToken(SyntaxKind.CloseParenthesis);
             var body = ParseBlockStatement();
+
             return new WhileStatementSyntax(keyword, openParen, condition, closeParen, body);
         }
 
@@ -153,12 +154,13 @@ namespace Uranium.CodeAnalysis.Parsing
             var keyword = MatchToken(SyntaxKind.ForKeyword);
             var openParenthesis = MatchToken(SyntaxKind.OpenParenthesis);
             var variable = Current.Kind == SyntaxKind.Semicolon ? null : ParseVariableDeclaration();
-            var initializeSemi = MatchToken(SyntaxKind.Semicolon);
+            var initializeSemi = variable is null ? MatchToken(SyntaxKind.Semicolon) : Peek(-1);
             var condition = Current.Kind == SyntaxKind.Semicolon ? null : ParseExpression();
             var conditionSemi = MatchToken(SyntaxKind.Semicolon);
             var incrementation = Current.Kind == SyntaxKind.CloseParenthesis ? null : ParseExpression();
             var closeParenthesis = MatchToken(SyntaxKind.CloseParenthesis);
             var block = ParseBlockStatement();
+            
             return new ForStatementSyntax
                 (
                     keyword, 
@@ -206,16 +208,27 @@ namespace Uranium.CodeAnalysis.Parsing
 
             //If it's an identifier, we parse it as one, if not, we go to our next level
             //Binary expressions
-            if(Current.Kind == SyntaxKind.IdentifierToken &&
-                Next.Kind == SyntaxKind.Equals)
-            {
-                //Despite knowing the token, we want to consume it, to avoid loops
-                var identifierToken = NextToken();
-                var operatorToken = NextToken();
 
-                var right = ParseAssignmentExpression();
-                return new AssignmentExpressionSyntax(identifierToken, operatorToken, right);
+            if(Current.Kind is SyntaxKind.IdentifierToken)
+            {
+                if(Next.Kind == SyntaxKind.Equals)
+                {
+                    //Despite knowing the token, we want to consume it, to avoid loops
+                    var identifierToken = NextToken();
+                    var operatorToken = NextToken();
+                    var right = ParseAssignmentExpression();
+
+                    return new AssignmentExpressionSyntax(identifierToken, operatorToken, right);
+                }
+                else if(SyntaxFacts.CheckForCompoundOperator(Next))
+                {
+                    var identifierToken = NextToken();
+                    var operatorToken = NextToken();
+                    var other = ParseAssignmentExpression();
+                    return new AssignmentExpressionSyntax(identifierToken, SyntaxFacts.GetSoloOperator(operatorToken), other, true, operatorToken);
+                }
             }
+            //Console.WriteLine(Current.Kind);
             return ParseBinaryExpression();
         }
 
@@ -241,7 +254,7 @@ namespace Uranium.CodeAnalysis.Parsing
             {
                 var precedence = Current.Kind.GetBinaryOperatorPrecedence();
 
-                if(precedence == MIN_PRECEDENCE || precedence <= parentPrecedence)
+                if(precedence <= MIN_PRECEDENCE || precedence <= parentPrecedence)
                 {
                     break;
                 }
@@ -253,7 +266,7 @@ namespace Uranium.CodeAnalysis.Parsing
             }
             return left;
         }
-
+        
 
         private ExpressionSyntax ParsePrimaryExpression()
             =>  Current.Kind switch

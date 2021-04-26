@@ -1,4 +1,6 @@
-﻿namespace Uranium.Main
+﻿using System;
+
+namespace Uranium.Main
 {
     public static class Program
     {

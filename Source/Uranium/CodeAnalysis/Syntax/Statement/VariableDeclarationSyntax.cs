@@ -14,13 +14,15 @@ namespace Uranium.CodeAnalysis.Syntax.Statement
             SyntaxToken keywordToken,
             SyntaxToken identifier, 
             SyntaxToken equalsToken, 
-            ExpressionSyntax initializer
+            ExpressionSyntax initializer,
+            SyntaxToken semicolon
             )
         {
             KeywordToken = keywordToken;
             Identifier = identifier;
             EqualsToken = equalsToken;
             Initializer = initializer;
+            Semicolon = semicolon;
         }
 
         public override SyntaxKind Kind => SyntaxKind.VariableDeclaration;
@@ -29,5 +31,6 @@ namespace Uranium.CodeAnalysis.Syntax.Statement
         public SyntaxToken Identifier { get; }
         public SyntaxToken EqualsToken { get; }
         public ExpressionSyntax Initializer { get; }
+        public SyntaxToken Semicolon { get; }
     }
 }

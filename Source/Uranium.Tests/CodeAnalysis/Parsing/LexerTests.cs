@@ -83,6 +83,7 @@ namespace Uranium.Tests.CodeAnalysis.Lexing
                 (SyntaxKind.Minus, "-"),
                 (SyntaxKind.Divide, "/"),
                 (SyntaxKind.Multiply, "*"),
+                (SyntaxKind.Pow, "**"),
                 (SyntaxKind.Percent, "%"),
                 (SyntaxKind.Ampersand, "&"),
                 (SyntaxKind.Pipe, "|"),
@@ -104,7 +105,7 @@ namespace Uranium.Tests.CodeAnalysis.Lexing
                 (SyntaxKind.MinusEquals, "-="),
                 (SyntaxKind.DivideEquals, "/="),
                 (SyntaxKind.MultiplyEquals, "*="),
-                (SyntaxKind.Pow, "**"),
+                (SyntaxKind.PowEquals, "**="),
                 (SyntaxKind.PercentEquals, "%="),
                 (SyntaxKind.DoubleAmpersand, "&&"),
                 (SyntaxKind.DoublePipe, "||"),
@@ -176,6 +177,7 @@ namespace Uranium.Tests.CodeAnalysis.Lexing
         private static bool RequiresSeparator(SyntaxKind leftKind, SyntaxKind rightKind)
         {
             var tokensThatRequire = Concatenate(GetSoloOperators(), GetKeywords(), GetNumbers());
+            tokensThatRequire.ToList().Add((SyntaxKind.Pow, "**"));
             foreach (var (kind, _) in tokensThatRequire)
             {
                 if(kind == leftKind || kind == rightKind)

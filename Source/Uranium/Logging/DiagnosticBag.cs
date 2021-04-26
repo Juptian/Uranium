@@ -86,13 +86,19 @@ namespace Uranium.Logging
         public void ReportCannotAssign(TextSpan identifier, TextSpan equals, string name)
         {
             var totalSpan = new TextSpan(identifier.Start, identifier.Length + equals.Length + 1);
-            var message = $"Cannot assign a value to {name} because it is marked as let or const, meaning that it is read only.";
+            var message = $"JC0010: Cannot assign a value to {name} because it is marked as let or const, meaning that it is read only.";
             Report(totalSpan, message);
         }
 
         public void ReportNoSemiColon(TextSpan span)
         {
-            var message = $"Line cannot end without a semi colon";
+            var message = $"JC0011: Line cannot end without a semi colon";
+            Report(span, message);
+        }
+        
+        public void ReportCannotStartWithNumber(TextSpan span, string text)
+        {
+            var message = $"JC0012: A file cannot start with a number. {text}";
             Report(span, message);
         }
     }

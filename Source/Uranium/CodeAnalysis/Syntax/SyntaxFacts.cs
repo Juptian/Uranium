@@ -72,6 +72,29 @@ namespace Uranium.CodeAnalysis.Syntax
             }
         }
 
+        public static bool CheckForCompoundOperator(SyntaxToken token)
+            => token.Kind switch
+            {
+                SyntaxKind.PlusEquals or
+                SyntaxKind.MinusEquals or
+                SyntaxKind.MultiplyEquals or
+                SyntaxKind.DivideEquals or
+                SyntaxKind.PowEquals => true,
+                _ => false,
+            };
+        
+        public static SyntaxToken GetSoloOperator(SyntaxToken token)
+            => token.Kind switch
+            {
+                SyntaxKind.PlusEquals => new(SyntaxKind.Plus, token.Position, token.Text, token.Value),
+                SyntaxKind.MinusEquals => new(SyntaxKind.Minus, token.Position, token.Text, token.Value),
+                SyntaxKind.MultiplyEquals => new(SyntaxKind.Multiply, token.Position, token.Text, token.Value),
+                SyntaxKind.DivideEquals => new(SyntaxKind.Divide, token.Position, token.Text, token.Value),
+                SyntaxKind.PowEquals => new(SyntaxKind.Pow, token.Position, token.Text, token.Value),
+                _ => token,
+            };
+
+
         internal static SyntaxKind GetKeywordKind(string text)
             => text switch
             {
@@ -136,6 +159,16 @@ namespace Uranium.CodeAnalysis.Syntax
             SyntaxKind.Minus => "-",
             SyntaxKind.Divide => "/",
             SyntaxKind.Multiply => "*",
+
+            SyntaxKind.PlusPlus => "++",
+            SyntaxKind.PlusEquals => "+=",
+            SyntaxKind.MinusMinus => "--",
+            SyntaxKind.MinusEquals => "-=",
+            SyntaxKind.DivideEquals => "/=",
+            SyntaxKind.MultiplyEquals => "*=",
+            SyntaxKind.Pow => "**",
+            SyntaxKind.PowEquals => "**=",
+            
             SyntaxKind.Percent => "%",
             SyntaxKind.Ampersand => "&",
             SyntaxKind.Pipe => "|",
@@ -144,13 +177,7 @@ namespace Uranium.CodeAnalysis.Syntax
             SyntaxKind.LesserThan => "<",
             SyntaxKind.Bang => "!", 
             SyntaxKind.DoubleEquals => "==",
-            SyntaxKind.PlusPlus => "++",
-            SyntaxKind.PlusEquals => "+=",
-            SyntaxKind.MinusMinus => "--",
-            SyntaxKind.MinusEquals => "-=",
-            SyntaxKind.DivideEquals => "/=",
-            SyntaxKind.MultiplyEquals => "*=",
-            SyntaxKind.Pow => "**",
+            
             SyntaxKind.PercentEquals => "%=",
             SyntaxKind.DoubleAmpersand => "&&",
             SyntaxKind.DoublePipe => "||",
@@ -172,5 +199,27 @@ namespace Uranium.CodeAnalysis.Syntax
 
             _ => "BadToken"
         };
+
+        public static Type? GetKeywordType(SyntaxKind kind) => kind switch
+        {
+            SyntaxKind.DoubleKeyword => typeof(double),
+            SyntaxKind.CharKeyword => typeof(char),
+            SyntaxKind.StringKeyword => typeof(string), 
+            SyntaxKind.FloatKeyword => typeof(float),
+            SyntaxKind.LongKeyword => typeof(long),
+            SyntaxKind.BoolKeyword => typeof(bool),
+            _ => null,
+        };
+        public static Type? GetKeywordType(string kind) => kind switch
+        {
+            "double" => typeof(double),
+            "char" => typeof(char),
+            "string" => typeof(string), 
+            "float" => typeof(float),
+            "lomg" => typeof(long),
+            "bool" => typeof(bool),
+            _ => null,
+        };
+
     }
 }

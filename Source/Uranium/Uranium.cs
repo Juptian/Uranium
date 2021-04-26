@@ -13,6 +13,8 @@ using Uranium.CodeAnalysis;
 using Uranium.CodeAnalysis.Text;
 using Uranium.Logging;
 
+#pragma warning disable CS8618
+
 namespace Uranium
 {
     public static class Uranium
@@ -68,7 +70,7 @@ namespace Uranium
 
         private static void DealWithDiagnostics(this EvaluationResult result)
         {
-            var diagnostics = result.Diagnostics;   
+            var diagnostics = result.Diagnostics; 
 
             //If there are any diagnostics, we print them in red
             //This makes it more easy to determine what is and isn't an error

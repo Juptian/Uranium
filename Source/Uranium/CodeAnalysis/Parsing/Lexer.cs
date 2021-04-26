@@ -19,6 +19,7 @@ namespace Uranium.CodeAnalysis.Lexing
         private SyntaxKind _current;
         private string? _text;
         private object? _currentValue;
+        private SyntaxToken? _previous;
 
         private readonly SourceText _source;
         private readonly DiagnosticBag _diagnostics = new();
@@ -37,7 +38,8 @@ namespace Uranium.CodeAnalysis.Lexing
 #if DEBUG
             Debug.WriteLine($"{_current}, {_text ?? CurrentIndex.ToString()}, {_index}, {_currentValue}");
 #endif
-            return new(_current, _index++, _text ?? PreviousIndex.ToString(), _currentValue);
+            _previous = new(_current, _index++, _text ?? PreviousIndex.ToString(), _currentValue);
+            return _previous; 
         }
 
         private char Peek(int offset)
@@ -361,50 +363,61 @@ namespace Uranium.CodeAnalysis.Lexing
                 _diagnostics.ReportInvalidNumber(new(_start, length), text, typeof(double));
             }
 
-            if (isDecimal)
+            var targetType = SyntaxFacts.GetKeywordType(_previous?.Kind ?? SyntaxKind.DoubleKeyword);
+
+            if(isDecimal)
             {
-                if (!double.TryParse(text, out var value))
-                {
-                    _diagnostics.ReportInvalidNumber(new(_start, length), text, typeof(double));
-                }
-                else
-                {
-                    if (value >= float.MinValue && value <= float.MaxValue)
-                    {
-                        _currentValue = (float)value;
-                    }
-                    else
-                    {
-                        _currentValue = value;
-                    }
-                }
+                ParseDouble(text, length);
+            } 
+            else
+            {
+                ParseLong(text, length);
+            }
+            _index--;
+        }
+   
+        private void ParseDouble(string text, int length)
+        {
+            if (!double.TryParse(text, out var value))
+            {
+                _diagnostics.ReportInvalidNumber(new(_start, length), text, typeof(double));
             }
             else
             {
-                if (!ulong.TryParse(text, out var value))
+                if (value >= float.MinValue && value <= float.MaxValue)
                 {
-                    _diagnostics.ReportInvalidNumber(new(_start, length), text, typeof(long));
+                    _currentValue = (float)value;
                 }
                 else
                 {
-                    if (value <= int.MaxValue)
-                    {
-                        _currentValue = (int)value;
-                    }
-                    else if (value <= uint.MaxValue)
-                    {
-                        _currentValue = (uint)value;
-                    }
-                    else
-                    {
-                        _currentValue = value;
-                    }
+                    _currentValue = value;
                 }
             }
-            _index--;
-
         }
-   
+
+        private void ParseLong(string text, int length)
+        {
+            if (!ulong.TryParse(text, out var value))
+            {
+                _diagnostics.ReportInvalidNumber(new(_start, length), text, typeof(long));
+            }
+            else
+            {
+                if (value <= int.MaxValue)
+                {
+                    _currentValue = (int)value;
+                }
+                else if (value <= uint.MaxValue)
+                {
+                    _currentValue = (uint)value;
+                }
+                else
+                {
+                    _currentValue = value;
+                }
+            }
+        }
+
         private void ReadIdentifierOrKeyword()
         {
             var _start = _index;
@@ -461,7 +474,7 @@ namespace Uranium.CodeAnalysis.Lexing
             }
             else if (Match('*', 1))
             {
-                _current = SyntaxKind.Pow;
+                _current = Match('=', 1) ? SyntaxKind.PowEquals : SyntaxKind.Pow;
             }
             else
             {

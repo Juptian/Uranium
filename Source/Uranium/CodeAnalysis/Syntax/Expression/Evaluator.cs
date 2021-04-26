@@ -46,11 +46,17 @@ namespace Uranium.CodeAnalysis.Syntax.Expression
                 case BoundVariableExpression v:
                     return _variables[v.Variable];
 
-                case BoundAssignmentExpression a:
+                case BoundAssignmentExpression a:     
                     var value = EvaluateExpression(a.Expression);
-                    _variables[a.Variable] = value;
-                    return value;
-
+                    if(a.IsCompound)
+                    {
+                        EvaluateCompoundOperator(a, (int)value);
+                    }
+                    else
+                    {
+                            _variables[a.Variable] = value;
+                    }
+                    return _variables[a.Variable];
                 //If it's none of the above, we check out last resort
                 //A BoundBinaryExpression, here we evaluate the left and right sides of both expressions
                 //then return a value based off of the current operator kind
@@ -97,7 +103,6 @@ namespace Uranium.CodeAnalysis.Syntax.Expression
             }
         }
 
-
         private void EvaluateBlockStatement(BoundBlockStatement statement)
         {
             foreach(var item in statement.Statements)
@@ -141,7 +146,6 @@ namespace Uranium.CodeAnalysis.Syntax.Expression
             {
                 EvaluateStatement(statement.VariableDeclaration);
             }
-
             while(statement.Condition is null || (bool)EvaluateExpression(statement.Condition))
             {
                 EvaluateStatement(statement.Body);
@@ -225,6 +229,28 @@ namespace Uranium.CodeAnalysis.Syntax.Expression
                     throw new($"Unexpected binary operator {b.Op.Kind}");
             }
         }
+        
+        private void EvaluateCompoundOperator(BoundAssignmentExpression a, int value)
+        {
+            switch(a.CompoundOperator!.Kind)
+            {
+                case SyntaxKind.PlusEquals:
+                    _variables[a.Variable] = (int)_variables[a.Variable] + value;
+                    break;
+                case SyntaxKind.MinusEquals:
+                    _variables[a.Variable] = (int)_variables[a.Variable] - value;
+                    break;
+                case SyntaxKind.MultiplyEquals:
+                    _variables[a.Variable] = (int)_variables[a.Variable] * value;
+                    break;
+                case SyntaxKind.DivideEquals:
+                    _variables[a.Variable] = (int)_variables[a.Variable] / value;
+                    break;
+                case SyntaxKind.PowEquals:
+                    _variables[a.Variable] = (int)Pow((int)_variables[a.Variable], value);
+                    return;
+            }
+        }
 
         private static bool LeftEqualsRight(object left, object right)
         {
@@ -256,16 +282,13 @@ namespace Uranium.CodeAnalysis.Syntax.Expression
 
         private static int Pow(int number, int power)
         {
-            if(power == 1)
+            int result = number;
+            while(power > 1)
             {
-                return number;
+                result *= number;
+                power--;
             }
-            //Another default case in case someone tries to be funny
-            else if(power <= 0) 
-            {
-                return 0;
-            }
-            return number * Pow(number, --power);
+            return result;
         }
     }
 }

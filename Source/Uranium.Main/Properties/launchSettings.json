@@ -2,7 +2,7 @@
   "profiles": {
     "Main": {
       "commandName": "Project",
-      "commandLineArgs": "../../Test.urnm --#showtree"
+      "commandLineArgs": "dotnet run  --project Source\\Uranium.Main\\Uranium.Main.csproj Test.urnm"
     }
   }
 }
