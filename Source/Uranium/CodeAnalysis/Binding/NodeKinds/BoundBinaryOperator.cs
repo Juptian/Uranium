@@ -52,6 +52,10 @@ namespace Uranium.CodeAnalysis.Binding.NodeKinds
             new(SyntaxKind.MultiplyEquals, BoundBinaryOperatorKind.MultiplicationEquals, typeof(int), true),
             new(SyntaxKind.DivideEquals, BoundBinaryOperatorKind.DivisionEquals, typeof(int), true),
 
+            new(SyntaxKind.PlusPlus, BoundBinaryOperatorKind.AdditionAddition, typeof(int), true),
+            new(SyntaxKind.MinusMinus, BoundBinaryOperatorKind.SubtractionSubtraction, typeof(int), true),
+
+
 
             new(SyntaxKind.LesserThan, BoundBinaryOperatorKind.LesserThan, typeof(int), typeof(bool)),
             new(SyntaxKind.LesserThanEquals, BoundBinaryOperatorKind.LesserThanEquals, typeof(int), typeof(bool)),

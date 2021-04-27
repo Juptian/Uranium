@@ -129,6 +129,12 @@ namespace Uranium.Tests.CodeAnalysis.Expression
     var a = 10;
     a **= 5;
 }", 100000)]
+        [InlineData(@"
+{
+    var a = 10;
+    var b = 1 + 2;
+    a **= a - 10 + (b - 1);
+}", 100)]
         [MemberData(nameof(TestCases))]
         public void SyntaxFactGetTextRoundTrips(string text, object expectedResult)
         {
@@ -159,6 +165,15 @@ namespace Uranium.Tests.CodeAnalysis.Expression
                 yield return new object[] { $"{i} < {i}", false };
                 yield return new object[] { $"{i + 1} > {i}", true };
                 yield return new object[] { $"{i - 1} >= {i}", false };
+            }
+
+            for (int i = 1; i <= 100; i++)
+            {
+                yield return new object[] { "{ " + $"var a = {i}; a += {i}" + " }", i + i };
+                yield return new object[] { "{ " + $"var a = {i}; a -= {i}" + " }", 0 };
+                yield return new object[] { "{ " + $"var a = {i}; a *= {i}" + " }", i * i };
+                yield return new object[] { "{ " + $"var a = {i}; a /= {i}" + " }", 1 };
+                yield return new object[] { "{ " + $"var a = {i}; a **= 1 + (1 + 1)" + " }", i * i * i };
             }
         }
 

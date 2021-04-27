@@ -225,7 +225,7 @@ namespace Uranium.CodeAnalysis.Parsing
                     var identifierToken = NextToken();
                     var operatorToken = NextToken();
                     var other = ParseAssignmentExpression();
-                    return new AssignmentExpressionSyntax(identifierToken, SyntaxFacts.GetSoloOperator(operatorToken), other, true, operatorToken);
+                    return new AssignmentExpressionSyntax(identifierToken, SyntaxFacts.GetSoloOperator(operatorToken), other!, true, operatorToken);
                 }
             }
             //Console.WriteLine(Current.Kind);

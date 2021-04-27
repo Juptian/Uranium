@@ -4,6 +4,7 @@ using Uranium.CodeAnalysis.Binding;
 using Uranium.CodeAnalysis.Binding.Statements;
 using Uranium.CodeAnalysis.Binding.NodeKinds;
 using Uranium.CodeAnalysis.Text;
+using Uranium.CodeAnalysis.Syntax.Expression.EvaluatorSupport;
 
 namespace Uranium.CodeAnalysis.Syntax.Expression
 {
@@ -31,10 +32,10 @@ namespace Uranium.CodeAnalysis.Syntax.Expression
 
         private object EvaluateExpression(BoundExpression node)
         {
-            switch(node)
+            switch (node)
             {
                 //if it's a literal expression, return it's value
-                case BoundLiteralExpression n: 
+                case BoundLiteralExpression n:
                     return n.Value;
 
                 //if it's a Unary expression, we just evaluate the operand
@@ -46,15 +47,15 @@ namespace Uranium.CodeAnalysis.Syntax.Expression
                 case BoundVariableExpression v:
                     return _variables[v.Variable];
 
-                case BoundAssignmentExpression a:     
+                case BoundAssignmentExpression a:
                     var value = EvaluateExpression(a.Expression);
-                    if(a.IsCompound)
+                    if (a.IsCompound)
                     {
                         EvaluateCompoundOperator(a, (int)value);
                     }
                     else
                     {
-                            _variables[a.Variable] = value;
+                        _variables[a.Variable] = value;
                     }
                     return _variables[a.Variable];
                 //If it's none of the above, we check out last resort
@@ -73,25 +74,25 @@ namespace Uranium.CodeAnalysis.Syntax.Expression
 
         private void EvaluateStatement(BoundStatement statement)
         {
-            switch(statement.Kind)
+            switch (statement.Kind)
             {
                 case BoundNodeKind.BlockStatement:
-                    EvaluateBlockStatement( (BoundBlockStatement)statement);
+                    EvaluateBlockStatement((BoundBlockStatement)statement);
                     return;
 
                 case BoundNodeKind.ExpressionStatement:
-                    EvaluateExpressionStatement( (BoundExpressionStatement)statement);
+                    EvaluateExpressionStatement((BoundExpressionStatement)statement);
                     return;
                 case BoundNodeKind.VariableDeclaration:
-                    EvaluateVariableDeclaration( (BoundVariableDeclaration)statement);
+                    EvaluateVariableDeclaration((BoundVariableDeclaration)statement);
                     return;
 
                 case BoundNodeKind.IfStatement:
-                    EvaluateIfStatement( (BoundIfStatement)statement );
+                    EvaluateIfStatement((BoundIfStatement)statement);
                     return;
 
                 case BoundNodeKind.WhileStatement:
-                    EvaluateWhileStatement( (BoundWhileStatement)statement );
+                    EvaluateWhileStatement((BoundWhileStatement)statement);
                     return;
 
                 case BoundNodeKind.ForStatement:
@@ -105,13 +106,13 @@ namespace Uranium.CodeAnalysis.Syntax.Expression
 
         private void EvaluateBlockStatement(BoundBlockStatement statement)
         {
-            foreach(var item in statement.Statements)
+            foreach (var item in statement.Statements)
             {
                 EvaluateStatement(item);
             }
         }
 
-        private void EvaluateExpressionStatement(BoundExpressionStatement statement) => _lastValue = EvaluateExpression(statement.Expression); 
+        private void EvaluateExpressionStatement(BoundExpressionStatement statement) => _lastValue = EvaluateExpression(statement.Expression);
 
         private void EvaluateVariableDeclaration(BoundVariableDeclaration statement)
         {
@@ -122,11 +123,11 @@ namespace Uranium.CodeAnalysis.Syntax.Expression
 
         private void EvaluateIfStatement(BoundIfStatement statement)
         {
-            if( (bool)EvaluateExpression(statement.Condition) )
+            if ((bool)EvaluateExpression(statement.Condition))
             {
                 EvaluateStatement(statement.Statement);
             }
-            else if(statement.ElseStatement is not null)
+            else if (statement.ElseStatement is not null)
             {
                 EvaluateStatement(statement.ElseStatement);
             }
@@ -134,7 +135,7 @@ namespace Uranium.CodeAnalysis.Syntax.Expression
 
         private void EvaluateWhileStatement(BoundWhileStatement statement)
         {
-            while( (bool)EvaluateExpression(statement.Condition))
+            while ((bool)EvaluateExpression(statement.Condition))
             {
                 EvaluateStatement(statement.Body);
             }
@@ -142,14 +143,14 @@ namespace Uranium.CodeAnalysis.Syntax.Expression
 
         private void EvaluateForStatement(BoundForStatement statement)
         {
-            if(statement.VariableDeclaration is not null)
+            if (statement.VariableDeclaration is not null)
             {
                 EvaluateStatement(statement.VariableDeclaration);
             }
-            while(statement.Condition is null || (bool)EvaluateExpression(statement.Condition))
+            while (statement.Condition is null || (bool)EvaluateExpression(statement.Condition))
             {
                 EvaluateStatement(statement.Body);
-                if(statement.Increment is not null)
+                if (statement.Increment is not null)
                 {
                     EvaluateExpression(statement.Increment);
                 }
@@ -159,7 +160,7 @@ namespace Uranium.CodeAnalysis.Syntax.Expression
         private object EvaluateBoundUnaryExpression(BoundUnaryExpression u)
         {
             var operand = EvaluateExpression(u.Operand);
-            switch(u.Op.Kind)
+            switch (u.Op.Kind)
             {
                 case BoundUnaryOperatorKind.Identity:
                     return (int)operand;
@@ -176,11 +177,11 @@ namespace Uranium.CodeAnalysis.Syntax.Expression
         {
             var left = EvaluateExpression(b.Left);
             var right = EvaluateExpression(b.Right);
-            switch (b.Op.Kind)  
+            switch (b.Op.Kind)
             {
                 //Universal
                 case BoundBinaryOperatorKind.LogicalEquals:
-                    return LeftEqualsRight(left, right); 
+                    return LeftEqualsRight(left, right);
                 case BoundBinaryOperatorKind.NotEquals:
                     return !LeftEqualsRight(left, right);
 
@@ -207,8 +208,8 @@ namespace Uranium.CodeAnalysis.Syntax.Expression
                 //C# doesn't like casting a double ot an int, so I had to work around it...
                 //Which I decided was to make my own recursive Pow function
                 case BoundBinaryOperatorKind.Pow:
-                    return Pow( (int) left, (int) right);
-                
+                    return EvaluatorPow.Pow((int)left, (int)right);
+
                 //Bool
                 case BoundBinaryOperatorKind.LogicalAND:
                     return (bool)left && (bool)right;
@@ -220,7 +221,7 @@ namespace Uranium.CodeAnalysis.Syntax.Expression
                     return leftBool ^= rightBool;
                 case BoundBinaryOperatorKind.LogicalXOR:
                     return (bool)left ^ (bool)right;
-                    
+
                 default:
                     //We can throw exceptions here because we've exhausted all options,
                     //and this is an internal Uranium error, should handle this more gracefully,
@@ -229,10 +230,10 @@ namespace Uranium.CodeAnalysis.Syntax.Expression
                     throw new($"Unexpected binary operator {b.Op.Kind}");
             }
         }
-        
+
         private void EvaluateCompoundOperator(BoundAssignmentExpression a, int value)
         {
-            switch(a.CompoundOperator!.Kind)
+            switch (a.CompoundOperator!.Kind)
             {
                 case SyntaxKind.PlusEquals:
                     _variables[a.Variable] = (int)_variables[a.Variable] + value;
@@ -247,48 +248,20 @@ namespace Uranium.CodeAnalysis.Syntax.Expression
                     _variables[a.Variable] = (int)_variables[a.Variable] / value;
                     break;
                 case SyntaxKind.PowEquals:
-                    _variables[a.Variable] = Pow((int)_variables[a.Variable], value);
-                    return;
+                    _variables[a.Variable] = EvaluatorPow.Pow((int)_variables[a.Variable], value);
+                    break;
+                case SyntaxKind.PlusPlus:
+                    _variables[a.Variable] = (int)_variables[a.Variable] + 1;
+                    break;
+                case SyntaxKind.MinusMinus:
+                    _variables[a.Variable] = (int)_variables[a.Variable] - 1;
+                    break;
             }
         }
 
-        private static bool LeftEqualsRight(object left, object right)
-        {
-            if(left.GetType() == typeof(int) && right.GetType() == typeof(bool))
-            {
-                if((int)left == 0)
-                {
-                    return (bool)right == false;
-                }
-                else
-                {
-                    return (bool)right == true;
-                }
-            }
-            else if(left.GetType() == typeof(bool) && right.GetType() == typeof(int))
-            {
-                if((int)right == 0)
-                {
-                    return (bool)left == false;
-                }
-                else
-                {
-                    return (bool)left == true;
-                }
+        private static bool LeftEqualsRight(object left, object right) 
+            => EvaluatorEquals.LeftEqualsRight(left, right);
 
-            }
-            return Equals(left, right);
-        }
 
-        private static int Pow(int number, int power)
-        {
-            int result = number;
-            while(power > 1)
-            {
-                result *= number;
-                power--;
-            }
-            return result;
-        }
     }
 }
