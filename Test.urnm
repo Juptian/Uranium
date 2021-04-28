@@ -1,6 +1,7 @@
 ﻿{
-	3 == true;
-	3 == false;
-	0 == true;
-	0 == false;
+	var a = true;
+	var b = 10;
+	if(b == a || b != a) {
+		b == a
+	}
 }

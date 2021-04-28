@@ -79,7 +79,7 @@ namespace Uranium.Logging
 
         public void ReportCannotConvert(TextSpan span, Type converterType, Type converteetype)
         {
-            var message = $"JC0009: Cannot convert from type '{converterType}' to type '{converteetype}'.";
+            var message = $"JC0009: Cannot convert from type '{converterType.ToString()[7..]}' to type '{converteetype.ToString()[7..]}'.";
             Report(span, message);
         }
 
