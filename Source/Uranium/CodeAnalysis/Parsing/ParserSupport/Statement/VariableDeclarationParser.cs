@@ -5,7 +5,7 @@ namespace Uranium.CodeAnalysis.Parsing.ParserSupport.Statement
 {
     internal static class VariableDeclarationParser
     {
-        public static StatementSyntax ParseVariableDeclaration(Parser parser)
+        public static StatementSyntax Parse(Parser parser)
         {
             var keyword = parser.NextToken();
             var identifier = parser.MatchToken(SyntaxKind.IdentifierToken);

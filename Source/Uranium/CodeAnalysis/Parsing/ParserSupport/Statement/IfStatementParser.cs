@@ -5,13 +5,15 @@ namespace Uranium.CodeAnalysis.Parsing.ParserSupport.Statement
 {
     internal static class IfStatementParser
     {
-        public static StatementSyntax ParseIfStatement(Parser parser)
+        public static StatementSyntax Parse(Parser parser)
         {
             var keyword = parser.MatchToken(SyntaxKind.IfKeyword);
             var openParen = parser.MatchToken(SyntaxKind.OpenParenthesis);
+
             var condition = Parser.ParseExpression(parser);
+            
             var closeParen = parser.MatchToken(SyntaxKind.CloseParenthesis);
-            var body = BlockStatementParser.ParseBlockStatement(parser);
+            var body = BlockStatementParser.Parse(parser);
             var elseClause = ParseElseClause(parser);
 
             return new IfStatementSyntax(keyword, openParen, condition, closeParen, body, elseClause);
@@ -24,7 +26,7 @@ namespace Uranium.CodeAnalysis.Parsing.ParserSupport.Statement
                 return null;
             }
             var keyword = parser.NextToken();
-            var statement = StatementParser.ParseStatement(parser);
+            var statement = StatementParser.Parse(parser);
 
             return new(keyword, statement);
         }

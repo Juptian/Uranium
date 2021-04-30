@@ -5,12 +5,12 @@ namespace Uranium.CodeAnalysis.Parsing.ParserSupport.Statement
 {
     internal static class ForStatementParser
     {
-        public static StatementSyntax ParseForStatement(Parser parser)
+        public static StatementSyntax Parse(Parser parser)
         {
             var keyword = parser.MatchToken(SyntaxKind.ForKeyword);
             var openParenthesis = parser.MatchToken(SyntaxKind.OpenParenthesis);
             
-            var variable = parser.Current.Kind == SyntaxKind.Semicolon ? null : VariableDeclarationParser.ParseVariableDeclaration(parser);
+            var variable = parser.Current.Kind == SyntaxKind.Semicolon ? null : VariableDeclarationParser.Parse(parser);
             var initializeSemi = variable is null ? parser.MatchToken(SyntaxKind.Semicolon) : parser.Peek(-1);
 
             var condition = parser.Current.Kind == SyntaxKind.Semicolon ? null : Parser.ParseExpression(parser);
@@ -18,7 +18,8 @@ namespace Uranium.CodeAnalysis.Parsing.ParserSupport.Statement
 
             var incrementation = parser.Current.Kind == SyntaxKind.CloseParenthesis ? null : Parser.ParseExpression(parser);
             var closeParenthesis = parser.MatchToken(SyntaxKind.CloseParenthesis);
-            var block = BlockStatementParser.ParseBlockStatement(parser);
+
+            var body = BlockStatementParser.Parse(parser);
             
             return new ForStatementSyntax
                 (
@@ -28,7 +29,7 @@ namespace Uranium.CodeAnalysis.Parsing.ParserSupport.Statement
                         condition, conditionSemi, 
                         incrementation, 
                     closeParenthesis,
-                    block
+                    body
                 );
         }
 

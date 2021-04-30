@@ -16,7 +16,7 @@ namespace Uranium.CodeAnalysis.Parsing
 {
     internal sealed class Parser
     {
-        private readonly SyntaxToken[] _tokens;
+        internal readonly SyntaxToken[] _tokens;
         internal int Position;
         internal readonly DiagnosticBag _diagnostics = new();
 
@@ -78,12 +78,14 @@ namespace Uranium.CodeAnalysis.Parsing
         //     => new(StatementParser.ParseStatement(this), MatchToken(SyntaxKind.EndOfFile));
         public CompilationUnitSyntax ParseCompilationUnit()
         {
-            var statement = StatementParser.ParseStatement(this);
+            var statement = StatementParser.Parse(this);
             var EndOfFileToken = MatchToken(SyntaxKind.EndOfFile);
             return new(statement, EndOfFileToken);
         }
-
+        
+        //Two different return types here so two different functions
         internal static ExpressionStatementSyntax ParseExpressionStatement(Parser parser) => new(ParseExpression(parser));
         internal static ExpressionSyntax ParseExpression(Parser parser) => AssignmentExpressionParser.Parse(parser);
+
     }
 }

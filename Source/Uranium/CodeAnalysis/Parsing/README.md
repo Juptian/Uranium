@@ -13,10 +13,10 @@ return _tokens[^1];
 
 This line is just a fancy way of writing `return _tokens[_tokens.Length - 1];` I do this because overall I find it's cleaner, and once you know it, it's easier to read.
 
-Line 90 - 99:
+This has been moved to the ParserSupport.Statement namespace, and it's called StatementParser with the method named Parse now
 ```cs
 //If it doesn't fit any of our current conditions, we take it as an expression
-private StatementSyntax ParseStatement()
+public static StatementSyntax Parse()
     => Current.Kind switch
      {
         SyntaxKind.OpenCurlyBrace => ParseBlockStatement(),
@@ -30,13 +30,13 @@ There's a lot going on in this function, what we're doing here, is we're checkin
 
 <h4 align="center"> Block statements </h4>
 
-In the `ParseBlockStatement()`, we loop for as long as we haven't reached the ` EndOfFile ` token, or a closing curly brace (`}`). 
+In the `ParseBlockStatement()`, we loop for as long as we haven't reached the `EndOfFile` token, or a closing curly brace (`}`). 
 
 If we meet a line break, or a semi colon, we just move to the next position, and then keep going, this is because we have no reason to read those.
 
 If it's not a semi colon, or a line break, we call `ParseStatement()` which I cover further down. Once we're done that, we add the statement that we got from `ParseStatement()` and add it to our current statements list to be bound and evaluated.
 
-Then, we match the current token to ` CloseCurlyBrace `, and then we continue moving.
+Then, we match the current token to `CloseCurlyBrace`, and then we continue moving.
 
 Now I'm sure that by this point, you're wondering why I use `MatchToken()` over just assigning it to our current value. This causes two problems.
 
@@ -108,4 +108,13 @@ In general, in this file, the comments describe what's going on quite well.
 In the `while()` loop I have, I am just looping over the tree, walking to the right side every time until eventually, we don't have an operator or binary, or the precedence for the operator is less than our current precedence.
 
 <h4 align="center"> ParsePrimaryExpression </h4>
-Here, we do another comparison of the type, because here we have a split road, we can have either a number literal (ie: 1, 2, 0249, 142 409, ect), a parethesized expression (ie 1 + (2 + 2)), a boolean expression so `true` or `false`, and if it fits none of the above, we assume it's a name expression. The rest of the methods don't have much to them, so I just won't talk about them, if you want further specifications, feel free to make an issue and I'll gladly respond to questions!
+Here, we do another comparison of the type, because here we have a split road, we can have either:
+
+* a number literal (ie: 1, 2, 0249, 142 409, ect),
+* a parethesized expression (ie 1 + (2 + 2)), 
+* a boolean expression so `true` or `false`, 
+
+and if it fits none of the above, we assume it's 
+* a name expression. The rest of the methods don't have much to them, 
+
+so I just won't talk about them, if you want further specifications, feel free to make an issue and I'll gladly respond to questions!

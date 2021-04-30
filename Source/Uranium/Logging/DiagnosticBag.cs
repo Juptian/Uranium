@@ -30,75 +30,86 @@ namespace Uranium.Logging
 
         public void ReportNumberStartWithUnderscore(TextSpan span, string text, Type type)
         {
-            var message = $"JC0001: {text} : {type} cannot start with an underscore!";
+            var message = $"UR00001: {text} : {type} cannot start with an underscore!";
             Report(span, message);
         }
 
         public void ReportInvalidNumber(TextSpan span, string text, Type type)
         {
-            var message = $"JC0002: at {type} {text} : Could not parse {text} to {type}.";
+            var message = $"UR00002: at {type} {text} : Could not parse {text} to {type}.";
             Report(span, message);
         }
 
         public void ReportInvalidToken(TextSpan span, SyntaxToken actualKind, SyntaxKind expectedKind)
         {
             var expectedText = expectedKind == SyntaxKind.EndOfFile ? "EndOfFile token" : $"{SyntaxFacts.GetText(expectedKind)}";
-            var message = $"JC0003: Unexpected token: `{actualKind.Text}`. Expected: `{expectedText}`.";
+            var message = $"UR00003: Unexpected token: `{actualKind.Text}`. Expected: `{expectedText}`.";
             Report(span, message);
         }
 
         public void ReportUnfinishedMultiLineComment(TextSpan span, int position)
         {
-            var message = $"JC0004: Unfinished comment at index: {position}.";
+            var message = $"UR00004: Unfinished comment at index: {position}.";
             Report(span, message);
         }
 
         public void ReportUndefinedUnaryOperator(TextSpan span, string operatorText, Type operandType)
         {
-            var message = $"JC0005: Unary operator {operatorText} is not defined for {operandType}.";
+            var message = $"UR00005: Unary operator {operatorText} is not defined for {operandType}.";
             Report(span, message);
         }
 
         public void ReportUndefinedBinaryOperator(TextSpan span, string? operatorText, Type leftType, Type rightType)
         {
-            var message = $"JC0006: Binary operator {operatorText} is undefined for {leftType} and {rightType}.";
+            var message = $"UR00006: Binary operator {operatorText} is undefined for {leftType} and {rightType}.";
             Report(span, message);
         }
 
         public void ReportUndefinedName(TextSpan span, string name)
         {
-            var message = $"JC0007: The type or namespace {name} does not exist.";
+            var message = $"UR00007: The type or namespace {name} does not exist.";
             Report(span, message);
         }
 
         public void ReportVariableAlreadyDeclared(TextSpan span, string name)
         {
-            var message = $"JC0008: The variable {name} already exists in the current scope!";
+            var message = $"UR00008: The variable {name} already exists in the current scope!";
             Report(span, message);
         }
 
         public void ReportCannotConvert(TextSpan span, Type converterType, Type converteetype)
         {
-            var message = $"JC0009: Cannot convert from type '{converterType.ToString()[7..]}' to type '{converteetype.ToString()[7..]}'.";
+            var message = $"UR00009: Cannot convert from type '{converterType.ToString()[7..]}' to type '{converteetype.ToString()[7..]}'.";
             Report(span, message);
         }
 
         public void ReportCannotAssign(TextSpan identifier, TextSpan equals, string name)
         {
             var totalSpan = new TextSpan(identifier.Start, identifier.Length + equals.Length + 1);
-            var message = $"JC0010: Cannot assign a value to {name} because it is marked as let or const, meaning that it is read only.";
+            var message = $"UR00010: Cannot assign a value to {name} because it is marked as let or const, meaning that it is read only.";
             Report(totalSpan, message);
         }
 
         public void ReportNoSemiColon(TextSpan span)
         {
-            var message = $"JC0011: Line cannot end without a semi colon";
+            var message = $"UR00011: Line cannot end without a semi colon";
             Report(span, message);
         }
         
         public void ReportCannotStartWithNumber(TextSpan span, string text)
         {
-            var message = $"JC0012: A file cannot start with a number. {text}";
+            var message = $"UR00012: A file cannot start with a number. {text}";
+            Report(span, message);
+        }
+
+        public void ReportInvalidCompoundOperator(TextSpan span, SyntaxToken token)
+        {
+            var message = $"UR00013: You cannot have a compound operator ({token.Text}) without a variable. Error at index: {token.Span.Start} through {token.Span.End}";
+            Report(span, message);
+        }
+        public void ReportInvalidEqualsToken(TextSpan span)
+        {
+            var message = $"UR00014: Cannot have an equals expression without an identifier token";
             Report(span, message);
         }
     }

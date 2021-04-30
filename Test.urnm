@@ -1,7 +1,3 @@
 ﻿{
-	var a = true;
-	var b = 10;
-	if(b == a || b != a) {
-		b == a
-	}
+	1 += 1
 }

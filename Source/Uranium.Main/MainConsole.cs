@@ -1,8 +1,6 @@
-﻿using System;
-
-namespace Uranium.Main
+﻿namespace Uranium.Main
 {
-    public static class Program
+    public static class MainConsole
     {
         private static void Main(string[] args)
         {
