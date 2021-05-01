@@ -22,5 +22,4 @@ test_script:
 - move coverage.opencover.xml C:\projects\Uranium\CodeCoverage\CodeCoverage.xml
 - codecov -f "C:\projects\Uranium\CodeCoverage\CodeCoverage.xml"
 - curl -s https://codecov.io/bash > codecov
-- chmod +x codecovimage: Visual Studio 2019
-
+- chmod +x codecov
