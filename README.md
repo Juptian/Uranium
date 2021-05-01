@@ -1,7 +1,7 @@
 <h1 align="center" style="position: relative;">
 <img width="500" style="border-radius: 50%;" src="UraniumLogo.png" alt="Uranium Logo" /></h1>
 <h1 align="center"> Uranium </h1>
-<h2 align="center"> <img src="https://img.shields.io/github/workflow/status/Juptian/Uranium/Windows?label=Build%20Build&style=plastic"/> 
+<h2 align="center"> <img src="https://img.shields.io/github/workflow/status/Juptian/Uranium/Windows?label=Build&style=plastic"/> 
   <img src="https://img.shields.io/badge/Language-C%23-success?color=success&style=plastic"/> 
   <img src="https://img.shields.io/github/license/Juptian/Uranium?color=success&style=plastic"/>
 
