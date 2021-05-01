@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Uranium.CodeAnalysis.Syntax.Expression;
+﻿using Uranium.CodeAnalysis.Syntax.Expression;
 
 namespace Uranium.CodeAnalysis.Syntax.Statement
 {
     public sealed class ForStatementSyntax : StatementSyntax
     {
-        //for var a = 10; a < 11; a = a + 1
+        //for(var a = 10; a < 11; a += 1)
         public ForStatementSyntax
             (
             SyntaxToken forKeyword, SyntaxToken openParenthesisToken,

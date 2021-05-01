@@ -30,12 +30,6 @@ namespace Uranium.CodeAnalysis.Binding
             return true;
         }
 
-        //If I wanted to be fancy I could do something like
-        //
-        //public bool TryLookup(string name, out VariableSymbol variable)
-        //    => _variables.TryGetValue(name, out variable) ? true : Parent?.TryLookup(name, out variable) ?? false;
-        //
-        //But that's just not needed
         public bool TryLookup(string name, out VariableSymbol variable)
         {
             if(_variables.TryGetValue(name, out variable!))

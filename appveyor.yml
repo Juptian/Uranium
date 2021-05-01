@@ -1,0 +1,26 @@
+image: Visual Studio 2019
+
+before_build:
+- nuget restore
+- choco install opencover.portable
+- choco install codecov
+- choco install dotnet-sdk
+
+build:
+  project: Uraniumsln
+  verbosity: minimal
+
+test_script:
+- dotnet tool install --global coverlet.console --verbosity q
+- cd C:\projects\Uranium\
+- dotnet test --collect:"XPlat Code Coverage" --settings CodeCoverage\coverage.settings --verbosity q
+- pwd
+- cd "Source\Uranium.Tests\TestResults"
+- for /d %%A in (*) do cd %%A
+- pwd
+- dir
+- move coverage.opencover.xml C:\projects\Uranium\CodeCoverage\CodeCoverage.xml
+- codecov -f "C:\projects\Uranium\CodeCoverage\CodeCoverage.xml"
+- curl -s https://codecov.io/bash > codecov
+- chmod +x codecovimage: Visual Studio 2019
+
