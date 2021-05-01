@@ -73,7 +73,7 @@ namespace Uranium.CodeAnalysis.Syntax.SyntaxFactsSupport
                 SyntaxKind.MinusMinus => true,
                 _ => false,
             };
-        
+
         public static SyntaxToken GetSoloOperator(SyntaxToken token)
             => token.Kind switch
             {

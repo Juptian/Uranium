@@ -7,7 +7,7 @@ namespace Uranium.CodeAnalysis.Syntax.Expression.EvaluatorSupport.Expression
     {
         public static object EvaluateBoundUnaryExpression(BoundUnaryExpression u, Evaluator eval)
         {
-            var operand = ExpressionEvaluator.EvaluateExpression(u.Operand, eval);
+            var operand = ExpressionEvaluator.Evaluate(u.Operand, eval);
             switch (u.Op.Kind)
             {
                 case BoundUnaryOperatorKind.Identity:

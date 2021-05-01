@@ -23,22 +23,34 @@ namespace Uranium.CodeAnalysis.Parsing.ParserSupport.Expression
 
             if(parser.Current.Kind is SyntaxKind.IdentifierToken)
             {
-                //Two ifs here to keep it clean
-                //Also bool initialization to avoid two ifs
-                if(parser.Next.Kind == SyntaxKind.Equals && SyntaxFacts.CheckForCompoundOperator(parser.Next) is var isCompound)
+                //Declaring bool ahead of time so that we can use a single if statement
+                bool isCompound = SyntaxFacts.CheckForCompoundOperator(parser.Next);
+                
+                if(isCompound ||
+                   parser.Next.Kind is SyntaxKind.Equals)
                 {
                     //Despite knowing the token, we want to consume it, to avoid loops
                     var identifierToken = parser.NextToken();
                     var operatorToken = parser.NextToken();
                     var right = Parse(parser);
-                    
-                    //Something something cleaner than other implementations
-                    operatorToken = isCompound ? SyntaxFacts.GetSoloOperator(operatorToken) : operatorToken;
+
+                    if(isCompound)
+                    {
+                        var soloOp = SyntaxFacts.GetSoloOperator(operatorToken);
+                        return new AssignmentExpressionSyntax(identifierToken, soloOp, right, true, operatorToken);
+                    }
 
                     return new AssignmentExpressionSyntax(identifierToken, operatorToken, right);
                 }
+                /*else if(SyntaxFacts.CheckForCompoundOperator(parser.Next))
+                {
+                    var identifierToken = parser.NextToken();
+                    var operatorToken = parser.NextToken();
+                    var right = Parse(parser);
+                    var soloOp = SyntaxFacts.GetSoloOperator(operatorToken);
+                    return new AssignmentExpressionSyntax(identifierToken, soloOp, right, true, operatorToken);
+                }*/
             }
-
             StopInfiniteLoops(parser);
             return BinaryExpressionParser.Parse(parser);
         }

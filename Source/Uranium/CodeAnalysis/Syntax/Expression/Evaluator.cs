@@ -35,27 +35,27 @@ namespace Uranium.CodeAnalysis.Syntax.Expression
             switch (statement.Kind)
             {
                 case BoundNodeKind.BlockStatement:
-                    BlockStatementEvaluator.EvaluateBlockStatement((BoundBlockStatement)statement, this);
+                    BlockStatementEvaluator.Evaluate((BoundBlockStatement)statement, this);
                     return;
 
                 case BoundNodeKind.ExpressionStatement:
                     EvaluateExpressionStatement((BoundExpressionStatement)statement);
                     return;
                 case BoundNodeKind.VariableDeclaration:
-                    VariableDeclarationEvaluator.EvaluateVariableDeclaration((BoundVariableDeclaration)statement, this);
+                    VariableDeclarationEvaluator.Evaluate((BoundVariableDeclaration)statement, this);
                     return;
 
                 case BoundNodeKind.IfStatement:
-                    IfStatementEvaluator.EvaluateIfStatement((BoundIfStatement)statement, this);
+                    IfStatementEvaluator.Evaluate((BoundIfStatement)statement, this);
                     return;
 
                 case BoundNodeKind.WhileStatement:
-                    WhileStatementEvaluator.EvaluateWhileStatement((BoundWhileStatement)statement, this);
+                    WhileStatementEvaluator.Evaluate((BoundWhileStatement)statement, this);
                     return;
 
                 case BoundNodeKind.ForStatement:
-                    ForStatementEvaluator.EvaluateForStatement((BoundForStatement)statement, this);
-                    break;
+                    ForStatementEvaluator.Evaluate((BoundForStatement)statement, this);
+                    return;
                 default:
                     //Exhausted all our options, time to call it quits!
                     throw new($"Unexpected statement {statement}");
@@ -63,6 +63,6 @@ namespace Uranium.CodeAnalysis.Syntax.Expression
         }
 
         private void EvaluateExpressionStatement(BoundExpressionStatement statement) 
-            => LastValue = ExpressionEvaluator.EvaluateExpression(statement.Expression, this);
+            => LastValue = ExpressionEvaluator.Evaluate(statement.Expression, this);
     }
 }

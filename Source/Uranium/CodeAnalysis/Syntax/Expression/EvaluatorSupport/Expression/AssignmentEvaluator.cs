@@ -12,7 +12,7 @@ namespace Uranium.CodeAnalysis.Syntax.Expression.EvaluatorSupport.Expression
     {
         public static object EvaluateAssignmentExpression(BoundAssignmentExpression a, Evaluator eval)
         {
-            var value = ExpressionEvaluator.EvaluateExpression(a.Expression, eval);
+            var value = ExpressionEvaluator.Evaluate(a.Expression, eval);
             if (a.IsCompound)
             {
                 CompoundExpressionEvaluator.EvaluateCompoundOperator(a, (int)value, eval);

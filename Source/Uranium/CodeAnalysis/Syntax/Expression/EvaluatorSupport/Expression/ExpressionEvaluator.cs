@@ -1,16 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using Uranium.CodeAnalysis.Binding;
-using Uranium.CodeAnalysis.Binding.Statements;
 using Uranium.CodeAnalysis.Binding.NodeKinds;
-using Uranium.CodeAnalysis.Text;
-using Uranium.CodeAnalysis.Syntax.Expression.EvaluatorSupport.Types;
 
 namespace Uranium.CodeAnalysis.Syntax.Expression.EvaluatorSupport.Expression
 {
     internal static class ExpressionEvaluator
     {
-        public static object EvaluateExpression(BoundExpression node, Evaluator eval)
+        public static object Evaluate(BoundExpression node, Evaluator eval)
             => node switch
             {
                 //if it's a literal expression, return it's value

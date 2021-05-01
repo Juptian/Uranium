@@ -5,9 +5,9 @@ namespace Uranium.CodeAnalysis.Syntax.Expression.EvaluatorSupport.Statements
 {
     internal static class IfStatementEvaluator
     {
-        public static void EvaluateIfStatement(BoundIfStatement statement, Evaluator eval)
+        public static void Evaluate(BoundIfStatement statement, Evaluator eval)
         {
-            if ( (bool)ExpressionEvaluator.EvaluateExpression(statement.Condition, eval) )
+            if ( (bool)ExpressionEvaluator.Evaluate(statement.Condition, eval) )
             {
                 eval.EvaluateStatement(statement.Statement);
             }

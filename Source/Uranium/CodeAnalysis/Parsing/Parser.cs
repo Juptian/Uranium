@@ -71,11 +71,6 @@ namespace Uranium.CodeAnalysis.Parsing
             return new(kind, Current.Position, Current.Text, null);
         }
 
-        //This could be one lined but no
-        //Just no
-        //It'd look something like:
-        // public CompilationUnitSyntax ParseCompilationUnit()
-        //     => new(StatementParser.ParseStatement(this), MatchToken(SyntaxKind.EndOfFile));
         public CompilationUnitSyntax ParseCompilationUnit()
         {
             var statement = StatementParser.Parse(this);

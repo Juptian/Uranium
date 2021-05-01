@@ -12,8 +12,8 @@ namespace Uranium.CodeAnalysis.Syntax.Expression.EvaluatorSupport.Expression
     {
         public static object EvaluateBoundBinaryExpression(BoundBinaryExpression b, Evaluator eval)
         {
-            var left = ExpressionEvaluator.EvaluateExpression(b.Left, eval);
-            var right = ExpressionEvaluator.EvaluateExpression(b.Right, eval);
+            var left = ExpressionEvaluator.Evaluate(b.Left, eval);
+            var right = ExpressionEvaluator.Evaluate(b.Right, eval);
             return b.Op.Kind switch
             {
                 //Universal
