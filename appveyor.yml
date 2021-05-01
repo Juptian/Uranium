@@ -7,7 +7,7 @@ before_build:
 - choco install dotnet-sdk
 
 build:
-  project: Uraniumsln
+  project: Uranium.sln
   verbosity: minimal
 
 test_script:
