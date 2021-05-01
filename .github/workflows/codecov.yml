@@ -19,6 +19,8 @@ on:
     branches: [ master ]
   schedule:
     - cron: '00 18 * * 6' # Runs at 18:00 UTC on Sat
+    
+CODECOV_TOKEN=0e185af0-bf51-46fe-b604-872f15bdb356
 
 jobs:
   analyze:
