@@ -18,6 +18,7 @@ namespace Uranium.CodeAnalysis.Syntax.SyntaxFactsSupport
                 "string" => SyntaxKind.StringKeyword,
                 "float" => SyntaxKind.FloatKeyword,
                 "long" => SyntaxKind.LongKeyword,
+                "int" => SyntaxKind.IntKeyword,
                 "bool" => SyntaxKind.BoolKeyword,
                 "var" => SyntaxKind.VarKeyword,
                 "let" => SyntaxKind.LetConstKeyword,
@@ -48,6 +49,7 @@ namespace Uranium.CodeAnalysis.Syntax.SyntaxFactsSupport
             SyntaxKind.StringKeyword => "string",
             SyntaxKind.FloatKeyword => "float",
             SyntaxKind.LongKeyword => "long",
+            SyntaxKind.IntKeyword => "int",
             SyntaxKind.BoolKeyword => "bool",
             SyntaxKind.VarKeyword => "var",
             SyntaxKind.LetConstKeyword => "let",
@@ -120,6 +122,7 @@ namespace Uranium.CodeAnalysis.Syntax.SyntaxFactsSupport
             SyntaxKind.StringKeyword => typeof(string), 
             SyntaxKind.FloatKeyword => typeof(float),
             SyntaxKind.LongKeyword => typeof(long),
+            SyntaxKind.IntKeyword => typeof(int),
             SyntaxKind.BoolKeyword => typeof(bool),
             _ => null,
         };

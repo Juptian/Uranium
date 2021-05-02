@@ -2,7 +2,7 @@
 using Uranium.CodeAnalysis.Syntax;
 using Uranium.CodeAnalysis.Syntax.Statement;
 
-namespace Uranium.CodeAnalysis.Parsing.ParserSupport.Statement
+namespace Uranium.CodeAnalysis.Parsing.ParserSupport
 {
     internal static class ForStatementParser
     {

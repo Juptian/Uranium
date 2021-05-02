@@ -1,7 +1,7 @@
 ﻿using Uranium.CodeAnalysis.Syntax;
 using Uranium.CodeAnalysis.Syntax.Expression;
 
-namespace Uranium.CodeAnalysis.Parsing.ParserSupport.Expression
+namespace Uranium.CodeAnalysis.Parsing.ParserSupport
 {
     internal static class NumberLiteralParser
     {

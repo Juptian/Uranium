@@ -161,6 +161,7 @@ namespace Uranium.Tests.CodeAnalysis.Lexing
                 (SyntaxKind.CharKeyword, "char"),
                 (SyntaxKind.StringKeyword, "string"),
                 (SyntaxKind.FloatKeyword, "float"),
+                (SyntaxKind.IntKeyword, "int"),
                 (SyntaxKind.LongKeyword, "long"),
                 (SyntaxKind.BoolKeyword, "bool"),
                 (SyntaxKind.VarKeyword, "var"),

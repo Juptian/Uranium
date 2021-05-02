@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using Uranium.CodeAnalysis.Binding;
 using Uranium.CodeAnalysis.Binding.Statements;
 using Uranium.CodeAnalysis.Text;
-using Uranium.CodeAnalysis.Syntax.Expression.EvaluatorSupport.Expression;
-using Uranium.CodeAnalysis.Syntax.Expression.EvaluatorSupport.Statements;
+using Uranium.CodeAnalysis.Syntax.EvaluatorSupport;
 
-namespace Uranium.CodeAnalysis.Syntax.Expression
+namespace Uranium.CodeAnalysis.Syntax
 {
     //Basically just the teacher that only gives
     //pop quizzes and tests

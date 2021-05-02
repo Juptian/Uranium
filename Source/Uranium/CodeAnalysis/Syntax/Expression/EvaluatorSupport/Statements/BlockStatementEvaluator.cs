@@ -1,7 +1,7 @@
 ﻿using System;
 using Uranium.CodeAnalysis.Binding.Statements;
 
-namespace Uranium.CodeAnalysis.Syntax.Expression.EvaluatorSupport.Statements
+namespace Uranium.CodeAnalysis.Syntax.EvaluatorSupport
 {
     internal static class BlockStatementEvaluator
     {

@@ -1,7 +1,7 @@
 ﻿using Uranium.CodeAnalysis.Syntax;
 using Uranium.CodeAnalysis.Syntax.Statement;
 
-namespace Uranium.CodeAnalysis.Parsing.ParserSupport.Statement
+namespace Uranium.CodeAnalysis.Parsing.ParserSupport
 {
     internal static class StatementParser
     {
@@ -12,7 +12,11 @@ namespace Uranium.CodeAnalysis.Parsing.ParserSupport.Statement
                 SyntaxKind.OpenCurlyBrace => BlockStatementParser.Parse(parser),
                 SyntaxKind.LetConstKeyword or
                 SyntaxKind.ConstKeyword or
-                SyntaxKind.VarKeyword => VariableDeclarationParser.Parse(parser),
+                SyntaxKind.VarKeyword or 
+                SyntaxKind.IntKeyword or
+                SyntaxKind.LongKeyword or 
+                SyntaxKind.DoubleKeyword or
+                SyntaxKind.FloatKeyword => VariableDeclarationParser.Parse(parser),
                 SyntaxKind.IfKeyword => IfStatementParser.Parse(parser),
                 SyntaxKind.WhileKeyword => WhileStatementParser.Parse(parser),
                 SyntaxKind.ForKeyword => ForStatementParser.Parse(parser),

@@ -1,7 +1,7 @@
 ﻿using System;
 using Uranium.CodeAnalysis.Binding.NodeKinds;
 
-namespace Uranium.CodeAnalysis.Syntax.Expression.EvaluatorSupport.Expression
+namespace Uranium.CodeAnalysis.Syntax.EvaluatorSupport
 {
     internal static class ExpressionEvaluator
     {

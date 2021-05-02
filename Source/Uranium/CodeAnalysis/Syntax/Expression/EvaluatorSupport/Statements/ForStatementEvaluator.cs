@@ -1,7 +1,6 @@
 ﻿using Uranium.CodeAnalysis.Binding.Statements;
-using Uranium.CodeAnalysis.Syntax.Expression.EvaluatorSupport.Expression;
 
-namespace Uranium.CodeAnalysis.Syntax.Expression.EvaluatorSupport.Statements
+namespace Uranium.CodeAnalysis.Syntax.EvaluatorSupport
 {
     internal static class ForStatementEvaluator
     {

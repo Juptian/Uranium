@@ -1,16 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.Linq;
 using Uranium.CodeAnalysis.Lexing;
-using Uranium.CodeAnalysis.Syntax.Expression;
 using Uranium.CodeAnalysis.Syntax;
+using Uranium.CodeAnalysis.Syntax.Expression;
 using Uranium.CodeAnalysis.Syntax.Statement;
 using Uranium.CodeAnalysis.Text;
 using Uranium.Logging;
-using Uranium.CodeAnalysis.Parsing.ParserSupport.Statement;
-using Uranium.CodeAnalysis.Parsing.ParserSupport.Expression;
-
+using Uranium.CodeAnalysis.Parsing.ParserSupport;
 
 namespace Uranium.CodeAnalysis.Parsing
 {
@@ -28,7 +24,7 @@ namespace Uranium.CodeAnalysis.Parsing
             do
             {
                 token = lexer.Lex();
-                if (token.Kind is not SyntaxKind.WhiteSpace && token.Kind is not SyntaxKind.BadToken && token.Kind is not SyntaxKind.LineBreak)
+                if (!IsIgnoredToken(token))
                 {
                     tokens.Add(token);
                 }
@@ -82,5 +78,9 @@ namespace Uranium.CodeAnalysis.Parsing
         internal static ExpressionStatementSyntax ParseExpressionStatement(Parser parser) => new(ParseExpression(parser));
         internal static ExpressionSyntax ParseExpression(Parser parser) => AssignmentExpressionParser.Parse(parser);
 
+        internal static bool IsIgnoredToken(SyntaxToken token)
+            => token.Kind is SyntaxKind.WhiteSpace || 
+               token.Kind is SyntaxKind.BadToken ||
+               token.Kind is SyntaxKind.LineBreak;
     }
 }

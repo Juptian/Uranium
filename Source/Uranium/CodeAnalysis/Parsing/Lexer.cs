@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Collections.Generic;
 using System.Linq;
 using Uranium.Logging;
 using Uranium.CodeAnalysis.Syntax;
@@ -19,7 +18,7 @@ namespace Uranium.CodeAnalysis.Lexing
         private SyntaxKind _current;
         private string? _text;
         private object? _currentValue;
-        private SyntaxToken? _previous;
+        private SyntaxToken? _previousIdentifier;
 
         private readonly SourceText _source;
         private readonly DiagnosticBag _diagnostics = new();
@@ -38,8 +37,12 @@ namespace Uranium.CodeAnalysis.Lexing
 #if DEBUG
             Debug.WriteLine($"{_current}, {_text ?? CurrentIndex.ToString()}, {_index}, {_currentValue}");
 #endif
-            _previous = new(_current, _index++, _text ?? PreviousIndex.ToString(), _currentValue);
-            return _previous; 
+            var token = new SyntaxToken(_current, _index++, _text ?? PreviousIndex.ToString(), _currentValue);
+            if(SyntaxFacts.GetKeywordType(_current) is not null)
+            {
+                _previousIdentifier = token;
+            }
+            return token;
         }
 
         private char Peek(int offset)
@@ -363,8 +366,23 @@ namespace Uranium.CodeAnalysis.Lexing
                 _diagnostics.ReportInvalidNumber(new(_start, length), text, typeof(double));
             }
 
-            var targetType = SyntaxFacts.GetKeywordType(_previous?.Kind ?? SyntaxKind.DoubleKeyword);
-
+            var targetType = SyntaxFacts.GetKeywordType(_previousIdentifier?.Kind ?? SyntaxKind.DoubleKeyword);
+            
+            if((_text.Equals(0f.ToString()) ||
+                _text.Equals( ((double)0).ToString()) ||
+                _text.Equals("0")) && 
+                _previousIdentifier is not null && 
+                !IsVarKeyword(_previousIdentifier!.Kind))
+            {
+                if(IsFloatingPoint(_previousIdentifier!.Kind))
+                {
+                    ParseDouble(text, length);
+                }
+                else
+                {
+                    ParseLong(text, length);
+                }
+            }
             if(isDecimal)
             {
                 ParseDouble(text, length);
@@ -378,9 +396,20 @@ namespace Uranium.CodeAnalysis.Lexing
    
         private void ParseDouble(string text, int length)
         {
-            if (!double.TryParse(text, out var value))
+            if (!double.TryParse(text, out double value))
             {
                 _diagnostics.ReportInvalidNumber(new(_start, length), text, typeof(double));
+            }
+            else if (_previousIdentifier is not null && !IsVarKeyword(_previousIdentifier.Kind))
+            { 
+                if(_previousIdentifier!.Kind is SyntaxKind.DoubleKeyword)
+                {
+                    _currentValue = value;
+                }
+                else
+                {
+                    _currentValue = (float)value;
+                }
             }
             else
             {
@@ -397,23 +426,38 @@ namespace Uranium.CodeAnalysis.Lexing
 
         private void ParseLong(string text, int length)
         {
-            if (!ulong.TryParse(text, out var value))
+            if (!ulong.TryParse(text, out ulong value))
             {
                 _diagnostics.ReportInvalidNumber(new(_start, length), text, typeof(long));
             }
+            else if(_previousIdentifier is not null && !IsVarKeyword(_previousIdentifier.Kind))
+            {
+                if(_previousIdentifier.Kind is SyntaxKind.IntKeyword)
+                {
+                    _currentValue = (int)value;
+                } 
+                else
+                {
+                    _currentValue = (long)value;
+                }
+            }
             else
             {
-                if (value <= int.MaxValue)
+                if(value <= int.MaxValue)
                 {
                     _currentValue = (int)value;
                 }
-                else if (value <= uint.MaxValue)
+                else if(value <= uint.MaxValue && value >= uint.MinValue)
                 {
                     _currentValue = (uint)value;
                 }
+                else if(value <= long.MaxValue)
+                {
+                    _currentValue = (long)value;
+                }
                 else
                 {
-                    _currentValue = value;
+                    _currentValue = (long)value;
                 }
             }
         }
@@ -523,5 +567,18 @@ namespace Uranium.CodeAnalysis.Lexing
                 _text = text;
             }
         }
+
+        private static bool IsVarKeyword(SyntaxKind kind)
+            => kind is SyntaxKind.VarKeyword ||
+               kind is SyntaxKind.LetConstKeyword ||
+               kind is SyntaxKind.ConstKeyword;
+
+        private static bool IsFloatingPoint(SyntaxKind kind)
+            => kind is SyntaxKind.DoubleKeyword ||
+               kind is SyntaxKind.FloatKeyword;
+
+        private static bool IsInteger(SyntaxKind kind)
+            => kind is SyntaxKind.IntKeyword ||
+               kind is SyntaxKind.LongKeyword;
     }
 }

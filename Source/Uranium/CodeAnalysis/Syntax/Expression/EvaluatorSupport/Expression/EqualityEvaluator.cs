@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Uranium.CodeAnalysis.Syntax.Expression.EvaluatorSupport.Expression
+namespace Uranium.CodeAnalysis.Syntax.EvaluatorSupport
 {
     internal static class EqualityEvaluator
     {
