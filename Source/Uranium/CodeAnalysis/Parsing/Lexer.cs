@@ -366,13 +366,11 @@ namespace Uranium.CodeAnalysis.Lexing
                 _diagnostics.ReportInvalidNumber(new(_start, length), text, typeof(double));
             }
 
-            var targetType = SyntaxFacts.GetKeywordType(_previousIdentifier?.Kind ?? SyntaxKind.DoubleKeyword);
+            //var targetType = SyntaxFacts.GetKeywordType(_previousIdentifier?.Kind ?? SyntaxKind.DoubleKeyword);
             
-            if((_text.Equals(0f.ToString()) ||
-                _text.Equals( ((double)0).ToString()) ||
-                _text.Equals("0")) && 
-                _previousIdentifier is not null && 
-                !IsVarKeyword(_previousIdentifier!.Kind))
+            if(_text.Equals("0", StringComparison.Ordinal) && 
+               _previousIdentifier is not null && 
+               !IsVarKeyword(_previousIdentifier!.Kind))
             {
                 if(IsFloatingPoint(_previousIdentifier!.Kind))
                 {

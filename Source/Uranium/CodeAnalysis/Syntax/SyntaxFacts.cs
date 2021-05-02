@@ -11,14 +11,14 @@ namespace Uranium.CodeAnalysis.Syntax
     {
         //Binary operators
         public static int GetBinaryOperatorPrecedence(this SyntaxKind kind)
-            => SyntaxFactsOperators.GetBinaryOperatorPrecedence(kind);
+            => OperatorChecker.GetBinaryOperatorPrecedence(kind);
         
         public static IEnumerable<SyntaxKind> GetBinaryOperators()
-            => SyntaxFactsOperators.GetBinaryOperators();
+            => OperatorChecker.GetBinaryOperators();
 
         //Unary operators
         public static int GetUnaryOperatorPrecedence(this SyntaxKind kind)
-            => SyntaxFactsOperators.GetUnaryOperatorPrecedence(kind);
+            => OperatorChecker.GetUnaryOperatorPrecedence(kind);
         //Bound to 4 so that our tree looks correct, result is the same regardless
         //-1 * 3
         //
@@ -31,25 +31,31 @@ namespace Uranium.CodeAnalysis.Syntax
         //Because this is how math works!
 
         public static IEnumerable<SyntaxKind> GetUnaryOperators()
-            => SyntaxFactsOperators.GetUnaryOperators();
+            => OperatorChecker.GetUnaryOperators();
 
         public static bool CheckForCompoundOperator(SyntaxToken token)
-            => SyntaxFactsOperators.CheckForCompoundOperator(token);
+            => OperatorChecker.CheckForCompoundOperator(token);
 
         public static SyntaxToken GetSoloOperator(SyntaxToken token)
-            => SyntaxFactsOperators.GetSoloOperator(token);
+            => OperatorChecker.GetSoloOperator(token);
 
         internal static SyntaxKind GetKeywordKind(string text)
-            => SyntaxFactsText.GetKeywordKind(text);
+            => TextChecker.GetKeywordKind(text);
 
         public static string GetText(SyntaxKind kind) 
-            => SyntaxFactsText.GetText(kind);
+            => TextChecker.GetText(kind);
 
         public static Type? GetKeywordType(SyntaxKind kind)
-            => SyntaxFactsText.GetKeywordType(kind);
+            => TextChecker.GetKeywordType(kind);
 
         public static Type? GetKeywordType(string kind)
-            => SyntaxFactsText.GetKeywordType(kind); 
+            => TextChecker.GetKeywordType(kind);
+
+        public static bool IsFloatingPoint(SyntaxKind kind)
+            => TypeChecker.IsFloatingPoint(kind);
+
+        public static bool IsInteger(SyntaxKind kind)
+            => TypeChecker.IsInteger(kind);
 
     }
 }

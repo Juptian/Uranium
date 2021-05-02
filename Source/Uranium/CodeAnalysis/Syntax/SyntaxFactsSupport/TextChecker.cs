@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Uranium.CodeAnalysis.Syntax.SyntaxFactsSupport
 {
-    internal static class SyntaxFactsText
+    internal static class TextChecker
     {
         internal static SyntaxKind GetKeywordKind(string text)
             => text switch
@@ -132,7 +128,8 @@ namespace Uranium.CodeAnalysis.Syntax.SyntaxFactsSupport
             "char" => typeof(char),
             "string" => typeof(string), 
             "float" => typeof(float),
-            "lomg" => typeof(long),
+            "long" => typeof(long),
+            "int" => typeof(int),
             "bool" => typeof(bool),
             _ => null,
         };

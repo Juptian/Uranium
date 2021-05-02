@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Uranium.CodeAnalysis.Syntax.SyntaxFactsSupport
 {
-    internal static class SyntaxFactsOperators
+    internal static class OperatorChecker
     {
         private const int _minusValue = 4;
 
