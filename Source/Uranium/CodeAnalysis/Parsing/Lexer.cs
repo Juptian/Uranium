@@ -372,7 +372,7 @@ namespace Uranium.CodeAnalysis.Lexing
                _previousIdentifier is not null && 
                !IsVarKeyword(_previousIdentifier!.Kind))
             {
-                if(IsFloatingPoint(_previousIdentifier!.Kind))
+                if(SyntaxFacts.IsFloatingPoint(_previousIdentifier!.Kind))
                 {
                     ParseDouble(text, length);
                 }
@@ -469,7 +469,7 @@ namespace Uranium.CodeAnalysis.Lexing
             }
             var length = _index - _start;
             var text = _source.ToString(_start, length);
-            var kind = SyntaxFacts.GetKeywordKind(text);
+            var kind = SyntaxFacts.GetKind(text);
             
             _current = kind == SyntaxKind.BadToken ? SyntaxKind.IdentifierToken : kind;
             _text = text;
@@ -571,12 +571,5 @@ namespace Uranium.CodeAnalysis.Lexing
                kind is SyntaxKind.LetConstKeyword ||
                kind is SyntaxKind.ConstKeyword;
 
-        private static bool IsFloatingPoint(SyntaxKind kind)
-            => kind is SyntaxKind.DoubleKeyword ||
-               kind is SyntaxKind.FloatKeyword;
-
-        private static bool IsInteger(SyntaxKind kind)
-            => kind is SyntaxKind.IntKeyword ||
-               kind is SyntaxKind.LongKeyword;
     }
 }

@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Xunit;
 using Uranium.CodeAnalysis.Syntax;
-
+using Uranium.CodeAnalysis.Syntax.Expression;
 
 namespace Uranium.Tests.CodeAnalysis.Parsing
 {
@@ -66,6 +66,19 @@ namespace Uranium.Tests.CodeAnalysis.Parsing
 
                 var token = Assert.IsType<SyntaxToken>(_enumerator.Current);
                 Assert.Equal(text, token.Text);
+            }
+            catch when (MarkFailed())
+            {
+                throw;
+            }
+        }
+        public void AssertLiteralExpression(SyntaxKind kind)
+        {
+            try
+            {
+                Assert.True(_enumerator.MoveNext());
+                Assert.Equal(kind, _enumerator.Current.Kind);
+                Assert.IsType<LiteralExpressionSyntax>(_enumerator.Current);
             }
             catch when (MarkFailed())
             {

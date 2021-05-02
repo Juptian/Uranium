@@ -4,7 +4,7 @@ namespace Uranium.CodeAnalysis.Syntax.SyntaxFactsSupport
 {
     internal static class TextChecker
     {
-        internal static SyntaxKind GetKeywordKind(string text)
+        public static SyntaxKind GetSyntaxKind(string text)
             => text switch
             {
                 "true" => SyntaxKind.TrueKeyword,
@@ -32,7 +32,52 @@ namespace Uranium.CodeAnalysis.Syntax.SyntaxFactsSupport
                 "if" => SyntaxKind.IfKeyword,
                 "else" => SyntaxKind.ElseKeyword,
                 "return" => SyntaxKind.ReturnKeyword,
-                _ => SyntaxKind.IdentifierToken,
+
+                "=" => SyntaxKind.Equals,
+                "+" => SyntaxKind.Plus,
+                "-" => SyntaxKind.Minus,
+                "/" => SyntaxKind.Divide,
+                "*" => SyntaxKind.Multiply,
+
+                "++" => SyntaxKind.PlusPlus,
+                "+=" => SyntaxKind.PlusEquals,
+                "--" => SyntaxKind.MinusMinus,
+                "-=" => SyntaxKind.MinusEquals,
+                "/=" => SyntaxKind.DivideEquals,
+                "*=" => SyntaxKind.MultiplyEquals,
+                "**" => SyntaxKind.Pow,
+                "**=" => SyntaxKind.PowEquals,
+
+                "%" => SyntaxKind.Percent,
+                "&" => SyntaxKind.Ampersand,
+                "|" => SyntaxKind.Pipe,
+                "^" => SyntaxKind.Hat,
+                ">" => SyntaxKind.GreaterThan,
+                "<" => SyntaxKind.LesserThan,
+                "!" => SyntaxKind.Bang,
+
+                "==" => SyntaxKind.DoubleEquals,
+                "%=" => SyntaxKind.PercentEquals,
+                "^=" => SyntaxKind.HatEquals,
+                ">=" => SyntaxKind.GreaterThanEquals,
+                "<=" => SyntaxKind.LesserThanEquals,
+                "!=" => SyntaxKind.BangEquals,
+                "&&" => SyntaxKind.DoubleAmpersand,
+                "||" => SyntaxKind.DoublePipe,
+
+                ";" => SyntaxKind.Semicolon,
+                ":" => SyntaxKind.Colon,
+                "." => SyntaxKind.Dot,
+                "," => SyntaxKind.Comma,
+                "~" => SyntaxKind.Tilde,
+                "(" => SyntaxKind.OpenParenthesis,
+                ")" => SyntaxKind.CloseParenthesis,
+                "{" => SyntaxKind.OpenCurlyBrace,
+                "}" => SyntaxKind.CloseCurlyBrace,
+                "[" => SyntaxKind.OpenBrackets,
+                "]" => SyntaxKind.CloseBrackets,
+
+                _ => SyntaxKind.BadToken,
             };
 
         public static string GetText(SyntaxKind kind) => kind switch
@@ -90,12 +135,13 @@ namespace Uranium.CodeAnalysis.Syntax.SyntaxFactsSupport
             SyntaxKind.DoubleEquals => "==",
             
             SyntaxKind.PercentEquals => "%=",
-            SyntaxKind.DoubleAmpersand => "&&",
-            SyntaxKind.DoublePipe => "||",
             SyntaxKind.HatEquals => "^=", 
             SyntaxKind.GreaterThanEquals => ">=",
             SyntaxKind.LesserThanEquals => "<=",
             SyntaxKind.BangEquals => "!=",
+            SyntaxKind.DoubleAmpersand => "&&",
+            SyntaxKind.DoublePipe => "||",
+
             SyntaxKind.Semicolon => ";",
             SyntaxKind.Colon => ":",
             SyntaxKind.Dot => ".",

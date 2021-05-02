@@ -47,13 +47,39 @@ namespace Uranium.Tests.CodeAnalysis.Syntax
             Assert.Equal(token.Text, text);
         }
 
+        [Theory]
+        [MemberData(nameof(GetSyntaxTextData))]
+        public void SyntaxFactsBinaryOperatorRoundTrips(string text, SyntaxKind kind)
+        {
+            if(text.Equals("BadToken") || kind is SyntaxKind.BadToken)
+            {
+                return;
+            }
+
+            var tokens = SyntaxTree.LexTokens(text);
+            var token = Assert.Single(tokens);
+            Assert.Equal(text, SyntaxFacts.GetText(kind));
+            Assert.Equal(kind, SyntaxFacts.GetKind(text));
+            Assert.Equal(text, token.Text);
+            Assert.Equal(kind, SyntaxFacts.GetKind(token.Text));
+        }
+
         public static IEnumerable<object[]> GetSyntaxKindData()
         {
-            var syntaxKinds = (SyntaxKind[]) Enum.GetValues(typeof(SyntaxKind));
+            var syntaxKinds = (SyntaxKind[])Enum.GetValues(typeof(SyntaxKind));
             
             foreach(var kind in syntaxKinds)
             {
                 yield return new object[] { kind };
+            }
+        }
+
+        public static IEnumerable<object[]> GetSyntaxTextData()
+        {
+            var syntaxKinds = (SyntaxKind[])Enum.GetValues(typeof(SyntaxKind));
+            foreach(var kind in syntaxKinds)
+            {
+                yield return new object[] { SyntaxFacts.GetText(kind), kind };
             }
         }
     }

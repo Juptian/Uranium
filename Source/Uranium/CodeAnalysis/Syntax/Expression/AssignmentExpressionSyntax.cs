@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Uranium.CodeAnalysis.Syntax.Expression
 {
-    internal sealed class AssignmentExpressionSyntax : ExpressionSyntax
+    public sealed class AssignmentExpressionSyntax : ExpressionSyntax
     {
         public AssignmentExpressionSyntax(SyntaxToken identifierToken, SyntaxToken equalsToken, ExpressionSyntax expression, bool isCompound = false)
             : this(identifierToken, equalsToken, expression, isCompound, null)

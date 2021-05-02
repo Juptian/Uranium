@@ -146,12 +146,66 @@ namespace Uranium.Tests.CodeAnalysis.Parsing
             }
         }
 
+/*        [Theory]
+        [InlineData(@"
+    for(var i = 0; i <= 10; i += 1)
+    {
+        i;
+    }
+")]
+
+        public void ParserParsesForLoops(string data)
+        {
+            var expression = ParseForLoop(data);
+            using var e = new AssertingEnumerator(expression);
+            e.AssertNode(SyntaxKind.ForStatement);
+            e.AssertToken(SyntaxKind.ForKeyword, "for");
+            e.AssertToken(SyntaxKind.OpenParenthesis, "(");
+                
+                e.AssertNode(SyntaxKind.VariableDeclaration);
+                    e.AssertToken(SyntaxKind.VarKeyword, "var");
+                    e.AssertToken(SyntaxKind.IdentifierToken, "i");
+                   
+                    e.AssertToken(SyntaxKind.Equals, "=");
+                    e.AssertLiteralExpression(SyntaxKind.LiteralExpression);
+                        e.AssertToken(SyntaxKind.NumberToken, "0");
+                    e.AssertToken(SyntaxKind.Semicolon, ";");
+
+                e.AssertNode(SyntaxKind.BinaryExpression);
+                    e.AssertToken(SyntaxKind.IdentifierToken, "i");
+                    e.AssertToken(SyntaxKind.LesserThanEquals, "<=");
+                    e.AssertLiteralExpression(SyntaxKind.LiteralExpression);
+                        e.AssertToken(SyntaxKind.NumberToken, "10");
+                    e.AssertToken(SyntaxKind.Semicolon, ";");
+            
+                e.AssertNode(SyntaxKind.AssignmentExpression);
+                    e.AssertToken(SyntaxKind.IdentifierToken, "i");
+                    e.AssertToken(SyntaxKind.PlusEquals, "+=");
+                    e.AssertToken(SyntaxKind.LiteralExpression, "1");
+                        e.AssertToken(SyntaxKind.NumberToken, "1");
+
+                e.AssertToken(SyntaxKind.CloseParenthesis, ")");
+                    e.AssertNode(SyntaxKind.BlockStatement);
+                    e.AssertToken(SyntaxKind.OpenCurlyBrace, "{");
+                    e.AssertToken(SyntaxKind.IdentifierToken, "i");
+                    e.AssertToken(SyntaxKind.Semicolon, ";");
+
+            e.AssertToken(SyntaxKind.CloseCurlyBrace, "}");
+        }*/
+
         private static ExpressionSyntax ParseExpression(string text)
         {
             var syntaxTree = SyntaxTree.Parse(text);
             var root = syntaxTree.Root;
             var statement = root.Statement;
             return Assert.IsType<ExpressionStatementSyntax>(statement).Expression;
+        }
+        private static ForStatementSyntax ParseForLoop(string text)
+        {
+            var syntaxTree = SyntaxTree.Parse(text);
+            var root = syntaxTree.Root;
+            var statement = root.Statement;
+            return Assert.IsType<ForStatementSyntax>(statement);
         }
 
         public static IEnumerable<object[]> GetBinaryOperatorPairsData()
