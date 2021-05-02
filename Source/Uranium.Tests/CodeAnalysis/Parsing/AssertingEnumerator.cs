@@ -13,6 +13,7 @@ namespace Uranium.Tests.CodeAnalysis.Parsing
     {
         private readonly IEnumerator<SyntaxNode> _enumerator;
         private bool _hasError;
+        private int _position = 0;
 
         public AssertingEnumerator(SyntaxNode node)
         {
@@ -61,6 +62,7 @@ namespace Uranium.Tests.CodeAnalysis.Parsing
         {
             try
             {
+                _position++;
                 Assert.True(_enumerator.MoveNext());
                 Assert.Equal(kind, _enumerator.Current.Kind);
 
@@ -80,38 +82,12 @@ namespace Uranium.Tests.CodeAnalysis.Parsing
                 throw;
             }
         }
-        public void AssertLiteralExpression(SyntaxKind kind)
-        {
-            try
-            {
-                Assert.True(_enumerator.MoveNext());
-                Assert.Equal(kind, _enumerator.Current.Kind);
-                Assert.IsType<LiteralExpressionSyntax>(_enumerator.Current);
-            }
-            catch when (MarkFailed())
-            {
-                throw;
-            }
-        }
-        public void AssertNameExpression(SyntaxKind kind)
-        {
-            try
-            {
-                Assert.True(_enumerator.MoveNext());
-                Assert.Equal(kind, _enumerator.Current.Kind);
-                var token = Assert.IsType<NameExpressionSyntax>(_enumerator.Current);
-            }
-            catch when (MarkFailed())
-            {
-                throw;
-            }
-        }
-
 
         public void AssertNode(SyntaxKind kind)
         {
             try
             {
+                _position++;
                 Assert.True(_enumerator.MoveNext());
                 Assert.Equal(kind, _enumerator.Current.Kind);
                 Assert.IsNotType<SyntaxToken>(_enumerator.Current);
@@ -120,6 +96,107 @@ namespace Uranium.Tests.CodeAnalysis.Parsing
             {
                 throw;
             }
+        }
+
+        public void AssertLiteralExpression()
+        {
+            try
+            {
+                _position++;
+                Assert.True(_enumerator.MoveNext());
+                Assert.Equal(SyntaxKind.LiteralExpression, _enumerator.Current.Kind);
+                Assert.IsType<LiteralExpressionSyntax>(_enumerator.Current);
+            }
+            catch when (MarkFailed())
+            {
+                throw;
+            }
+        }
+
+        public void AssertNameExpression()
+        {
+            try
+            {
+                _position++;
+                Assert.True(_enumerator.MoveNext());
+                Assert.Equal(SyntaxKind.NameExpression, _enumerator.Current.Kind);
+                var token = Assert.IsType<NameExpressionSyntax>(_enumerator.Current);
+            }
+            catch when (MarkFailed())
+            {
+                throw;
+            }
+        }
+
+        public void AssertVariableDeclaration
+            (
+                SyntaxKind keyword, string keywordName, 
+                string initializerName, string initializerValue
+            )
+        {
+            AssertNode(SyntaxKind.VariableDeclaration);
+                AssertToken(keyword, keywordName);
+                AssertToken(SyntaxKind.IdentifierToken, initializerName);
+                AssertToken(SyntaxKind.Equals, "=");
+                AssertLiteralExpression();
+                    AssertToken(SyntaxKind.NumberToken, initializerValue);
+                 
+                AssertToken(SyntaxKind.Semicolon, ";");
+        }
+        public void AssertCondition
+            (
+            string initializerName,
+            SyntaxKind conditionToken, string conditionText
+            )
+        {
+            AssertNode(SyntaxKind.BinaryExpression);
+                AssertNameExpression();
+                    AssertToken(SyntaxKind.IdentifierToken, initializerName);
+
+                AssertToken(conditionToken, SyntaxFacts.GetText(conditionToken));
+                AssertLiteralExpression();
+                    AssertToken(SyntaxKind.NumberToken, conditionText);
+        }
+
+        public void AssertAssignmentExpression
+            (
+            string initializerName,
+            SyntaxKind soloOperator, string soloText,
+            string incrementationText,
+            SyntaxKind incrementor
+            )
+        {
+            AssertNode(SyntaxKind.AssignmentExpression);
+                AssertToken(SyntaxKind.IdentifierToken, initializerName);
+                AssertToken(soloOperator, soloText, true);
+                AssertLiteralExpression();
+                    AssertToken(SyntaxKind.NumberToken, incrementationText);
+                //This one is because in our Assignment expression syntax we save our compound operator
+                //So, we have to assert it here as well.
+                AssertToken(incrementor, SyntaxFacts.GetText(incrementor));
+        }
+
+        public void AssertBlockStatement(bool ignoreStatements)
+        {
+            AssertNode(SyntaxKind.BlockStatement);
+            AssertToken(SyntaxKind.OpenCurlyBrace, "{");
+            if(ignoreStatements)
+            {
+                IgnoreBlockStatements();
+            }
+            else
+            {
+                AssertToken(SyntaxKind.CloseCurlyBrace, "}");
+            }
+        }
+
+        public void IgnoreBlockStatements()
+        {
+            while(_enumerator.Current.Kind is not SyntaxKind.CloseCurlyBrace)
+            {
+                Assert.True(_enumerator.MoveNext());
+            }
+            Assert.True(_enumerator.Current.Kind is SyntaxKind.CloseCurlyBrace);
         }
     }
 }

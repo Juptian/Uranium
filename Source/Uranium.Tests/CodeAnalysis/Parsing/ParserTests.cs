@@ -147,76 +147,16 @@ namespace Uranium.Tests.CodeAnalysis.Parsing
         }
 
         [Theory]
-        [InlineData(@"
-    for(var i = 0; i <= 10; i += 1)
-    {
-        i;
-    }
-", SyntaxKind.VarKeyword, "var", "i", "0", SyntaxKind.LesserThanEquals, "10", "1", SyntaxKind.PlusEquals)]
-
-        [InlineData(@"
-    for(int a = 0; a <= 100; a += 1)
-    {
-        a;
-    }", SyntaxKind.IntKeyword, "int", "a", "0", SyntaxKind.LesserThanEquals, "100", "1", SyntaxKind.PlusEquals)]
-
-        [InlineData(@"
-    for(var i = 0; i <= 1000; i += 1)
-    {
-        i += 1;
-    }
-", SyntaxKind.VarKeyword, "var", "i", "0", SyntaxKind.LesserThanEquals, "1000", "1", SyntaxKind.PlusEquals)]
-
-        [InlineData(@"
-    for(var i = 0; i != 1000; i += 1)
-    {
-        i += 1;
-        var a = i * 2;
-    }
-", SyntaxKind.VarKeyword, "var", "i", "0", SyntaxKind.BangEquals, "1000", "1", SyntaxKind.PlusEquals)]
-
-        [InlineData(@"
-    for(float f = 0; f < 100; f += 1)
-    {
-        var b = f + b;
-    }
-", SyntaxKind.FloatKeyword, "float", "f", "0", SyntaxKind.LesserThan, "100", "1", SyntaxKind.PlusEquals)]
-
-        [InlineData(@"
-    for(var i = 100; i >= 10; i -= 1)
-    {
-        i;
-    }
-", SyntaxKind.VarKeyword, "var", "i", "100", SyntaxKind.GreaterThanEquals, "10", "1", SyntaxKind.MinusEquals)]
-
-        [InlineData(@"
-    for(int a = 0; a >= 100; a -= 1)
-    {
-        a;
-    }
-", SyntaxKind.IntKeyword, "int", "a", "0", SyntaxKind.GreaterThanEquals, "100", "1", SyntaxKind.MinusEquals)]
-
-        [InlineData(@"
-    for(var i = 2000; i >= 1000; i -= 1)
-    {
-        i += 1;
-    }
-", SyntaxKind.VarKeyword, "var", "i", "2000", SyntaxKind.GreaterThanEquals, "1000", "1", SyntaxKind.MinusEquals)]
-        [InlineData(@"
-    for(var i = 2000; i != 1000; i -= 1)
-    {
-        i += 1;
-        var a = i * 2;
-    }
-", SyntaxKind.VarKeyword, "var", "i", "2000", SyntaxKind.BangEquals, "1000", "1", SyntaxKind.MinusEquals)]
-
-        [InlineData(@"
-    for(float f = 200; f > 100; f -= 1)
-    {
-        var b = f + b;
-    }
-", SyntaxKind.FloatKeyword, "float", "f", "200", SyntaxKind.GreaterThan, "100", "1", SyntaxKind.MinusEquals)]
-
+        [InlineData(ParserTestCases.CaseOne, SyntaxKind.VarKeyword, "var", "i", "0", SyntaxKind.LesserThanEquals, "10", "1", SyntaxKind.PlusEquals)]
+        [InlineData(ParserTestCases.CaseTwo, SyntaxKind.IntKeyword, "int", "a", "0", SyntaxKind.LesserThanEquals, "100", "1", SyntaxKind.PlusEquals)]
+        [InlineData(ParserTestCases.CaseThree, SyntaxKind.VarKeyword, "var", "i", "0", SyntaxKind.LesserThanEquals, "1000", "1", SyntaxKind.PlusEquals)]
+        [InlineData(ParserTestCases.CaseFour, SyntaxKind.VarKeyword, "var", "i", "0", SyntaxKind.BangEquals, "1000", "1", SyntaxKind.PlusEquals)]
+        [InlineData(ParserTestCases.CaseFive, SyntaxKind.FloatKeyword, "float", "f", "0", SyntaxKind.LesserThan, "100", "1", SyntaxKind.PlusEquals)]
+        [InlineData(ParserTestCases.CaseSix, SyntaxKind.VarKeyword, "var", "i", "100", SyntaxKind.GreaterThanEquals, "10", "1", SyntaxKind.MinusEquals)]
+        [InlineData(ParserTestCases.CaseEight, SyntaxKind.IntKeyword, "int", "a", "0", SyntaxKind.GreaterThanEquals, "100", "1", SyntaxKind.MinusEquals)]
+        [InlineData(ParserTestCases.CaseNine, SyntaxKind.VarKeyword, "var", "i", "2000", SyntaxKind.BangEquals, "1000", "1", SyntaxKind.MinusEquals)]
+        [InlineData(ParserTestCases.CaseTen, SyntaxKind.VarKeyword, "var", "i", "2000", SyntaxKind.GreaterThanEquals, "1000", "1", SyntaxKind.MinusEquals)]
+        [InlineData(ParserTestCases.CaseEleven, SyntaxKind.FloatKeyword, "float", "f", "200", SyntaxKind.GreaterThan, "100", "1", SyntaxKind.MinusEquals)]
         public void ParserParsesForLoops
             (
                 string data, 
@@ -236,40 +176,17 @@ namespace Uranium.Tests.CodeAnalysis.Parsing
             e.AssertNode(SyntaxKind.ForStatement);
                 e.AssertToken(SyntaxKind.ForKeyword, "for");
                 e.AssertToken(SyntaxKind.OpenParenthesis, "(");
-                
-                    e.AssertNode(SyntaxKind.VariableDeclaration);
-                        e.AssertToken(keyword, keywordName);
-                        e.AssertToken(SyntaxKind.IdentifierToken, initializerName);
-                   
-                        e.AssertToken(SyntaxKind.Equals, "=");
-                        e.AssertLiteralExpression(SyntaxKind.LiteralExpression);
-                            e.AssertToken(SyntaxKind.NumberToken, initializerValue);
-                        //Two semi colons here because variable declaration semicolon
-                        //Also counts as the for loop's declaration semi
-                        e.AssertToken(SyntaxKind.Semicolon, ";");
+                    e.AssertVariableDeclaration(keyword, keywordName, initializerName, initializerValue);
                     e.AssertToken(SyntaxKind.Semicolon, ";");
 
-                    e.AssertNode(SyntaxKind.BinaryExpression);
-                        e.AssertNameExpression(SyntaxKind.NameExpression);
-                            e.AssertToken(SyntaxKind.IdentifierToken, initializerName);
-
-                        e.AssertToken(conditionToken, SyntaxFacts.GetText(conditionToken));
-                        e.AssertLiteralExpression(SyntaxKind.LiteralExpression);
-                            e.AssertToken(SyntaxKind.NumberToken, conditionText);
+                    e.AssertCondition(initializerName, conditionToken, conditionText);
                     e.AssertToken(SyntaxKind.Semicolon, ";");
 
-                    e.AssertNode(SyntaxKind.AssignmentExpression);
-                        e.AssertToken(SyntaxKind.IdentifierToken, initializerName);
-                        e.AssertToken(soloOperator, soloText, true);
-                        e.AssertLiteralExpression(SyntaxKind.LiteralExpression);
-                            e.AssertToken(SyntaxKind.NumberToken, incrementationText);
-                        //This one is because in our Assignment expression syntax we save our compound operator
-                        //So, we have to assert it here as well.
-                        e.AssertToken(incrementor, SyntaxFacts.GetText(incrementor));
-
+                    e.AssertAssignmentExpression(initializerName, soloOperator, soloText, incrementationText, incrementor);
                 e.AssertToken(SyntaxKind.CloseParenthesis, ")");
-                e.AssertNode(SyntaxKind.BlockStatement);
+                e.AssertBlockStatement(true);
         }
+        
 
         private static ExpressionSyntax ParseExpression(string text)
         {
@@ -278,6 +195,7 @@ namespace Uranium.Tests.CodeAnalysis.Parsing
             var statement = root.Statement;
             return Assert.IsType<ExpressionStatementSyntax>(statement).Expression;
         }
+
         private static ForStatementSyntax ParseForLoop(string text)
         {
             var syntaxTree = SyntaxTree.Parse(text);
