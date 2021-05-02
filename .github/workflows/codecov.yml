@@ -1,0 +1,41 @@
+name: Report code coverage
+
+on: [push, pull_request]
+
+jobs:
+  build:
+
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 5.0.x
+    - name: Install coverlet.console
+      run: dotnet tool install --global coverlet.console --verbosity q
+    - name: Install CodeCov
+      shell: pwsh
+      run: |
+        Set-Location D:\a\Uranium\Uranium\
+        Invoke-WebRequest "https://github.com/codecov/codecov-exe/releases/download/1.13.0/codecov-win7-x64.zip" -Method "GET" -Outfile "codecov.zip"
+        Invoke-WebRequest "https://github.com/ANF-Studios/WinPath/releases/download/0.2.0/WinPath_win10-x64.exe" -Method "GET" -Outfile "winpath.exe"
+        Expand-Archive codecov.zip
+        Move-Item -Path "winpath.exe" -Destination "C:\Windows\"
+        winpath.exe add --user --value "D:\a\Uranium\Uranium\codecov\"
+    - name: Restore dependencies
+      run: dotnet restore
+    - name: Build
+      run: dotnet build --no-restore
+    - name: Test
+      run: dotnet test --collect:"XPlat Code Coverage" --settings "./Source/Uranium.Tests/coverage.settings" --verbosity n
+    - name: Upload Results
+      shell: pwsh
+      run: |
+        cd ./Source/Uranium.Tests/TestResults
+        foreach ($dir in dir) { cd $dir; }
+        Move-Item -Path ".\coverage.opencover.xml" -Destination D:\a\Uranium\Uranium\coverage.xml
+        cd D:\a\Uranium\Uranium
+        D:\a\Uranium\Uranium\codecov\codecov --file "coverage.xml"
+        curl -s https://codecov.io/bash > .\codecov\codecov.exe
