@@ -1,13 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Xunit;
 using Uranium.CodeAnalysis.Syntax;
 using Uranium.CodeAnalysis.Text;
 using Uranium.CodeAnalysis;
-using Uranium.Tests.CodeAnalysis.Other;
 
 namespace Uranium.Tests.CodeAnalysis.Expression
 {
@@ -173,27 +169,36 @@ namespace Uranium.Tests.CodeAnalysis.Expression
                 yield return new object[] { "{ " + $"var a = {i}; a -= {i}" + " }", 0 };
                 yield return new object[] { "{ " + $"var a = {i}; a *= {i}" + " }", i * i };
                 yield return new object[] { "{ " + $"var a = {i}; a /= {i}" + " }", 1 };
-                yield return new object[] { "{ " + $"var a = {i}; a **= 1 + (1 + 1)" + " }", i * i * i };
+                yield return new object[] { "{ " + $"var a = {i}; a **= ({i}-{i}+1) + ({i}/{i} + 1)" + " }", i * i * i };
             }
 
-            for (float i = 0.01f; i <= 1; i += 0.01f)
+            for (float i = 0.01f; i <= 2; i += 0.01f)
             {
                 yield return new object[] { "{ " + $"float i = {i};" + " }", (float)i };
                 yield return new object[] { "{ " + $"double i = {(double)i};" + " }", (double)i };
             }
 
-            for(int i = 0; i <= 100; i++)
+            for(int i = 0; i <= 200; i++)
             {
                 yield return new object[] { "{ " + $"int i = {i * 100};" + " }", i * 100 };
                 yield return new object[] { "{ " + $"long i = {i * 2000};" + " }", (long)i * 2000 };
             }
-            for(int i = 0; i < 100; i++)
+
+            for(int i = 0; i < 100_000; i++)
             {
+                if(i == 50)
+                {
+                    i = 99_950;
+                }
                 yield return new object[] { $"{i} + -{i}", 0 };
                 yield return new object[] { $"{i} + +{i}", i + i };
             }
-            for(int i = 1; i <= 10; i++)
+            for(int i = 1; i < 100_000; i++)
             {
+                if(i == 50)
+                {
+                    i = 99_950;
+                }
                 yield return new object[] { "{ " + $"int i = {i}; i += {i}" + " }", i + i };
                 yield return new object[] { "{ " + $"int i = {i}; i -= {i}" + " }", 0 };
                 yield return new object[] { "{ " + $"int i = {i}; i *= {i}" + " }", i * i };

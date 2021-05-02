@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Uranium.CodeAnalysis.Syntax.Expression
 {
-    internal sealed class NameExpressionSyntax : ExpressionSyntax
+    public sealed class NameExpressionSyntax : ExpressionSyntax
     {
         public NameExpressionSyntax(SyntaxToken identifierToken)
         {

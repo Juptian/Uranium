@@ -30,7 +30,7 @@ namespace Uranium.CodeAnalysis.Parsing
                 }
             }
             while (token.Kind is not SyntaxKind.EndOfFile);
-            
+
             _tokens = tokens.ToArray();
             //Doing this to keep all our previous diagnostics
             //So that we don't lose them

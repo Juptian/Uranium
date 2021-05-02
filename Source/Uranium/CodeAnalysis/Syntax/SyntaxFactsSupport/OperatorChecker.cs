@@ -82,5 +82,16 @@ namespace Uranium.CodeAnalysis.Syntax.SyntaxFactsSupport
                 _ => token,
             };
 
+        public static SyntaxKind GetSoloOperator(SyntaxKind kind)
+            => kind switch
+            {
+                SyntaxKind.PlusEquals => SyntaxKind.Plus,
+                SyntaxKind.MinusEquals => SyntaxKind.Minus,
+                SyntaxKind.MultiplyEquals => SyntaxKind.Multiply,
+                SyntaxKind.DivideEquals => SyntaxKind.Divide,
+                SyntaxKind.PowEquals => SyntaxKind.Pow, 
+
+                _ => kind,
+            };
     }
 }

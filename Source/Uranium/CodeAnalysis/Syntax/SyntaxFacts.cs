@@ -39,6 +39,9 @@ namespace Uranium.CodeAnalysis.Syntax
         public static SyntaxToken GetSoloOperator(SyntaxToken token)
             => OperatorChecker.GetSoloOperator(token);
 
+        public static SyntaxKind GetSoloOperator(SyntaxKind kind)
+            => OperatorChecker.GetSoloOperator(kind);
+
         public static SyntaxKind GetKind(string text)
             => TextChecker.GetSyntaxKind(text);
 

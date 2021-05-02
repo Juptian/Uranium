@@ -64,6 +64,21 @@ namespace Uranium.Tests.CodeAnalysis.Syntax
             Assert.Equal(kind, SyntaxFacts.GetKind(token.Text));
         }
 
+        [Fact]
+        public static void TestAllRoundTrips()
+        {
+            var text = AllTokens();
+            SyntaxToken[] tokens = SyntaxTree.LexTokens(text).ToArray();
+            foreach(var t in tokens)
+            {
+                if(t.Kind is not SyntaxKind.IdentifierToken)
+                {
+                    Assert.Equal(t.Text, SyntaxFacts.GetText(t.Kind));
+                    Assert.Equal(t.Kind, SyntaxFacts.GetKind(t.Text));
+                }
+            }
+        }
+
         public static IEnumerable<object[]> GetSyntaxKindData()
         {
             var syntaxKinds = (SyntaxKind[])Enum.GetValues(typeof(SyntaxKind));
@@ -81,6 +96,16 @@ namespace Uranium.Tests.CodeAnalysis.Syntax
             {
                 yield return new object[] { SyntaxFacts.GetText(kind), kind };
             }
+        }
+        public static string AllTokens()
+        {
+            var syntaxKinds = (SyntaxKind[])Enum.GetValues(typeof(SyntaxKind));
+            var result = new StringBuilder();
+            foreach(var kind in syntaxKinds)
+            {
+                result.Append(SyntaxFacts.GetText(kind) + " ");
+            }
+            return result.ToString();
         }
     }
 }

@@ -131,9 +131,9 @@ namespace Uranium.CodeAnalysis.Syntax.SyntaxFactsSupport
             SyntaxKind.Hat => "^",
             SyntaxKind.GreaterThan => ">", 
             SyntaxKind.LesserThan => "<",
-            SyntaxKind.Bang => "!", 
-            SyntaxKind.DoubleEquals => "==",
+            SyntaxKind.Bang => "!",
             
+            SyntaxKind.DoubleEquals => "==",
             SyntaxKind.PercentEquals => "%=",
             SyntaxKind.HatEquals => "^=", 
             SyntaxKind.GreaterThanEquals => ">=",

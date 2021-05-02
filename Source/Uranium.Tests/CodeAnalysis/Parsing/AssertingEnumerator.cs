@@ -23,6 +23,8 @@ namespace Uranium.Tests.CodeAnalysis.Parsing
         {
             if(!_hasError)
             {
+                while(_enumerator.MoveNext())
+                {}
                 Assert.False(_enumerator.MoveNext());
             }
             _enumerator.Dispose();
@@ -45,8 +47,6 @@ namespace Uranium.Tests.CodeAnalysis.Parsing
                 //Removing the node we just got so that we can get it's children specifically
                 //Without needing to initialize another variable to keep our index
                 var n = stack.Pop();
-
-                //Returning that poped node to know what node we just yoinked
                 yield return n;
 
                 //Forcefully adding nodes, so that we can flatten the ENTIRE tree
@@ -57,7 +57,7 @@ namespace Uranium.Tests.CodeAnalysis.Parsing
             }
         }
         
-        public void AssertToken(SyntaxKind kind, string text)
+        public void AssertToken(SyntaxKind kind, string text, bool asSoloOperator = false)
         {
             try
             {
@@ -65,7 +65,15 @@ namespace Uranium.Tests.CodeAnalysis.Parsing
                 Assert.Equal(kind, _enumerator.Current.Kind);
 
                 var token = Assert.IsType<SyntaxToken>(_enumerator.Current);
-                Assert.Equal(text, token.Text);
+                if(asSoloOperator)
+                {
+                    var asSolo = SyntaxFacts.GetSoloOperator(token);
+                    Assert.Equal(text, SyntaxFacts.GetText(asSolo.Kind));
+                }
+                else
+                {
+                    Assert.Equal(text, token.Text);
+                }
             }
             catch when (MarkFailed())
             {
@@ -85,6 +93,20 @@ namespace Uranium.Tests.CodeAnalysis.Parsing
                 throw;
             }
         }
+        public void AssertNameExpression(SyntaxKind kind)
+        {
+            try
+            {
+                Assert.True(_enumerator.MoveNext());
+                Assert.Equal(kind, _enumerator.Current.Kind);
+                var token = Assert.IsType<NameExpressionSyntax>(_enumerator.Current);
+            }
+            catch when (MarkFailed())
+            {
+                throw;
+            }
+        }
+
 
         public void AssertNode(SyntaxKind kind)
         {
