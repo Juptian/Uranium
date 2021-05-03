@@ -193,12 +193,10 @@ namespace Uranium.Tests.CodeAnalysis.Parsing
         [InlineData(ParserTestCases.CaseThirteen, SyntaxKind.DoubleKeyword, "d", "10.10", SyntaxKind.Plus, "20.20")]
         [InlineData(ParserTestCases.CaseForteen, SyntaxKind.FloatKeyword, "f", "10.3", SyntaxKind.Plus, "10.3")]
         [InlineData(ParserTestCases.CaseFifteen, SyntaxKind.LongKeyword, "l", "15", SyntaxKind.Plus, "10")]
-
         [InlineData(ParserTestCases.CaseSixteen, SyntaxKind.IntKeyword, "i", "10", SyntaxKind.Minus, "1")]
         [InlineData(ParserTestCases.CaseSeventeen, SyntaxKind.DoubleKeyword, "d", "10.1001", SyntaxKind.Minus, "10")]
         [InlineData(ParserTestCases.CaseEighteen, SyntaxKind.FloatKeyword, "f", "10.3", SyntaxKind.Minus, "10.3")]
         [InlineData(ParserTestCases.CaseNineteen, SyntaxKind.LongKeyword, "l", "15", SyntaxKind.Minus, "10")]
-        
         [InlineData(ParserTestCases.CaseTwenty, SyntaxKind.IntKeyword, "i", "10", SyntaxKind.Pow, "2")]
         [InlineData(ParserTestCases.CaseTwentyOne, SyntaxKind.LongKeyword, "l", "100", SyntaxKind.Pow, "2")]
         [InlineData(ParserTestCases.CaseTwentyTwo, SyntaxKind.DoubleKeyword, "d", "10", SyntaxKind.Divide, "100")]

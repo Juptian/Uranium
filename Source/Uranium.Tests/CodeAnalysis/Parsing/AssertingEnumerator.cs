@@ -13,7 +13,6 @@ namespace Uranium.Tests.CodeAnalysis.Parsing
     {
         private readonly IEnumerator<SyntaxNode> _enumerator;
         private bool _hasError;
-        private int _position = 0;
 
         public AssertingEnumerator(SyntaxNode node)
         {
@@ -62,7 +61,6 @@ namespace Uranium.Tests.CodeAnalysis.Parsing
         {
             try
             {
-                _position++;
                 Assert.True(_enumerator.MoveNext());
                 Assert.Equal(kind, _enumerator.Current.Kind);
 
@@ -87,7 +85,6 @@ namespace Uranium.Tests.CodeAnalysis.Parsing
         {
             try
             {
-                _position++;
                 Assert.True(_enumerator.MoveNext());
                 Assert.Equal(kind, _enumerator.Current.Kind);
                 Assert.IsNotType<SyntaxToken>(_enumerator.Current);
@@ -102,7 +99,6 @@ namespace Uranium.Tests.CodeAnalysis.Parsing
         {
             try
             {
-                _position++;
                 Assert.True(_enumerator.MoveNext());
                 Assert.Equal(SyntaxKind.LiteralExpression, _enumerator.Current.Kind);
                 Assert.IsType<LiteralExpressionSyntax>(_enumerator.Current);
@@ -117,7 +113,6 @@ namespace Uranium.Tests.CodeAnalysis.Parsing
         {
             try
             {
-                _position++;
                 Assert.True(_enumerator.MoveNext());
                 Assert.Equal(SyntaxKind.NameExpression, _enumerator.Current.Kind);
                 var token = Assert.IsType<NameExpressionSyntax>(_enumerator.Current);

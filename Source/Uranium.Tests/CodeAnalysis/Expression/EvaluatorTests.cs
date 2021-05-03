@@ -149,80 +149,377 @@ namespace Uranium.Tests.CodeAnalysis.Expression
         }
         public static IEnumerable<object[]> TestCases()
         {
-            for (int i = 1; i <= 1_000_000; i++)
+            //Low numbers
+            //Unrolled for effieciency sake
+            for (int i = 1; i <= 100; i += 10)
             {
-                if(i == 100)
-                {
-                    i = 999_900;
-                }
                 yield return new object[] { $"{i} + {i}", i + i };
-                yield return new object[] { $"{i} + -{i}/2", i + -i / 2 };
+                yield return new object[] { $"{i} + -{i}/2", i + -(i >> 1) };
                 yield return new object[] { $"{i} * {i}", i * i };
                 yield return new object[] { $"{i} * 2 / {i}", 2 };
+                yield return new object[] { $"var a = {i};", i };
                 yield return new object[] { $"let a = {i};", i };
+                yield return new object[] { $"const a = {i};", i };
                 yield return new object[] { $"{i} <= {i + 1}", true };
                 yield return new object[] { $"{i} < {i}", false };
                 yield return new object[] { $"{i + 1} > {i}", true };
                 yield return new object[] { $"{i - 1} >= {i}", false };
+            
+                yield return new object[] { $"{i + 1} + {i + 1}", (i + 1) << 1};
+                yield return new object[] { $"{i + 1} + -{i + 1}/2", i + 1 + -((i + 1) >> 1) };
+                yield return new object[] { $"{i + 1} * {i + 1}", (i + 1) * (i + 1) };
+                yield return new object[] { $"{i + 1} * 2 / {i + 1}", 2 };
+                yield return new object[] { $"var a = {i + 1};", i + 1 };
+                yield return new object[] { $"let a = {i + 1};", i + 1};
+                yield return new object[] { $"const a = {i + 1};", i + 1};
+                yield return new object[] { $"{i + 1} <= {i + 2}", true };
+                yield return new object[] { $"{i + 1} < {i + 1}", false };
+                yield return new object[] { $"{i + 2} > {i + 1}", true };
+                yield return new object[] { $"{i} >= {i + 1}", false };
+           
+                yield return new object[] { $"{i + 2} + {i + 2}", (i + 2) << 1 };
+                yield return new object[] { $"{i + 2} + -{i + 2}/2", i + 2 + -((i + 2) >> 1) };
+                yield return new object[] { $"{i + 2} * {i + 2}", (i + 2) * (i + 2) };
+                yield return new object[] { $"{i + 2} * 2 / {i + 2}", 2 };
+                yield return new object[] { $"var a = {i + 2};", i + 2 };
+                yield return new object[] { $"let a = {i + 2};", i + 2};
+                yield return new object[] { $"const a = {i + 2};", i + 2};
+                yield return new object[] { $"{i + 2} <= {i + 3}", true };
+                yield return new object[] { $"{i + 2} < {i + 2}", false };
+                yield return new object[] { $"{i + 3} > {i + 2}", true };
+                yield return new object[] { $"{i + 1} >= {i + 2}", false };
+
+                yield return new object[] { $"{i + 3} + {i + 3}", (i + 3) << 1 };
+                yield return new object[] { $"{i + 3} + -{i + 3}/2", i + 3 + -((i + 3) >> 1) };
+                yield return new object[] { $"{i + 3} * {i + 3}", (i + 3) * (i + 3) };
+                yield return new object[] { $"{i + 3} * 2 / {i + 3}", 2 };
+                yield return new object[] { $"var a = {i + 3};", i + 3 };
+                yield return new object[] { $"let a = {i + 3};", i + 3};
+                yield return new object[] { $"const a = {i + 3};", i + 3};
+                yield return new object[] { $"{i + 3} <= {i + 4}", true };
+                yield return new object[] { $"{i + 3} < {i + 3}", false };
+                yield return new object[] { $"{i + 4} > {i + 3}", true };
+                yield return new object[] { $"{i + 2} >= {i + 3}", false };
+           
+                yield return new object[] { $"{i + 4} + {i + 4}", (i + 4) << 1 };
+                yield return new object[] { $"{i + 4} + -{i + 4}/2", i + 4 + -((i + 4) >> 1) };
+                yield return new object[] { $"{i + 4} * {i + 4}", (i + 4) * (i + 4) };
+                yield return new object[] { $"{i + 4} * 2 / {i + 4}", 2 };
+                yield return new object[] { $"var a = {i + 4};", i + 4 };
+                yield return new object[] { $"let a = {i + 4};", i + 4};
+                yield return new object[] { $"const a = {i + 4};", i + 4};
+                yield return new object[] { $"{i + 4} <= {i + 5}", true };
+                yield return new object[] { $"{i + 4} < {i + 4}", false };
+                yield return new object[] { $"{i + 5} > {i + 4}", true };
+                yield return new object[] { $"{i + 3} >= {i + 4}", false };
+
+                yield return new object[] { $"{i + 5} + {i + 5}", (i + 5) << 1};
+                yield return new object[] { $"{i + 5} + -{i + 5}/2", i + 5 + -((i + 5) >> 1) };
+                yield return new object[] { $"{i + 5} * {i + 5}", (i + 5) * (i + 5) };
+                yield return new object[] { $"{i + 5} * 2 / {i + 5}", 2 };
+                yield return new object[] { $"var a = {i + 5};", i + 5 };
+                yield return new object[] { $"let a = {i + 5};", i + 5 };
+                yield return new object[] { $"const a = {i + 5};", i + 5 };
+                yield return new object[] { $"{i + 5} <= {i + 6}", true };
+                yield return new object[] { $"{i + 5} < {i + 5}", false };
+                yield return new object[] { $"{i + 6} > {i + 5}", true };
+                yield return new object[] { $"{i + 4} >= {i + 5}", false };
+           
+                yield return new object[] { $"{i + 6} + {i + 6}", (i + 6) << 1 };
+                yield return new object[] { $"{i + 6} + -{i + 6}/2", i + 6 + -((i + 6) >> 1) };
+                yield return new object[] { $"{i + 6} * {i + 6}", (i + 6) * (i + 6) };
+                yield return new object[] { $"{i + 6} * 2 / {i + 6}", 2 };
+                yield return new object[] { $"var a = {i + 6};", i + 6 };
+                yield return new object[] { $"let a = {i + 6};", i + 6 };
+                yield return new object[] { $"const a = {i + 6};", i + 6 };
+                yield return new object[] { $"{i + 6} <= {i + 7}", true };
+                yield return new object[] { $"{i + 6} < {i + 6}", false };
+                yield return new object[] { $"{i + 7} > {i + 6}", true };
+                yield return new object[] { $"{i + 5} >= {i + 6}", false };
+
+                yield return new object[] { $"{i + 7} + {i + 7}", (i + 7) << 1 };
+                yield return new object[] { $"{i + 7} + -{i + 7}/2", i + 7 + -((i + 7) >> 1) };
+                yield return new object[] { $"{i + 7} * {i + 7}", (i + 7) * (i + 7) };
+                yield return new object[] { $"{i + 7} * 2 / {i + 7}", 2 };
+                yield return new object[] { $"var a = {i + 7};", i + 7 };
+                yield return new object[] { $"let a = {i + 7};", i + 7 };
+                yield return new object[] { $"const a = {i + 7};", i + 7 };
+                yield return new object[] { $"{i + 7} <= {i + 8}", true };
+                yield return new object[] { $"{i + 7} < {i + 7}", false };
+                yield return new object[] { $"{i + 8} > {i + 7}", true };
+                yield return new object[] { $"{i + 6} >= {i + 7}", false };
+           
+                yield return new object[] { $"{i + 8} + {i + 8}", (i + 8) << 1 };
+                yield return new object[] { $"{i + 8} + -{i + 8}/2", i + 8 + -((i + 8) >> 1) };
+                yield return new object[] { $"{i + 8} * {i + 8}", (i + 8) * (i + 8) };
+                yield return new object[] { $"{i + 8} * 2 / {i + 8}", 2 };
+                yield return new object[] { $"var a = {i + 8};", i + 8 };
+                yield return new object[] { $"let a = {i + 8};", i + 8 };
+                yield return new object[] { $"const a = {i + 8};", i + 8 };
+                yield return new object[] { $"{i + 8} <= {i + 9}", true };
+                yield return new object[] { $"{i + 8} < {i + 8}", false };
+                yield return new object[] { $"{i + 9} > {i + 8}", true };
+                yield return new object[] { $"{i + 7} >= {i + 8}", false };
+           
+                yield return new object[] { $"{i + 9} + {i + 9}", (i + 9) << 1 };
+                yield return new object[] { $"{i + 9} + -{i + 9}/2", i + 9 + -((i + 9) >> 1) };
+                yield return new object[] { $"{i + 9} * {i + 9}", (i + 9) * (i + 9) };
+                yield return new object[] { $"{i + 9} * 2 / {i + 9}", 2 };
+                yield return new object[] { $"var a = {i + 9};", i + 9 };
+                yield return new object[] { $"let a = {i + 9};", i + 9 };
+                yield return new object[] { $"const a = {i + 9};", i + 9 };
+                yield return new object[] { $"{i + 9} <= {i + 10}", true };
+                yield return new object[] { $"{i + 9} < {i + 9}", false };
+                yield return new object[] { $"{i + 10} > {i + 9}", true };
+                yield return new object[] { $"{i + 8} >= {i + 9}", false };
             }
 
-            for (int i = 1; i <= 100_000; i++)
+            for (int i = 1; i <= 50; i++)
             {
-                if(i == 50)
-                {
-                    i = 99_950;
-                }
                 yield return new object[] { "{ " + $"var a = {i}; a += {i}" + " }", i + i };
                 yield return new object[] { "{ " + $"var a = {i}; a -= {i}" + " }", 0 };
                 yield return new object[] { "{ " + $"var a = {i}; a *= {i}" + " }", i * i };
                 yield return new object[] { "{ " + $"var a = {i}; a /= {i}" + " }", 1 };
-                if(i <= 50)
-                {
-                    yield return new object[] { "{ " + $"var a = {i}; a **= ({i}-{i}+1) + ({i}/{i} + 1)" + " }", i * i * i };
-                }
-                else
-                {
-                    yield return new object[] { "{ " + $"var a = {i % 50}; a**= ({i}-{i}+1) + ({i}/{i} + 1)" + " }", (i % 50) * (i % 50) * (i % 50) };
-                }
+                yield return new object[] { "{ " + $"var a = {i}; a **= ({i}-{i}+1) + ({i}/{i} + 1)" + " }", i * i * i };
             }
-
             for (float i = 0.01f; i <= 2; i += 0.01f)
             {
                 yield return new object[] { "{ " + $"float i = {i};" + " }", (float)i };
                 yield return new object[] { "{ " + $"double i = {(double)i};" + " }", (double)i };
             }
-
-            for(int i = 0; i <= 200; i++)
+            for (int i = 0; i <= 200; i++)
             {
                 yield return new object[] { "{ " + $"int i = {i * 100};" + " }", i * 100 };
                 yield return new object[] { "{ " + $"long i = {i * 2000};" + " }", (long)i * 2000 };
             }
-
-            for(int i = 0; i < 100_000; i++)
+            for (int i = 0; i < 100; i++)
             {
-                if(i == 100)
-                {
-                    i = 99_900;
-                }
                 yield return new object[] { $"{i} + -{i}", 0 };
                 yield return new object[] { $"{i} + +{i}", i + i };
             }
-            for(int i = 1; i < 100_000; i++)
+            for (int i = 1; i <= 100; i++)
             {
-                if(i == 100)
-                {
-                    i = 99_900;
-                }
                 yield return new object[] { "{ " + $"int i = {i}; i += {i}" + " }", i + i };
                 yield return new object[] { "{ " + $"int i = {i}; i -= {i}" + " }", 0 };
                 yield return new object[] { "{ " + $"int i = {i}; i /= {i}" + " }", 1 };
                 yield return new object[] { "{ " + $"int i = 1; i **= {i}" + " }", 1 };
             }
-            for(int i = 1; i <= 100; i++)
+            for (int i = 1; i <= 100; i++)
             {
-                yield return new object[] { "{ " + $"int i = {i}; i *= {i}" + " }", i * i};
+                yield return new object[] { "{ " + $"int i = {i}; i *= {i}" + " }", i * i };
+            }
+
+            //Testing for high numbers
+            //To cover most cases
+            for(int i = 999_900; i < 1_000_000; i += 10)
+            {
+                yield return new object[] { $"{i} + {i}", i + i };
+                yield return new object[] { $"{i} + -{i}/2", i + -i / 2 };
+                yield return new object[] { $"{i} * {i}", i * i };
+                yield return new object[] { $"{i} * 2 / {i}", 2 };
+                yield return new object[] { $"var a = {i};", i };
+                yield return new object[] { $"let a = {i};", i };
+                yield return new object[] { $"const a = {i};", i };
+                yield return new object[] { $"{i} <= {i + 1}", true };
+                yield return new object[] { $"{i} < {i}", false };
+                yield return new object[] { $"{i + 1} > {i}", true };
+                yield return new object[] { $"{i - 1} >= {i}", false };
+            
+                yield return new object[] { $"{i + 1} + {i + 1}", (i + 1) << 1};
+                yield return new object[] { $"{i + 1} + -{i + 1}/2", i + 1 + -((i + 1) >> 1) };
+                yield return new object[] { $"{i + 1} * {i + 1}", (i + 1) * (i + 1) };
+                yield return new object[] { $"{i + 1} * 2 / {i + 1}", 2 };
+                yield return new object[] { $"var a = {i + 1};", i + 1 };
+                yield return new object[] { $"let a = {i + 1};", i + 1};
+                yield return new object[] { $"const a = {i + 1};", i + 1};
+                yield return new object[] { $"{i + 1} <= {i + 2}", true };
+                yield return new object[] { $"{i + 1} < {i + 1}", false };
+                yield return new object[] { $"{i + 2} > {i + 1}", true };
+                yield return new object[] { $"{i} >= {i + 1}", false };
+           
+                yield return new object[] { $"{i + 2} + {i + 2}", (i + 2) << 1 };
+                yield return new object[] { $"{i + 2} + -{i + 2}/2", i + 2 + -((i + 2) >> 1) };
+                yield return new object[] { $"{i + 2} * {i + 2}", (i + 2) * (i + 2) };
+                yield return new object[] { $"{i + 2} * 2 / {i + 2}", 2 };
+                yield return new object[] { $"var a = {i + 2};", i + 2 };
+                yield return new object[] { $"let a = {i + 2};", i + 2};
+                yield return new object[] { $"const a = {i + 2};", i + 2};
+                yield return new object[] { $"{i + 2} <= {i + 3}", true };
+                yield return new object[] { $"{i + 2} < {i + 2}", false };
+                yield return new object[] { $"{i + 3} > {i + 2}", true };
+                yield return new object[] { $"{i + 1} >= {i + 2}", false };
+
+                yield return new object[] { $"{i + 3} + {i + 3}", (i + 3) << 1 };
+                yield return new object[] { $"{i + 3} + -{i + 3}/2", i + 3 + -((i + 3) >> 1) };
+                yield return new object[] { $"{i + 3} * {i + 3}", (i + 3) * (i + 3) };
+                yield return new object[] { $"{i + 3} * 2 / {i + 3}", 2 };
+                yield return new object[] { $"var a = {i + 3};", i + 3 };
+                yield return new object[] { $"let a = {i + 3};", i + 3};
+                yield return new object[] { $"const a = {i + 3};", i + 3};
+                yield return new object[] { $"{i + 3} <= {i + 4}", true };
+                yield return new object[] { $"{i + 3} < {i + 3}", false };
+                yield return new object[] { $"{i + 4} > {i + 3}", true };
+                yield return new object[] { $"{i + 2} >= {i + 3}", false };
+           
+                yield return new object[] { $"{i + 4} + {i + 4}", (i + 4) << 1 };
+                yield return new object[] { $"{i + 4} + -{i + 4}/2", i + 4 + -((i + 4) >> 1) };
+                yield return new object[] { $"{i + 4} * {i + 4}", (i + 4) * (i + 4) };
+                yield return new object[] { $"{i + 4} * 2 / {i + 4}", 2 };
+                yield return new object[] { $"var a = {i + 4};", i + 4 };
+                yield return new object[] { $"let a = {i + 4};", i + 4};
+                yield return new object[] { $"const a = {i + 4};", i + 4};
+                yield return new object[] { $"{i + 4} <= {i + 5}", true };
+                yield return new object[] { $"{i + 4} < {i + 4}", false };
+                yield return new object[] { $"{i + 5} > {i + 4}", true };
+                yield return new object[] { $"{i + 3} >= {i + 4}", false };
+
+                yield return new object[] { $"{i + 5} + {i + 5}", (i + 5) << 1};
+                yield return new object[] { $"{i + 5} + -{i + 5}/2", i + 5 + -((i + 5) >> 1) };
+                yield return new object[] { $"{i + 5} * {i + 5}", (i + 5) * (i + 5) };
+                yield return new object[] { $"{i + 5} * 2 / {i + 5}", 2 };
+                yield return new object[] { $"var a = {i + 5};", i + 5 };
+                yield return new object[] { $"let a = {i + 5};", i + 5 };
+                yield return new object[] { $"const a = {i + 5};", i + 5 };
+                yield return new object[] { $"{i + 5} <= {i + 6}", true };
+                yield return new object[] { $"{i + 5} < {i + 5}", false };
+                yield return new object[] { $"{i + 6} > {i + 5}", true };
+                yield return new object[] { $"{i + 4} >= {i + 5}", false };
+           
+                yield return new object[] { $"{i + 6} + {i + 6}", (i + 6) << 1 };
+                yield return new object[] { $"{i + 6} + -{i + 6}/2", i + 6 + -((i + 6) >> 1) };
+                yield return new object[] { $"{i + 6} * {i + 6}", (i + 6) * (i + 6) };
+                yield return new object[] { $"{i + 6} * 2 / {i + 6}", 2 };
+                yield return new object[] { $"var a = {i + 6};", i + 6 };
+                yield return new object[] { $"let a = {i + 6};", i + 6 };
+                yield return new object[] { $"const a = {i + 6};", i + 6 };
+                yield return new object[] { $"{i + 6} <= {i + 7}", true };
+                yield return new object[] { $"{i + 6} < {i + 6}", false };
+                yield return new object[] { $"{i + 7} > {i + 6}", true };
+                yield return new object[] { $"{i + 5} >= {i + 6}", false };
+
+                yield return new object[] { $"{i + 7} + {i + 7}", (i + 7) << 1 };
+                yield return new object[] { $"{i + 7} + -{i + 7}/2", i + 7 + -((i + 7) >> 1) };
+                yield return new object[] { $"{i + 7} * {i + 7}", (i + 7) * (i + 7) };
+                yield return new object[] { $"{i + 7} * 2 / {i + 7}", 2 };
+                yield return new object[] { $"var a = {i + 7};", i + 7 };
+                yield return new object[] { $"let a = {i + 7};", i + 7 };
+                yield return new object[] { $"const a = {i + 7};", i + 7 };
+                yield return new object[] { $"{i + 7} <= {i + 8}", true };
+                yield return new object[] { $"{i + 7} < {i + 7}", false };
+                yield return new object[] { $"{i + 8} > {i + 7}", true };
+                yield return new object[] { $"{i + 6} >= {i + 7}", false };
+           
+                yield return new object[] { $"{i + 8} + {i + 8}", (i + 8) << 1 };
+                yield return new object[] { $"{i + 8} + -{i + 8}/2", i + 8 + -((i + 8) >> 1) };
+                yield return new object[] { $"{i + 8} * {i + 8}", (i + 8) * (i + 8) };
+                yield return new object[] { $"{i + 8} * 2 / {i + 8}", 2 };
+                yield return new object[] { $"var a = {i + 8};", i + 8 };
+                yield return new object[] { $"let a = {i + 8};", i + 8 };
+                yield return new object[] { $"const a = {i + 8};", i + 8 };
+                yield return new object[] { $"{i + 8} <= {i + 9}", true };
+                yield return new object[] { $"{i + 8} < {i + 8}", false };
+                yield return new object[] { $"{i + 9} > {i + 8}", true };
+                yield return new object[] { $"{i + 7} >= {i + 8}", false };
+           
+                yield return new object[] { $"{i + 9} + {i + 9}", (i + 9) << 1 };
+                yield return new object[] { $"{i + 9} + -{i + 9}/2", i + 9 + -((i + 9) >> 1) };
+                yield return new object[] { $"{i + 9} * {i + 9}", (i + 9) * (i + 9) };
+                yield return new object[] { $"{i + 9} * 2 / {i + 9}", 2 };
+                yield return new object[] { $"var a = {i + 9};", i + 9 };
+                yield return new object[] { $"let a = {i + 9};", i + 9 };
+                yield return new object[] { $"const a = {i + 9};", i + 9 };
+                yield return new object[] { $"{i + 9} <= {i + 10}", true };
+                yield return new object[] { $"{i + 9} < {i + 9}", false };
+                yield return new object[] { $"{i + 10} > {i + 9}", true };
+                yield return new object[] { $"{i + 8} >= {i + 9}", false };
+            }
+
+            for(int i = 999_900; i < 1_000_000; i += 10)
+            {
+                yield return new object[] { $"{i} + -{i}", 0 };
+                yield return new object[] { $"{i} + +{i}", i << 1 };
+
+                yield return new object[] { $"{i + 1} + -{i + 1}", 0 };
+                yield return new object[] { $"{i + 1} + +{i + 1}", (i + 1) << 1};
+
+                yield return new object[] { $"{i + 2} + -{i + 2}", 0 };
+                yield return new object[] { $"{i + 2} + +{i + 2}", (i + 2) << 1};
+
+                yield return new object[] { $"{i + 3} + -{i + 3}", 0 };
+                yield return new object[] { $"{i + 3} + +{i + 3}", (i + 3) << 1};
+
+                yield return new object[] { $"{i + 4} + -{i + 4}", 0 };
+                yield return new object[] { $"{i + 4} + +{i + 4}", (i + 4) << 1};
+
+                yield return new object[] { $"{i + 5} + -{i + 5}", 0 };
+                yield return new object[] { $"{i + 5} + +{i + 5}", (i + 5) << 1};
+
+                yield return new object[] { $"{i + 6} + -{i + 6}", 0 };
+                yield return new object[] { $"{i + 6} + +{i + 6}", (i + 6) << 1};
+
+                yield return new object[] { $"{i + 7} + -{i + 7}", 0 };
+                yield return new object[] { $"{i + 7} + +{i + 7}", (i + 7) << 1};
+
+                yield return new object[] { $"{i + 8} + -{i + 8}", 0 };
+                yield return new object[] { $"{i + 8} + +{i + 8}", (i + 8) << 1};
+
+                yield return new object[] { $"{i + 9} + -{i + 9}", 0 };
+                yield return new object[] { $"{i + 9} + +{i + 9}", (i + 9) << 1};
+            }
+
+
+            for(int i = 999_900; i < 1_000_000; i += 10)
+            {
+                yield return new object[] { "{ " + $"int i = {i}; i += {i}" + " }", i << 1 };
+                yield return new object[] { "{ " + $"int i = {i}; i -= {i}" + " }", 0 };
+                yield return new object[] { "{ " + $"int i = {i}; i /= {i}" + " }", 1 };
+                yield return new object[] { "{ " + $"int i = 1; i **= {i}" + " }", 1 };
+
+                yield return new object[] { "{ " + $"int i = {i + 1}; i += {i + 1}" + " }", (i + 1) << 1 };
+                yield return new object[] { "{ " + $"int i = {i + 1}; i -= {i + 1}" + " }", 0 };
+                yield return new object[] { "{ " + $"int i = {i + 1}; i /= {i + 1}" + " }", 1 };
+                yield return new object[] { "{ " + $"int i = 1; i **= {i + 1}" + " }", 1 };
+
+                yield return new object[] { "{ " + $"int i = {i + 2}; i += {i + 2}" + " }", (i + 2) << 1 };
+                yield return new object[] { "{ " + $"int i = {i + 2}; i -= {i + 2}" + " }", 0 };
+                yield return new object[] { "{ " + $"int i = {i + 2}; i /= {i + 2}" + " }", 1 };
+                yield return new object[] { "{ " + $"int i = 1; i **= {i + 2}" + " }", 1 };
+
+                yield return new object[] { "{ " + $"int i = {i + 3}; i += {i + 3}" + " }", (i + 3) << 1 };
+                yield return new object[] { "{ " + $"int i = {i + 3}; i -= {i + 3}" + " }", 0 };
+                yield return new object[] { "{ " + $"int i = {i + 3}; i /= {i + 3}" + " }", 1 };
+                yield return new object[] { "{ " + $"int i = 1; i **= {i + 3}" + " }", 1 };
+
+                yield return new object[] { "{ " + $"int i = {i + 4}; i += {i + 4}" + " }", (i + 4) << 1 };
+                yield return new object[] { "{ " + $"int i = {i + 4}; i -= {i + 4}" + " }", 0 };
+                yield return new object[] { "{ " + $"int i = {i + 4}; i /= {i + 4}" + " }", 1 };
+                yield return new object[] { "{ " + $"int i = 1; i **= {i + 4}" + " }", 1 };
+
+                yield return new object[] { "{ " + $"int i = {i + 5}; i += {i + 5}" + " }", (i + 5) << 1 };
+                yield return new object[] { "{ " + $"int i = {i + 5}; i -= {i + 5}" + " }", 0 };
+                yield return new object[] { "{ " + $"int i = {i + 5}; i /= {i + 5}" + " }", 1 };
+                yield return new object[] { "{ " + $"int i = 1; i **= {i + 5}" + " }", 1 };
+
+                yield return new object[] { "{ " + $"int i = {i + 6}; i += {i + 6}" + " }", (i + 6) << 1 };
+                yield return new object[] { "{ " + $"int i = {i + 6}; i -= {i + 6}" + " }", 0 };
+                yield return new object[] { "{ " + $"int i = {i + 6}; i /= {i + 6}" + " }", 1 };
+                yield return new object[] { "{ " + $"int i = 1; i **= {i + 6}" + " }", 1 };
+
+                yield return new object[] { "{ " + $"int i = {i + 7}; i += {i + 7}" + " }", (i + 7) << 1 };
+                yield return new object[] { "{ " + $"int i = {i + 7}; i -= {i + 7}" + " }", 0 };
+                yield return new object[] { "{ " + $"int i = {i + 7}; i /= {i + 7}" + " }", 1 };
+                yield return new object[] { "{ " + $"int i = 1; i **= {i + 7}" + " }", 1 };
+
+                yield return new object[] { "{ " + $"int i = {i + 8}; i += {i + 8}" + " }", (i + 8) << 1 };
+                yield return new object[] { "{ " + $"int i = {i + 8}; i -= {i + 8}" + " }", 0 };
+                yield return new object[] { "{ " + $"int i = {i + 8}; i /= {i + 8}" + " }", 1 };
+                yield return new object[] { "{ " + $"int i = 1; i **= {i + 8}" + " }", 1 };
+
+                yield return new object[] { "{ " + $"int i = {i + 9}; i += {i + 9}" + " }", (i + 9) << 1 };
+                yield return new object[] { "{ " + $"int i = {i + 9}; i -= {i + 9}" + " }", 0 };
+                yield return new object[] { "{ " + $"int i = {i + 9}; i /= {i + 9}" + " }", 1 };
+                yield return new object[] { "{ " + $"int i = 1; i **= {i + 9}" + " }", 1 };
             }
         }
-
     }
 }
