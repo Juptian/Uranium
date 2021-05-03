@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Uranium.CodeAnalysis.Syntax;
 
 namespace Uranium.Tests.CodeAnalysis.Parsing
 {
@@ -75,5 +71,34 @@ namespace Uranium.Tests.CodeAnalysis.Parsing
         var b = f + b;
     }
 ";
+        public const string CaseTwelve = "int i = 10 + 1";
+        public const string CaseThirteen = "double d = 10.10 + 20.20";
+        public const string CaseForteen = "float f = 10.3 + 10.3";
+        public const string CaseFifteen = "long l = 15 + 10";
+        public const string CaseSixteen = "int i = 10 - 1";
+        public const string CaseSeventeen = "double d = 10.1001 - 10";
+        public const string CaseEighteen = "float f = 10.3 - 10.3";
+        public const string CaseNineteen = "long l = 15 - 10";
+        public const string CaseTwenty = "int i = 10 ** 2";
+        public const string CaseTwentyOne = "long l = 100 ** 2";
+        public const string CaseTwentyTwo = "double d = 10 / 100";
+        public static string MakeForLoop
+            (
+                SyntaxKind identifierToken, string identifier, string initializer, 
+                SyntaxKind condition, int conditionNumber, 
+                SyntaxKind incrementationOperator, string incrementationAmount
+            )
+        {
+            var identifierTokenText = SyntaxFacts.GetText(identifierToken);
+            var conditionalText = SyntaxFacts.GetText(condition);
+            var incrementOpText = SyntaxFacts.GetText(incrementationOperator);
+            var result = $@"
+    for({identifierTokenText} {identifier} = {initializer}; {identifier} {conditionalText} {conditionNumber}; {identifier} {incrementOpText} {incrementationAmount})" + @"
+    {
+        var fkjwaghjkaw = 1;
+    }
+";
+            return result;
+        }
     }
 }

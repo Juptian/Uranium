@@ -143,6 +143,13 @@ namespace Uranium.Tests.CodeAnalysis.Parsing
                  
                 AssertToken(SyntaxKind.Semicolon, ";");
         }
+
+        public void AssertVariableDeclaration(SyntaxKind keyword, string identifer)
+        {
+            AssertNode(SyntaxKind.VariableDeclaration);
+            AssertToken(keyword, SyntaxFacts.GetText(keyword));
+            AssertToken(SyntaxKind.IdentifierToken, identifer);
+        }
         public void AssertCondition
             (
             string initializerName,

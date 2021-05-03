@@ -157,6 +157,7 @@ namespace Uranium.Tests.CodeAnalysis.Parsing
         [InlineData(ParserTestCases.CaseNine, SyntaxKind.VarKeyword, "var", "i", "2000", SyntaxKind.BangEquals, "1000", "1", SyntaxKind.MinusEquals)]
         [InlineData(ParserTestCases.CaseTen, SyntaxKind.VarKeyword, "var", "i", "2000", SyntaxKind.GreaterThanEquals, "1000", "1", SyntaxKind.MinusEquals)]
         [InlineData(ParserTestCases.CaseEleven, SyntaxKind.FloatKeyword, "float", "f", "200", SyntaxKind.GreaterThan, "100", "1", SyntaxKind.MinusEquals)]
+        [MemberData(nameof(GetForLoopData))]
         public void ParserParsesForLoops
             (
                 string data, 
@@ -187,7 +188,40 @@ namespace Uranium.Tests.CodeAnalysis.Parsing
                 e.AssertBlockStatement(true);
         }
         
+        [Theory]
+        [InlineData(ParserTestCases.CaseTwelve, SyntaxKind.IntKeyword, "i", "10", SyntaxKind.Plus, "1")]
+        [InlineData(ParserTestCases.CaseThirteen, SyntaxKind.DoubleKeyword, "d", "10.10", SyntaxKind.Plus, "20.20")]
+        [InlineData(ParserTestCases.CaseForteen, SyntaxKind.FloatKeyword, "f", "10.3", SyntaxKind.Plus, "10.3")]
+        [InlineData(ParserTestCases.CaseFifteen, SyntaxKind.LongKeyword, "l", "15", SyntaxKind.Plus, "10")]
 
+        [InlineData(ParserTestCases.CaseSixteen, SyntaxKind.IntKeyword, "i", "10", SyntaxKind.Minus, "1")]
+        [InlineData(ParserTestCases.CaseSeventeen, SyntaxKind.DoubleKeyword, "d", "10.1001", SyntaxKind.Minus, "10")]
+        [InlineData(ParserTestCases.CaseEighteen, SyntaxKind.FloatKeyword, "f", "10.3", SyntaxKind.Minus, "10.3")]
+        [InlineData(ParserTestCases.CaseNineteen, SyntaxKind.LongKeyword, "l", "15", SyntaxKind.Minus, "10")]
+        
+        [InlineData(ParserTestCases.CaseTwenty, SyntaxKind.IntKeyword, "i", "10", SyntaxKind.Pow, "2")]
+        [InlineData(ParserTestCases.CaseTwentyOne, SyntaxKind.LongKeyword, "l", "100", SyntaxKind.Pow, "2")]
+        [InlineData(ParserTestCases.CaseTwentyTwo, SyntaxKind.DoubleKeyword, "d", "10", SyntaxKind.Divide, "100")]
+        public void ParserParsesVariableDeclaration
+            (
+                string data, 
+                SyntaxKind keyword, string identifier, 
+                string valueLeft, SyntaxKind op, string valueRight
+            )
+        {
+            var expression = ParseVariableDeclaration(data);
+            using var e = new AssertingEnumerator(expression);
+            e.AssertNode(SyntaxKind.VariableDeclaration);
+            e.AssertToken(keyword, SyntaxFacts.GetText(keyword));
+            e.AssertToken(SyntaxKind.IdentifierToken, identifier);
+            e.AssertToken(SyntaxKind.Equals, "=");
+            e.AssertNode(SyntaxKind.BinaryExpression);
+            e.AssertLiteralExpression();
+            e.AssertToken(SyntaxKind.NumberToken, valueLeft);
+            e.AssertToken(op, SyntaxFacts.GetText(op));
+            e.AssertLiteralExpression();
+            e.AssertToken(SyntaxKind.NumberToken, valueRight);
+        }
         private static ExpressionSyntax ParseExpression(string text)
         {
             var syntaxTree = SyntaxTree.Parse(text);
@@ -202,6 +236,14 @@ namespace Uranium.Tests.CodeAnalysis.Parsing
             var root = syntaxTree.Root;
             var statement = root.Statement;
             return Assert.IsType<ForStatementSyntax>(statement);
+        }
+
+        private static VariableDeclarationSyntax ParseVariableDeclaration(string text)
+        {
+            var syntaxTree = SyntaxTree.Parse(text);
+            var root = syntaxTree.Root;
+            var statement = root.Statement;
+            return Assert.IsType<VariableDeclarationSyntax>(statement);
         }
 
         public static IEnumerable<object[]> GetBinaryOperatorPairsData()
@@ -225,6 +267,27 @@ namespace Uranium.Tests.CodeAnalysis.Parsing
                     yield return new object[] { unary, binary };
                 }
             }
+        }
+
+        public static IEnumerable<object[]> GetForLoopData()
+        {
+            for(int i = 0; i < 100; i++)
+            {
+                foreach(var keyword in GetIdentifierKeywords())
+                {
+                    var text = ParserTestCases.MakeForLoop(keyword, "i", "0", SyntaxKind.LesserThan, i, SyntaxKind.PlusEquals, "1");
+                    yield return new object[] { text, keyword, SyntaxFacts.GetText(keyword), "i", "0", SyntaxKind.LesserThan, i.ToString(), "1", SyntaxKind.PlusEquals};
+                }
+            }
+        }
+
+        public static IEnumerable<SyntaxKind> GetIdentifierKeywords()
+        {
+            yield return SyntaxKind.VarKeyword;
+            yield return SyntaxKind.IntKeyword;
+            yield return SyntaxKind.DoubleKeyword;
+            yield return SyntaxKind.FloatKeyword;
+            yield return SyntaxKind.LongKeyword;
         }
     }
 }
