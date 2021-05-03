@@ -151,7 +151,10 @@ namespace Uranium.Tests.CodeAnalysis.Expression
         {
             for (int i = 1; i <= 1_000_000; i++)
             {
-                i = i == 100 ? 999_900 : i;
+                if(i == 100)
+                {
+                    i = 999_900;
+                }
                 yield return new object[] { $"{i} + {i}", i + i };
                 yield return new object[] { $"{i} + -{i}/2", i + -i / 2 };
                 yield return new object[] { $"{i} * {i}", i * i };
@@ -163,13 +166,24 @@ namespace Uranium.Tests.CodeAnalysis.Expression
                 yield return new object[] { $"{i - 1} >= {i}", false };
             }
 
-            for (int i = 1; i <= 100; i++)
+            for (int i = 1; i <= 100_000; i++)
             {
+                if(i == 50)
+                {
+                    i = 99_950;
+                }
                 yield return new object[] { "{ " + $"var a = {i}; a += {i}" + " }", i + i };
                 yield return new object[] { "{ " + $"var a = {i}; a -= {i}" + " }", 0 };
                 yield return new object[] { "{ " + $"var a = {i}; a *= {i}" + " }", i * i };
                 yield return new object[] { "{ " + $"var a = {i}; a /= {i}" + " }", 1 };
-                yield return new object[] { "{ " + $"var a = {i}; a **= ({i}-{i}+1) + ({i}/{i} + 1)" + " }", i * i * i };
+                if(i <= 50)
+                {
+                    yield return new object[] { "{ " + $"var a = {i}; a **= ({i}-{i}+1) + ({i}/{i} + 1)" + " }", i * i * i };
+                }
+                else
+                {
+                    yield return new object[] { "{ " + $"var a = {i % 50}; a**= ({i}-{i}+1) + ({i}/{i} + 1)" + " }", (i % 50) * (i % 50) * (i % 50) };
+                }
             }
 
             for (float i = 0.01f; i <= 2; i += 0.01f)
@@ -186,25 +200,27 @@ namespace Uranium.Tests.CodeAnalysis.Expression
 
             for(int i = 0; i < 100_000; i++)
             {
-                if(i == 50)
+                if(i == 100)
                 {
-                    i = 99_950;
+                    i = 99_900;
                 }
                 yield return new object[] { $"{i} + -{i}", 0 };
                 yield return new object[] { $"{i} + +{i}", i + i };
             }
             for(int i = 1; i < 100_000; i++)
             {
-                if(i == 50)
+                if(i == 100)
                 {
-                    i = 99_950;
+                    i = 99_900;
                 }
                 yield return new object[] { "{ " + $"int i = {i}; i += {i}" + " }", i + i };
                 yield return new object[] { "{ " + $"int i = {i}; i -= {i}" + " }", 0 };
-                yield return new object[] { "{ " + $"int i = {i}; i *= {i}" + " }", i * i };
                 yield return new object[] { "{ " + $"int i = {i}; i /= {i}" + " }", 1 };
                 yield return new object[] { "{ " + $"int i = 1; i **= {i}" + " }", 1 };
-
+            }
+            for(int i = 1; i <= 100; i++)
+            {
+                yield return new object[] { "{ " + $"int i = {i}; i *= {i}" + " }", i * i};
             }
         }
 
