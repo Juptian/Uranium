@@ -16,6 +16,10 @@ coverage:
         if_ci_failed: ignore #success, failure, error, ignore
         informational: false
         only_pulls: false
+        fixes:
+          - "before/::after/"  # move path   e.g., "before/path" => "after/path"
+          - "::after/"         # move root   e.g., "path/" => "after/path/"
+          - "before/::"        # reduce root e.g., "before/path/" => "path/"
 
 comment:
   layout: "reach,diff,flags,files,footer"
