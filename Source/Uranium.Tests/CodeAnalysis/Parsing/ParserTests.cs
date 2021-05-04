@@ -24,16 +24,15 @@ namespace Uranium.Tests.CodeAnalysis.Parsing
 
             var expression = ParseExpression(text);
             
-            if(op1 == SyntaxKind.Pow && op2 == SyntaxKind.Pow)
+            if( (op1 == SyntaxKind.Pow && op2 == SyntaxKind.Pow) || op1Precedence < op2Precedence)
             {
                 using var e = new AssertingEnumerator(expression);
 
-
-                //      op1
+                //   op1
+                //  /   \
+                // a    op2
                 //     /   \
-                //    a    op2
-                //        /   \
-                //       b     c
+                //    b     c
                 e.AssertNode(SyntaxKind.BinaryExpression);
                     e.AssertNode(SyntaxKind.NameExpression);
                         e.AssertToken(SyntaxKind.IdentifierToken, "a");
@@ -73,35 +72,6 @@ namespace Uranium.Tests.CodeAnalysis.Parsing
                     e.AssertNode(SyntaxKind.NameExpression);
                         e.AssertToken(SyntaxKind.IdentifierToken, "c");
             } 
-            else
-            {
-                //      op1
-                //     /   \
-                //    a    op2
-                //        /   \
-                //       b     c
-                using var e = new AssertingEnumerator(expression);
-                
-                //indented to visualize with more ease.
-                //Op2
-                e.AssertNode(SyntaxKind.BinaryExpression);
-                    //Op1 - a
-                    e.AssertNode(SyntaxKind.NameExpression);
-                        e.AssertToken(SyntaxKind.IdentifierToken, "a");
-                    //Op1 - Operator
-                    e.AssertToken(op1, op1Text);
-                    //Op2
-                    e.AssertNode(SyntaxKind.BinaryExpression);
-                        //Op2 - B
-                        e.AssertNode(SyntaxKind.NameExpression);
-                            e.AssertToken(SyntaxKind.IdentifierToken, "b");
-                        //Op2 - Operator
-                        e.AssertToken(op2, op2Text);
-                        //Op2 - C
-                        e.AssertNode(SyntaxKind.NameExpression);
-                            e.AssertToken(SyntaxKind.IdentifierToken, "c");
-            }
-
         }
 
         [Theory]

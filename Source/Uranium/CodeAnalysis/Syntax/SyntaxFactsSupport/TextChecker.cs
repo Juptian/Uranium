@@ -80,7 +80,8 @@ namespace Uranium.CodeAnalysis.Syntax.SyntaxFactsSupport
                 _ => SyntaxKind.BadToken,
             };
 
-        public static string GetText(SyntaxKind kind) => kind switch
+        public static string GetText(SyntaxKind kind)
+            => kind switch
         {
             //Keywords
             SyntaxKind.TrueKeyword => "true",
