@@ -2,6 +2,7 @@
 using System.Linq;
 using System.IO;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using Uranium.CodeAnalysis.Syntax;
 using Uranium.CodeAnalysis;
 using Uranium.CodeAnalysis.Text;
@@ -16,6 +17,9 @@ namespace Uranium
         private static bool _showTree = false;
         private static SyntaxTree _syntaxTree;
         private static Compilation? _previous = null;
+
+        public static ImmutableArray<Diagnostic> Diagnostics;
+
         public static bool Emit(string[] args)
         {
             if(args.Length == 0)
@@ -65,8 +69,8 @@ namespace Uranium
 
         private static void DealWithDiagnostics(this EvaluationResult result)
         {
-            var diagnostics = result.Diagnostics; 
-
+            var diagnostics = result.Diagnostics;
+            Diagnostics = diagnostics;
             //If there are any diagnostics, we print them in red
             //This makes it more easy to determine what is and isn't an error
             if(!diagnostics.Any())

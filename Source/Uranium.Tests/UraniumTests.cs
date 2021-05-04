@@ -6,6 +6,11 @@ namespace Uranium.Tests
 {
     public static class UraniumTests
     {
+        private static readonly string[] _diagnostics = new string[]
+        {
+            "_100", "{ int a = 0.10 }", "{ var a = 10; var a = 11; }", "{ const a = 10; a = 11}", "{10 += 1}", "{10 = 1}"
+        };
+
         [Fact]
         public static void ItRuns()
         {
@@ -34,6 +39,13 @@ namespace Uranium.Tests
             text[1] = shouldFallIntoDefault;
             Assert.True(Uranium.Emit(text));
             Assert.False(Uranium.Emit(Array.Empty<string>()));
+
+            for(int i = 0; i < _diagnostics.Length; i++)
+            {
+                var item = new string[] { _diagnostics[i] };
+                Uranium.Emit(item);
+                Assert.False(Uranium.Diagnostics.IsEmpty);
+            }
         }
     }
 }
