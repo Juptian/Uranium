@@ -154,7 +154,7 @@ namespace Uranium.Tests.CodeAnalysis.Expression
         {
             //Low numbers
             //Unrolled for effieciency sake
-            for (int i = 1; i <= 100; i++)
+            for (int i = 1; i <= 50; i++)
             {
                 yield return new object[] { $"{i} + {i}", i + i };
                 yield return new object[] { $"{i} + -{i}/2", i + -(i >> 1) };
@@ -182,17 +182,17 @@ namespace Uranium.Tests.CodeAnalysis.Expression
                 yield return new object[] { "{ " + $"float i = {i};" + " }", (float)i };
                 yield return new object[] { "{ " + $"double i = {(double)i};" + " }", (double)i };
             }
-            for (int i = 0; i <= 200; i++)
+            for (int i = 0; i <= 50; i++)
             {
                 yield return new object[] { "{ " + $"int i = {i * 100};" + " }", i * 100 };
                 yield return new object[] { "{ " + $"long i = {i * 2000};" + " }", (long)i * 2000 };
             }
-            for (int i = 0; i < 100; i++)
+            for (int i = 0; i < 50; i++)
             {
                 yield return new object[] { $"{i} + -{i}", 0 };
                 yield return new object[] { $"{i} + +{i}", i + i };
             }
-            for (int i = 1; i <= 100; i++)
+            for (int i = 1; i <= 50; i++)
             {
                 yield return new object[] { "{ " + $"int i = {i}; i += {i}" + " }", i << 1 };
                 yield return new object[] { "{ " + $"int i = {i}; i -= {i}" + " }", 0 };
@@ -202,7 +202,7 @@ namespace Uranium.Tests.CodeAnalysis.Expression
 
             //Testing for high numbers
             //To cover most cases
-            for(int i = 999_900; i < 1_000_000; i++)
+            for(int i = 999_950; i < 1_000_000; i++)
             {
                 yield return new object[] { $"{i} + {i}", i + i };
                 yield return new object[] { $"{i} + -{i}/2", i + -i / 2 };
@@ -217,13 +217,13 @@ namespace Uranium.Tests.CodeAnalysis.Expression
                 yield return new object[] { $"{i - 1} >= {i}", false };
             }
 
-            for(int i = 999_900; i < 1_000_000; i++)
+            for(int i = 999_950; i < 1_000_000; i++)
             {
                 yield return new object[] { $"{i} + -{i}", 0 };
                 yield return new object[] { $"{i} + +{i}", i << 1 };
             }
 
-            for(int i = 999_900; i < 1_000_000; i += 10)
+            for(int i = 999_950; i < 1_000_000; i += 10)
             {
                 yield return new object[] { "{ " + $"int i = {i}; i += {i}" + " }", i << 1 };
                 yield return new object[] { "{ " + $"int i = {i}; i -= {i}" + " }", 0 };
