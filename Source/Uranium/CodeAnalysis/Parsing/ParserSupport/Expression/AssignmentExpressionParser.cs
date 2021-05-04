@@ -32,8 +32,16 @@ namespace Uranium.CodeAnalysis.Parsing.ParserSupport
                     //Despite knowing the token, we want to consume it, to avoid loops
                     var identifierToken = parser.NextToken();
                     var operatorToken = parser.NextToken();
-                    var right = Parse(parser);
-
+                    ExpressionSyntax right;
+                    if(operatorToken.Kind != SyntaxKind.PlusPlus &&
+                       operatorToken.Kind != SyntaxKind.MinusMinus)
+                    {
+                        right = Parse(parser);
+                    }
+                    else
+                    {
+                        right = new LiteralExpressionSyntax(new(SyntaxKind.NumberToken, operatorToken.Position, "1", 1));
+                    }
                     if(isCompound)
                     {
                         var soloOp = SyntaxFacts.GetSoloOperator(operatorToken);
@@ -42,14 +50,6 @@ namespace Uranium.CodeAnalysis.Parsing.ParserSupport
 
                     return new AssignmentExpressionSyntax(identifierToken, operatorToken, right);
                 }
-                /*else if(SyntaxFacts.CheckForCompoundOperator(parser.Next))
-                {
-                    var identifierToken = parser.NextToken();
-                    var operatorToken = parser.NextToken();
-                    var right = Parse(parser);
-                    var soloOp = SyntaxFacts.GetSoloOperator(operatorToken);
-                    return new AssignmentExpressionSyntax(identifierToken, soloOp, right, true, operatorToken);
-                }*/
             }
             StopInfiniteLoops(parser);
             return BinaryExpressionParser.Parse(parser);

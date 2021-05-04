@@ -79,6 +79,9 @@ namespace Uranium.CodeAnalysis.Syntax.SyntaxFactsSupport
                 SyntaxKind.MultiplyEquals => new(SyntaxKind.Multiply, token.Position, token.Text, token.Value),
                 SyntaxKind.DivideEquals => new(SyntaxKind.Divide, token.Position, token.Text, token.Value),
                 SyntaxKind.PowEquals => new(SyntaxKind.Pow, token.Position, token.Text, token.Value),
+                SyntaxKind.PlusPlus => new(SyntaxKind.Plus, token.Position, token.Text, token.Value),
+                SyntaxKind.MinusMinus => new(SyntaxKind.Minus, token.Position, token.Text, token.Value),
+
                 _ => token,
             };
 
@@ -90,7 +93,8 @@ namespace Uranium.CodeAnalysis.Syntax.SyntaxFactsSupport
                 SyntaxKind.MultiplyEquals => SyntaxKind.Multiply,
                 SyntaxKind.DivideEquals => SyntaxKind.Divide,
                 SyntaxKind.PowEquals => SyntaxKind.Pow, 
-
+                SyntaxKind.PlusPlus => SyntaxKind.Plus,
+                SyntaxKind.MinusMinus => SyntaxKind.Minus,
                 _ => kind,
             };
     }

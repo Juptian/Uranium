@@ -42,6 +42,8 @@ namespace Uranium.Tests.CodeAnalysis.Expression
         [InlineData("0 != false", false)]
         [InlineData("false == 0", true)]
         [InlineData("true == 1", true)]
+        [InlineData("{ var a = 10; a--; }", 9)]
+        [InlineData("{ var a = 10; a++; }", 11)]
         [InlineData(@"
 { 
     var a = 10; 
@@ -199,6 +201,8 @@ namespace Uranium.Tests.CodeAnalysis.Expression
                 yield return new object[] { "{ " + $"int i = {i}; i -= {i}" + " }", 0 };
                 yield return new object[] { "{ " + $"int i = {i}; i /= {i}" + " }", 1 };
                 yield return new object[] { "{ " + $"int i = 1; i **= {i}" + " }", 1 };
+                yield return new object[] { "{ " + $"int i = {i}; i++;" + " }", i + 1 };
+                yield return new object[] { "{ " + $"int i = {i}; i--;" + " }", i - 1 };
             }
 
             //Testing for high numbers
@@ -230,6 +234,8 @@ namespace Uranium.Tests.CodeAnalysis.Expression
                 yield return new object[] { "{ " + $"int i = {i}; i -= {i}" + " }", 0 };
                 yield return new object[] { "{ " + $"int i = {i}; i /= {i}" + " }", 1 };
                 yield return new object[] { "{ " + $"int i = 1; i **= {i}" + " }", 1 };
+                yield return new object[] { "{ " + $"int i = {i}; i++;" + " }", i + 1 };
+                yield return new object[] { "{ " + $"int i = {i}; i--;" + " }", i - 1 };
             }
         }
     }

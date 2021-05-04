@@ -80,6 +80,14 @@ namespace Uranium.Tests.CodeAnalysis.Lexing
             Assert.Equal(expectedType, token.Value.GetType());
         }
 
+        [Fact]
+        public void LexerLexesEndOfFileCorrectly()
+        {
+            string text = "      \0";
+            var tokens = SyntaxTree.LexTokens(text);
+            Assert.Empty(tokens);
+        }
+
         [Theory]
         [MemberData(nameof(GetTokenPairsData))]
         public void LexerLexesTokenPairs(TupleContainer left, TupleContainer right)

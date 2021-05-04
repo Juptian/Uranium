@@ -34,11 +34,8 @@ namespace Uranium.CodeAnalysis.Lexing
             ReadSpecialChars(false);
             LexToken(CurrentIndex);
 
-#if DEBUG
-            Debug.WriteLine($"{_current}, {_text ?? CurrentIndex.ToString()}, {_index}, {_currentValue}");
-#endif
             var token = new SyntaxToken(_current, _index++, _text ?? PreviousIndex.ToString(), _currentValue);
-            if(SyntaxFacts.GetKeywordType(_current) is not null)
+            if (SyntaxFacts.GetKeywordType(_current) is not null)
             {
                 _previousIdentifier = token;
             }
