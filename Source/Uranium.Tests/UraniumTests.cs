@@ -1,4 +1,5 @@
-﻿using Uranium;
+﻿using System;
+using Uranium;
 using Xunit;
 
 namespace Uranium.Tests
@@ -8,7 +9,7 @@ namespace Uranium.Tests
         [Fact]
         public static void ItRuns()
         {
-            var text = new string[] { "dotnet run --project Source\\Uranium.Main\\Uranium.Main.csproj", @"
+            var text = new string[] { @"
 {
     var a = 10;
     var b = 100;
@@ -17,7 +18,20 @@ namespace Uranium.Tests
         b -= 1;
     }
 }", "--tree" };
-            Uranium.Emit(text);
+            Assert.True(Uranium.Emit(text));
+
+            text[0] = @"
+{
+    int a = 10.10;
+    var b = 100;
+    for(; a < b; a += 1)
+    {
+        b -= 1;
+    }
+}";
+            Assert.True(Uranium.Emit(text));
+
+            Assert.False(Uranium.Emit(Array.Empty<string>()));
         }
     }
 }

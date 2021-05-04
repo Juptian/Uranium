@@ -16,12 +16,12 @@ namespace Uranium
         private static bool _showTree = false;
         private static SyntaxTree _syntaxTree;
         private static Compilation? _previous = null;
-        public static void Emit(string[] args)
+        public static bool Emit(string[] args)
         {
             if(args.Length == 0)
             {
                 Console.WriteLine("You must specify a file, or an input string");
-                return;
+                return false;
             }
             else if (args.Length >= 1)
             {
@@ -44,6 +44,7 @@ namespace Uranium
                 _syntaxTree.Root.WriteTo(Console.Out);
                 Console.ResetColor();    
             }
+            return true;
         }
 
         private static void ReadArgs(string[] args)
