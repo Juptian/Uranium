@@ -28,8 +28,56 @@ namespace Uranium.Tests.CodeAnalysis.Lexing
             var tokens = SyntaxTree.LexTokens(text);
 
             var singleToken = Assert.Single(tokens);
+            Assert.NotEmpty(singleToken.ToString());
             Assert.Equal(kind, singleToken.Kind);
             Assert.Equal(text, singleToken.Text);
+        }
+
+        [Theory]
+        [InlineData("     ")]
+        public void LexerLexesWhitespace(string text)
+        {
+            var tokens = SyntaxTree.LexTokens(text);
+            Assert.Empty(tokens);
+        }
+
+        [Theory]
+        [InlineData("\r\r")]
+        public void LexerLexesLineBreak(string text)
+        {
+            var tokens = SyntaxTree.LexTokens(text);
+            var token = Assert.Single(tokens);
+            Assert.Equal(SyntaxKind.LineBreak, token.Kind);
+        }
+
+        [Theory]
+        [InlineData("/* */", true)]
+        [InlineData("//")]
+        public void LexerLexesComments(string text, bool isMultiLine = false)
+        {
+            var tokens = SyntaxTree.LexTokens(text);
+            var token = Assert.Single(tokens);
+            Assert.Equal( isMultiLine ? SyntaxKind.MultiLineComment : SyntaxKind.SingleLineComment, token.Kind);
+        }
+        [Theory]
+        [InlineData("    f")]
+        public void LexerIgnoresWhitespace(string text)
+        {
+            var tokens = SyntaxTree.LexTokens(text);
+            var token = Assert.Single(tokens);
+            Assert.Equal(SyntaxKind.IdentifierToken, token.Kind);
+        }
+        
+        [Theory]
+        [InlineData("100 233", typeof(int))]
+        [InlineData("2147483648", typeof(uint))]
+        [InlineData("4294967299", typeof(long))]
+        [InlineData("9223372036854775810", typeof(ulong))]
+        public void LexerLexesNumbersProperly(string text, Type expectedType)
+        {
+            var tokens = SyntaxTree.LexTokens(text);
+            var token = Assert.Single(tokens);
+            Assert.Equal(expectedType, token.Value.GetType());
         }
 
         [Theory]

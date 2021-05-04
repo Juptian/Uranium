@@ -461,7 +461,7 @@ namespace Uranium.CodeAnalysis.Lexing
                 }
                 else
                 {
-                    _currentValue = (long)value;
+                    _currentValue = value;
                 }
             }
         }
