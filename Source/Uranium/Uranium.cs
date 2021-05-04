@@ -1,14 +1,8 @@
 ﻿using System;
-using Uranium.CodeAnalysis.Lexing;
-using Uranium.CodeAnalysis.Syntax.Expression;
 using System.Linq;
 using System.IO;
-using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using Uranium.CodeAnalysis.Syntax;
-using Uranium.CodeAnalysis.Parsing;
-using Uranium.CodeAnalysis.Binding;
 using Uranium.CodeAnalysis;
 using Uranium.CodeAnalysis.Text;
 using Uranium.Logging;

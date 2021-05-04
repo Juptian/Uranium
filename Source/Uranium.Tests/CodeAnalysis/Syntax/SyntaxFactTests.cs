@@ -137,31 +137,41 @@ namespace Uranium.Tests.CodeAnalysis.Syntax
             Assert.Null(SyntaxFacts.GetKeywordType(SyntaxKind.IfKeyword));
         }
 
+        [Fact]
+        public void GetUnaryOperator()
+        {
+            var operators = SyntaxFacts.GetUnaryOperators().ToArray();
+            for(int i = 0; i < operators.Length; i++)
+            {
+                Assert.False(SyntaxFacts.GetUnaryOperatorPrecedence(operators[i]) == 0);
+            }
+        }
+
         public static IEnumerable<object[]> GetSyntaxKindData()
         {
             var syntaxKinds = (SyntaxKind[])Enum.GetValues(typeof(SyntaxKind));
-            
-            foreach(var kind in syntaxKinds)
+
+            for(int i = 0; i < syntaxKinds.Length; i++)
             {
-                yield return new object[] { kind };
+                yield return new object[] { syntaxKinds[i] };
             }
         }
 
         public static IEnumerable<object[]> GetSyntaxTextData()
         {
             var syntaxKinds = (SyntaxKind[])Enum.GetValues(typeof(SyntaxKind));
-            foreach(var kind in syntaxKinds)
+            for(int i = 0; i < syntaxKinds.Length; i++)
             {
-                yield return new object[] { SyntaxFacts.GetText(kind), kind };
+                yield return new object[] { SyntaxFacts.GetText(syntaxKinds[i]), syntaxKinds[i] };
             }
         }
         public static string AllTokens()
         {
             var syntaxKinds = (SyntaxKind[])Enum.GetValues(typeof(SyntaxKind));
             var result = new StringBuilder();
-            foreach(var kind in syntaxKinds)
+            for(int i = 0; i < syntaxKinds.Length; i++)
             {
-                result.Append(SyntaxFacts.GetText(kind) + " ");
+                result.Append(SyntaxFacts.GetText(syntaxKinds[i]) + " ");
             }
             return result.ToString();
         }
