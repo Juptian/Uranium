@@ -24,9 +24,9 @@ namespace Uranium.Logging
             _diagnostics.Add(diag);
         }
 
-        public void Concat(DiagnosticBag other) => _diagnostics.AddRange(other._diagnostics);
+        public void Concat(DiagnosticBag other) => AddRange(other);
 
-        public void AddRange(DiagnosticBag other) => Concat(other);
+        public void AddRange(DiagnosticBag other) => _diagnostics.AddRange(other._diagnostics);
 
         public void ReportNumberStartWithUnderscore(TextSpan span, string text, Type type)
         {

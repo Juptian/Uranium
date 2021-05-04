@@ -18,9 +18,7 @@ namespace Uranium.Tests
         b -= 1;
     }
 }", "--tree" };
-            Assert.True(Uranium.Emit(text));
-
-            text[0] = @"
+            var shouldHaveDiagnostic = @"
 {
     int a = 10.10;
     var b = 100;
@@ -29,8 +27,12 @@ namespace Uranium.Tests
         b -= 1;
     }
 }";
+            var shouldFallIntoDefault = "aj";
             Assert.True(Uranium.Emit(text));
 
+            text[0] = shouldHaveDiagnostic;
+            text[1] = shouldFallIntoDefault;
+            Assert.True(Uranium.Emit(text));
             Assert.False(Uranium.Emit(Array.Empty<string>()));
         }
     }
