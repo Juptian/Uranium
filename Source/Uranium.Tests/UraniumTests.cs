@@ -8,7 +8,8 @@ namespace Uranium.Tests
     {
         private static readonly string[] _diagnostics = new string[]
         {
-            "_100", "{ int a = 0.10 }", "{ var a = 10; var a = 11; }", "{ const a = 10; a = 11}", "{10 += 1}", "{10 = 1}"
+            "_100", "{ int a = 0.10 }", "{ var a = 10; var a = 11; }", "{ const a = 10; a = 11}", "{10 += 1}", "{10 = 1}",
+            "{ int a = 10; double b = 11; float c = a + b; }", "{ var a = 10;"
         };
 
         [Fact]
