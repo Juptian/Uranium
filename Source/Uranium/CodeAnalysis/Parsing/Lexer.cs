@@ -367,9 +367,8 @@ namespace Uranium.CodeAnalysis.Lexing
             }
 
             //var targetType = SyntaxFacts.GetKeywordType(_previousIdentifier?.Kind ?? SyntaxKind.DoubleKeyword);
-            
-            if(_text.Equals("0", StringComparison.Ordinal) && 
-               _previousIdentifier is not null && 
+
+            if(_previousIdentifier is not null && 
                !IsVarKeyword(_previousIdentifier!.Kind))
             {
                 if(SyntaxFacts.IsFloatingPoint(_previousIdentifier!.Kind))
@@ -378,7 +377,14 @@ namespace Uranium.CodeAnalysis.Lexing
                 }
                 else
                 {
-                    ParseLong(text, length);
+                    if(isDecimal)
+                    {
+                        _diagnostics.ReportInvalidDecimal(new(_start, length), text, _previousIdentifier.Kind);
+                    }
+                    else
+                    {
+                        ParseLong(text, length);
+                    }
                 }
             }
             if(isDecimal)

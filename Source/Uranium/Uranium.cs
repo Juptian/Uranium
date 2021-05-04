@@ -59,7 +59,7 @@ namespace Uranium
                 //Using a switch statement here for future proofing!
                 switch(args[i].ToUpper())
                 {
-                    case "--#SHOWTREE":
+                    case "--TREE":
                         _showTree = true;
                         break;
                     default:
@@ -104,8 +104,7 @@ namespace Uranium
             var character = diag.Span.Start - treeText.Lines[lineIndex].Start + 1;
 
             Console.WriteLine();
-            Console.Write($"({lineNumber}, {character}),");
-            Console.WriteLine($"{diag}");
+            Console.WriteLine($"({lineNumber}, {character}), {diag}");
         }
         
         private static string OpenFile(string filePath)

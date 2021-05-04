@@ -39,6 +39,5 @@ namespace Uranium.CodeAnalysis.Syntax.EvaluatorSupport
                 _ => throw new($"Unexpected binary operator {b.Op.Kind}"),
             };
         }
-
     }
 }

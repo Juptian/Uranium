@@ -1,4 +1,6 @@
-﻿for(var i = 0; i <= 10; i += 1)
-{
-	i;
+﻿{
+	int a = 10.10;
+	long b = 100;
+	float c = 10.31;
+	double d = 10.10;
 }

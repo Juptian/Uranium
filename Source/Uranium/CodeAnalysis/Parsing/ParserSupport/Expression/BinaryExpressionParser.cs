@@ -27,7 +27,7 @@ namespace Uranium.CodeAnalysis.Parsing.ParserSupport
             {
                 var precedence = parser.Current.Kind.GetBinaryOperatorPrecedence();
 
-                if(precedence <= MIN_PRECEDENCE || precedence <= parentPrecedence)
+                if((precedence <= MIN_PRECEDENCE || precedence <= parentPrecedence) && parser.Current.Kind != SyntaxKind.Pow)
                 {
                     break;
                 }

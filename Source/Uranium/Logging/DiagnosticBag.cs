@@ -36,7 +36,7 @@ namespace Uranium.Logging
 
         public void ReportInvalidNumber(TextSpan span, string text, Type type)
         {
-            var message = $"UR00002: at {type} {text} : Could not parse {text} to {type}.";
+            var message = $"UR00002: at {type} {text} : Could not parse {text} to {type.ToString()[7..]}.";
             Report(span, message);
         }
 
@@ -55,13 +55,13 @@ namespace Uranium.Logging
 
         public void ReportUndefinedUnaryOperator(TextSpan span, string operatorText, Type operandType)
         {
-            var message = $"UR00005: Unary operator {operatorText} is not defined for {operandType}.";
+            var message = $"UR00005: Unary operator {operatorText} is not defined for {operandType.ToString()[7..]}.";
             Report(span, message);
         }
 
         public void ReportUndefinedBinaryOperator(TextSpan span, string? operatorText, Type leftType, Type rightType)
         {
-            var message = $"UR00006: Binary operator {operatorText} is undefined for {leftType} and {rightType}.";
+            var message = $"UR00006: Binary operator {operatorText} is undefined for {leftType.ToString()[7..]} and {rightType.ToString()[7..]}.";
             Report(span, message);
         }
 
@@ -109,7 +109,12 @@ namespace Uranium.Logging
         }
         public void ReportInvalidEqualsToken(TextSpan span)
         {
-            var message = $"UR00014: Cannot have an equals expression without an identifier token";
+            var message = $"UR00014: You Cannot have an equals expression without an identifier token";
+            Report(span, message);
+        }
+        public void ReportInvalidDecimal(TextSpan span, string text, SyntaxKind previousKeyword)
+        {
+            var message = $"UR00015: A variable of type {SyntaxFacts.GetText(previousKeyword)} cannot have any decimals. {text}";
             Report(span, message);
         }
     }
