@@ -28,11 +28,11 @@ namespace Uranium.Logging
 
         public void AddRange(DiagnosticBag other) => _diagnostics.AddRange(other._diagnostics);
 
-        public void ReportNumberStartWithUnderscore(TextSpan span, string text, Type type)
+        /*public void ReportNumberStartWithUnderscore(TextSpan span, string text, Type type)
         {
             var message = $"UR00001: {text} : {type} cannot start with an underscore!";
             Report(span, message);
-        }
+        }*/
 
         public void ReportInvalidNumber(TextSpan span, string text, Type type)
         {
@@ -90,7 +90,7 @@ namespace Uranium.Logging
             Report(totalSpan, message);
         }
 
-        public void ReportNoSemiColon(TextSpan span)
+        /*public void ReportNoSemiColon(TextSpan span)
         {
             var message = $"UR00011: Line cannot end without a semi colon";
             Report(span, message);
@@ -100,7 +100,7 @@ namespace Uranium.Logging
         {
             var message = $"UR00012: A file cannot start with a number. {text}";
             Report(span, message);
-        }
+        }*/
 
         public void ReportInvalidCompoundOperator(TextSpan span, SyntaxToken token)
         {

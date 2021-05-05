@@ -181,5 +181,9 @@ namespace Uranium.CodeAnalysis.Syntax.SyntaxFactsSupport
             _ => null,
         };
 
+        public static bool IsVarKeyword(SyntaxKind kind)
+            => kind is SyntaxKind.VarKeyword ||
+               kind is SyntaxKind.LetConstKeyword ||
+               kind is SyntaxKind.ConstKeyword;
     }
 }
