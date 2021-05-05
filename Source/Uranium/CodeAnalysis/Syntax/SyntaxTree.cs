@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Uranium.CodeAnalysis.Syntax.Expression;
 using Uranium.CodeAnalysis.Parsing;
 using Uranium.Logging;
 using Uranium.CodeAnalysis.Lexing;
@@ -17,12 +13,11 @@ namespace Uranium.CodeAnalysis.Syntax
         private SyntaxTree(SourceText text)
         {
             var parser = new Parser(text);
-            var root = parser.ParseCompilationUnit();
 
+            Root = parser.ParseCompilationUnit();
             Text = text;
             //After all that, we just add our diagnostics that got reported
             Diagnostics = parser.Diagnostics.ToImmutableArray();
-            Root = root;
         }
 
         public SourceText Text { get; }

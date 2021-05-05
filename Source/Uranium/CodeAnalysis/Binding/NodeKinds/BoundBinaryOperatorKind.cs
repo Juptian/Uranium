@@ -23,6 +23,10 @@ namespace Uranium.CodeAnalysis.Binding.NodeKinds
         AdditionAddition,
         SubtractionSubtraction,
 
+        BitwiseAND,
+        BitwiseOR,
+        BitwiseXOR,
+
         LogicalAND,
         LogicalOR,
         LogicalXOREquals,

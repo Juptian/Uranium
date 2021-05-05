@@ -54,8 +54,14 @@ namespace Uranium.CodeAnalysis.Syntax
         public static Type? GetKeywordType(string kind)
             => TextChecker.GetKeywordType(kind);
 
+        public static SyntaxKind GetKeyword(object obj)
+            => TextChecker.GetKeyword(obj);
+
         public static bool IsVarKeyword(SyntaxKind kind)
             => TextChecker.IsVarKeyword(kind);
+
+        public static bool IsNumber(object obj)
+            => IsFloatingPoint(TextChecker.GetKeyword(obj)) || IsInteger(TextChecker.GetKeyword(obj));
 
         public static bool IsFloatingPoint(SyntaxKind kind)
             => TypeChecker.IsFloatingPoint(kind);

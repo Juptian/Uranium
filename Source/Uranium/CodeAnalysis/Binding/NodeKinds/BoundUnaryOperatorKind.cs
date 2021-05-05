@@ -12,6 +12,7 @@ namespace Uranium.CodeAnalysis.Binding.NodeKinds
         Identity,
         Negation,
         LogicalNegation,
-        LogicalXOR
+
+        BitwiseNegation
     } 
 }

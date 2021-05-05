@@ -16,6 +16,8 @@ namespace Uranium.CodeAnalysis.Syntax.EvaluatorSupport
                     return -(int)operand;
                 case BoundUnaryOperatorKind.LogicalNegation:
                     return !(bool)operand;
+                case BoundUnaryOperatorKind.BitwiseNegation:
+                    return ~(int)operand;
             }
             Console.Error.WriteLine($"Unexpected unary operator {u.Kind}");
             return new object();

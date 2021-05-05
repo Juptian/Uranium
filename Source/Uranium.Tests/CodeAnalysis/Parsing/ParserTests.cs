@@ -177,6 +177,7 @@ namespace Uranium.Tests.CodeAnalysis.Parsing
                     e.AssertAssignmentExpression(initializerName, soloOperator, soloText, incrementationText, incrementor);
                 e.AssertToken(SyntaxKind.CloseParenthesis, ")");
                 e.AssertBlockStatement(true);
+            expression.ToString();
         }
         
         [Theory]

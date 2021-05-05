@@ -11,15 +11,26 @@ namespace Uranium.CodeAnalysis.Syntax.SyntaxFactsSupport
         public static int GetBinaryOperatorPrecedence(this SyntaxKind kind)
             => kind switch
             {
+                SyntaxKind.Hat or 
+                SyntaxKind.Pipe or
                 SyntaxKind.DoublePipe => _minusValue - 3,
+                
+                SyntaxKind.Ampersand or
                 SyntaxKind.DoubleAmpersand => _minusValue - 2, 
 
-                SyntaxKind.DoubleEquals or SyntaxKind.BangEquals or
-                SyntaxKind.LesserThan or SyntaxKind.LesserThanEquals or
-                SyntaxKind.GreaterThan or SyntaxKind.GreaterThanEquals => _minusValue - 1,
+                SyntaxKind.DoubleEquals or 
+                SyntaxKind.BangEquals or
+                SyntaxKind.LesserThan or 
+                SyntaxKind.LesserThanEquals or
+                SyntaxKind.GreaterThan or 
+                SyntaxKind.GreaterThanEquals => _minusValue - 1,
 
-                SyntaxKind.Plus or SyntaxKind.Minus => _minusValue,
-                SyntaxKind.Multiply or SyntaxKind.Divide => _minusValue + 1,
+                SyntaxKind.Plus or 
+                SyntaxKind.Minus => _minusValue,
+                
+                SyntaxKind.Multiply or 
+                SyntaxKind.Divide => _minusValue + 1,
+                
                 SyntaxKind.Pow => _minusValue + 2,
                 _ => 0,
             };
@@ -42,7 +53,8 @@ namespace Uranium.CodeAnalysis.Syntax.SyntaxFactsSupport
             {
                 SyntaxKind.Plus or 
                 SyntaxKind.Minus or 
-                SyntaxKind.Bang => _minusValue + 3,
+                SyntaxKind.Bang or
+                SyntaxKind.Tilde=> _minusValue + 3,
                 _ => 0,
             };
  

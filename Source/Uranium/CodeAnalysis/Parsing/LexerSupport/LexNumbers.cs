@@ -13,9 +13,9 @@ namespace Uranium.CodeAnalysis.Lexing.LexerSupport
             var hasMultiDecimals = false;
             lexer.Start = lexer.Index;
 
-            while (char.IsDigit(lexer.CurrentIndex) ||
-                  (lexer.CurrentIndex == '_' || lexer.CurrentIndex == ' ') && char.IsDigit(lexer.NextIndex) ||
-                  (lexer.CurrentIndex == '.' || lexer.CurrentIndex == ',') && char.IsDigit(lexer.NextIndex))
+            while ( char.IsDigit(lexer.CurrentIndex) ||
+                  ((lexer.CurrentIndex == '_' || lexer.CurrentIndex == ' ') && char.IsDigit(lexer.NextIndex)) ||
+                  ((lexer.CurrentIndex == '.' || lexer.CurrentIndex == ',') && char.IsDigit(lexer.NextIndex)))
             {
                 if (!hasSeparator && (lexer.CurrentIndex == '_' || lexer.CurrentIndex == ' '))
                 {
@@ -37,6 +37,7 @@ namespace Uranium.CodeAnalysis.Lexing.LexerSupport
             var charArray = lexer.Source.ToString(lexer.Start, length).Replace(',', '.').ToCharArray();
 
             var text = string.Join("", charArray.Where(e => !char.IsWhiteSpace(e) && !e.Equals('_')));
+
             lexer.Text = text;
 
             //Numbers cannot have multiple .s or ,s.
@@ -79,12 +80,13 @@ namespace Uranium.CodeAnalysis.Lexing.LexerSupport
    
         private static void ParseDouble(string text, int length, Lexer lexer)
         {
-            if (!double.TryParse(text, out double value))
+            var digits = text.Length - 1;
+            if (!double.TryParse(text, out var value))
             {
                 lexer.diagnostics.ReportInvalidNumber(new(lexer.Start, length), text, typeof(double));
             }
             else if (lexer.PreviousIdentifier is not null && !SyntaxFacts.IsVarKeyword(lexer.PreviousIdentifier.Kind))
-            { 
+            {
                 if(lexer.PreviousIdentifier!.Kind is SyntaxKind.DoubleKeyword)
                 {
                     lexer.CurrentValue = value;
@@ -96,7 +98,7 @@ namespace Uranium.CodeAnalysis.Lexing.LexerSupport
             }
             else
             {
-                if (value >= float.MinValue && value <= float.MaxValue)
+                if (value >= float.MinValue && value <= float.MaxValue && digits < 8)
                 {
                     lexer.CurrentValue = (float)value;
                 }
@@ -109,7 +111,7 @@ namespace Uranium.CodeAnalysis.Lexing.LexerSupport
 
         private static void ParseLong(string text, int length, Lexer lexer)
         {
-            if (!ulong.TryParse(text, out ulong value))
+            if (!ulong.TryParse(text, out var value))
             {
                 lexer.diagnostics.ReportInvalidNumber(new(lexer.Start, length), text, typeof(long));
             }

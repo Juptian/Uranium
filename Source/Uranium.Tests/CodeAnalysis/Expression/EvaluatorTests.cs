@@ -14,6 +14,7 @@ namespace Uranium.Tests.CodeAnalysis.Expression
         [InlineData("1", 1)]
         [InlineData("+1", 1)]
         [InlineData("-1", -1)]
+        [InlineData("~1", ~1)]
         [InlineData("1 - 2", -1)]
         [InlineData("1 * 25", 25)]
         [InlineData("5 ** 2", 25)]
@@ -27,6 +28,29 @@ namespace Uranium.Tests.CodeAnalysis.Expression
         [InlineData("3 != 3", false)]
         [InlineData("false", false)]
         [InlineData("true", true)]
+
+        [InlineData("1 | 2", (1 | 3))]
+        [InlineData("1 | 0", (1 | 0))]
+        [InlineData("1 & 2", (1 & 2))]
+        [InlineData("1 & 0", (1 & 0))]
+        [InlineData("1 ^ 0", (1 ^ 0))]
+        [InlineData("1 ^ 3", (1 ^ 3))]
+
+        [InlineData("false | false", false)]
+        [InlineData("true | true", true)]
+        [InlineData("false | true", true)]
+        [InlineData("true | false", true)]
+
+        [InlineData("false & false", false)]
+        [InlineData("true & true", true)]
+        [InlineData("false & true", false)]
+        [InlineData("true & false", false)]
+
+        [InlineData("false ^ false", false)]
+        [InlineData("true ^ true", false)]
+        [InlineData("false ^ true", true)]
+        [InlineData("true ^ false", true)]
+
         [InlineData("true == false", false)]
         [InlineData("true != false", true)]
         [InlineData("false != true", true)]
@@ -42,7 +66,7 @@ namespace Uranium.Tests.CodeAnalysis.Expression
         [InlineData("0 != false", false)]
         [InlineData("false == 0", true)]
         [InlineData("true == 1", true)]
-        [InlineData("var a = 0.2147483647", 0.2147483647)]
+        [InlineData("var a = 0.2147483;", (double)0.2147483)]
         [InlineData("{ var a = 10; a--; }", 9)]
         [InlineData("{ var a = 10; a++; }", 11)]
         [InlineData(@"
@@ -139,7 +163,7 @@ namespace Uranium.Tests.CodeAnalysis.Expression
         [InlineData("4**8", fourPowEight)]
         [InlineData("4**9", 262144)]
         [MemberData(nameof(TestCases))]
-        public void SyntaxFactGetTextRoundTrips(string text, object expectedResult)
+        public void EvaluatorTestCases(string text, object expectedResult)
         {
             var syntaxTree = SyntaxTree.Parse(text);
             var compilation = new Compilation(syntaxTree);
@@ -160,7 +184,7 @@ namespace Uranium.Tests.CodeAnalysis.Expression
             //Unrolled for effieciency sake
             for (int i = 1; i <= 50; i++)
             {
-                yield return new object[] { $"{i} + {i}", i + i };
+                yield return new object[] { $"{i} + {i}", i << 1 };
                 yield return new object[] { $"{i} + -{i}/2", i + -(i >> 1) };
                 yield return new object[] { $"{i} * {i}", i * i };
                 yield return new object[] { $"{i} * 2 / {i}", 2 };
@@ -175,7 +199,7 @@ namespace Uranium.Tests.CodeAnalysis.Expression
 
             for (int i = 1; i <= 50; i++)
             {
-                yield return new object[] { "{ " + $"var a = {i}; a += {i}" + " }", i + i };
+                yield return new object[] { "{ " + $"var a = {i}; a += {i}" + " }", i << 1 };
                 yield return new object[] { "{ " + $"var a = {i}; a -= {i}" + " }", 0 };
                 yield return new object[] { "{ " + $"var a = {i}; a *= {i}" + " }", i * i };
                 yield return new object[] { "{ " + $"var a = {i}; a /= {i}" + " }", 1 };
@@ -194,7 +218,7 @@ namespace Uranium.Tests.CodeAnalysis.Expression
             for (int i = 0; i < 50; i++)
             {
                 yield return new object[] { $"{i} + -{i}", 0 };
-                yield return new object[] { $"{i} + +{i}", i + i };
+                yield return new object[] { $"{i} + +{i}", i << 1 };
             }
             for (int i = 1; i <= 50; i++)
             {
@@ -210,8 +234,8 @@ namespace Uranium.Tests.CodeAnalysis.Expression
             //To cover most cases
             for(int i = 999_950; i < 1_000_000; i++)
             {
-                yield return new object[] { $"{i} + {i}", i + i };
-                yield return new object[] { $"{i} + -{i}/2", i + -i / 2 };
+                yield return new object[] { $"{i} + {i}", i << 1 };
+                yield return new object[] { $"{i} + -{i}/2", i + -(i >> 1) };
                 yield return new object[] { $"{i} * {i}", i * i };
                 yield return new object[] { $"{i} * 2 / {i}", 2 };
                 yield return new object[] { $"var a = {i};", i };
@@ -229,7 +253,7 @@ namespace Uranium.Tests.CodeAnalysis.Expression
                 yield return new object[] { $"{i} + +{i}", i << 1 };
             }
 
-            for(int i = 999_950; i < 1_000_000; i += 10)
+            for(int i = 999_950; i < 1_000_000; i++)
             {
                 yield return new object[] { "{ " + $"int i = {i}; i += {i}" + " }", i << 1 };
                 yield return new object[] { "{ " + $"int i = {i}; i -= {i}" + " }", 0 };

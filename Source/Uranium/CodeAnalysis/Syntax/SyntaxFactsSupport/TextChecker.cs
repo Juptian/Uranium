@@ -158,7 +158,8 @@ namespace Uranium.CodeAnalysis.Syntax.SyntaxFactsSupport
             _ => "BadToken"
         };
 
-        public static Type? GetKeywordType(SyntaxKind kind) => kind switch
+        public static Type? GetKeywordType(SyntaxKind kind) 
+            => kind switch
         {
             SyntaxKind.DoubleKeyword => typeof(double),
             SyntaxKind.CharKeyword => typeof(char),
@@ -169,7 +170,8 @@ namespace Uranium.CodeAnalysis.Syntax.SyntaxFactsSupport
             SyntaxKind.BoolKeyword => typeof(bool),
             _ => null,
         };
-        public static Type? GetKeywordType(string kind) => kind switch
+        public static Type? GetKeywordType(string kind) 
+            => kind switch
         {
             "double" => typeof(double),
             "char" => typeof(char),
@@ -181,6 +183,16 @@ namespace Uranium.CodeAnalysis.Syntax.SyntaxFactsSupport
             _ => null,
         };
 
+        public static SyntaxKind GetKeyword(object obj)
+            => obj switch
+        {
+            int => SyntaxKind.IntKeyword,
+            long => SyntaxKind.LongKeyword,
+            double => SyntaxKind.DoubleEquals,
+            float => SyntaxKind.FloatKeyword,
+            _ => SyntaxKind.BadToken,
+        };
+        
         public static bool IsVarKeyword(SyntaxKind kind)
             => kind is SyntaxKind.VarKeyword ||
                kind is SyntaxKind.LetConstKeyword ||

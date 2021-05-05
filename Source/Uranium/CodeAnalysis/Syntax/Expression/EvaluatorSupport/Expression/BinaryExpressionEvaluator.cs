@@ -27,10 +27,13 @@ namespace Uranium.CodeAnalysis.Syntax.EvaluatorSupport
 
                 BoundBinaryOperatorKind.Pow => (int)Math.Pow((int)left, (int)right),
 
+                BoundBinaryOperatorKind.BitwiseAND => BitwiseAND(left, right),
+                BoundBinaryOperatorKind.BitwiseOR => BitwiseOR(left, right),
+                BoundBinaryOperatorKind.BitwiseXOR => BitwiseXOR(left, right),
+
                 //Bool
                 BoundBinaryOperatorKind.LogicalAND => (bool)left && (bool)right,
                 BoundBinaryOperatorKind.LogicalOR => (bool)left || (bool)right,
-                BoundBinaryOperatorKind.LogicalXOR => (bool)left ^ (bool)right,
 
                 //We can throw exceptions here because we've exhausted all options,
                 //and this is an internal Uranium error, should handle this more gracefully,
@@ -38,6 +41,33 @@ namespace Uranium.CodeAnalysis.Syntax.EvaluatorSupport
                 //on the stack trace :)
                 _ => throw new($"Unexpected binary operator {b.Op.Kind}"),
             };
+        }
+
+        private static object BitwiseOR(object left, object right)
+        {
+            if(left is bool)
+            {
+                return ((bool)left | (bool)right);
+            }
+            return ((int)left | (int)right);
+        }
+
+        private static object BitwiseAND(object left, object right)
+        {
+            if(left is bool || right is bool)
+            {
+                return ((bool)left & (bool)right);
+            }
+            return ((int)left & (int)right);
+        }
+
+        private static object BitwiseXOR(object left, object right)
+        {
+            if(left is bool || right is bool)
+            {
+                return ((bool)left ^ (bool)right);
+            }
+            return ((int)left ^ (int)right);
         }
     }
 }

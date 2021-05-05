@@ -29,10 +29,11 @@ namespace Uranium.CodeAnalysis.Binding.NodeKinds
         //Just an array of possible operators, as the title would suggest
         private readonly static BoundUnaryOperator[] _operators =
         {
-            new BoundUnaryOperator(SyntaxKind.Plus, BoundUnaryOperatorKind.Identity, typeof(int)),
-            new BoundUnaryOperator(SyntaxKind.Minus, BoundUnaryOperatorKind.Negation, typeof(int)),
+            new(SyntaxKind.Plus, BoundUnaryOperatorKind.Identity, typeof(int)),
+            new(SyntaxKind.Minus, BoundUnaryOperatorKind.Negation, typeof(int)),
 
-            new BoundUnaryOperator(SyntaxKind.Bang, BoundUnaryOperatorKind.LogicalNegation, typeof(bool)),
+            new(SyntaxKind.Bang, BoundUnaryOperatorKind.LogicalNegation, typeof(bool)),
+            new(SyntaxKind.Tilde, BoundUnaryOperatorKind.BitwiseNegation, typeof(int))
         };
 
         public static BoundUnaryOperator? Bind(SyntaxKind syntaxKind, Type operandType)

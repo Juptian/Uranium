@@ -20,15 +20,13 @@ namespace Uranium.CodeAnalysis.Syntax.EvaluatorSupport
         {
             result = 0.0;
 
-            var isNumber = IsNumber(value.GetType());
+            var isNumber = SyntaxFacts.IsNumber(value);
             if (isNumber)
                 result = Convert.ToDouble(value);
 
             return isNumber;
         }
 
-        private static bool IsNumber(Type type) => IsFloatingPointNumber(type) || IsInteger(type);
-        private static bool IsFloatingPointNumber(Type type) => type == typeof(float) || type == typeof(double);
-        private static bool IsInteger(Type type) => type == typeof(int) || type == typeof(long);
+ 
     }
 }
