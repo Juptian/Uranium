@@ -42,6 +42,7 @@ namespace Uranium.Tests.CodeAnalysis.Expression
         [InlineData("0 != false", false)]
         [InlineData("false == 0", true)]
         [InlineData("true == 1", true)]
+        [InlineData("var a = 0.2147483647", 0.2147483647)]
         [InlineData("{ var a = 10; a--; }", 9)]
         [InlineData("{ var a = 10; a++; }", 11)]
         [InlineData(@"
