@@ -20,6 +20,8 @@ coverage:
           - "before/::after/"  # move path   e.g., "before/path" => "after/path"
           - "::after/"         # move root   e.g., "path/" => "after/path/"
           - "before/::"        # reduce root e.g., "before/path/" => "path/"
+        ignore:
+          - "Source/Uranium/CodeAnalysis/Syntax/SyntaxFactsSupport/*"
 
 comment:
   layout: "reach,diff,flags,files,footer"
