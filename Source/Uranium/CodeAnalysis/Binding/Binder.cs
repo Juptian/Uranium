@@ -157,7 +157,6 @@ namespace Uranium.CodeAnalysis.Binding
             var initializer = BindExpression(syntax.Initializer);
             var type = SyntaxFacts.GetKeywordType(syntax.KeywordToken.Kind) ?? initializer.Type;
             var variable = new VariableSymbol(name, isReadOnly, type);
-            Console.WriteLine($"Type: {type} BINDER 161");
             
             if(!_scope.TryDeclare(variable))
             {
@@ -256,7 +255,6 @@ namespace Uranium.CodeAnalysis.Binding
                 _diagnostics.ReportUndefinedName(syntax.IdentifierToken.Span, name);
                 return boundExpression;
             }
-            Console.WriteLine($"Variable type: {variable.Type} BINDER 259");
             if(variable.IsReadOnly)
             {
                 _diagnostics.ReportCannotAssign(syntax.IdentifierToken.Span, syntax.EqualsToken.Span, name);

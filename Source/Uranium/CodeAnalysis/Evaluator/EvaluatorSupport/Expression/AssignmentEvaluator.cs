@@ -8,7 +8,6 @@ namespace Uranium.CodeAnalysis.Syntax.EvaluatorSupport
         public static object EvaluateAssignmentExpression(BoundAssignmentExpression a, Evaluator eval)
         {
             var value = ExpressionEvaluator.Evaluate(a.Expression, eval);
-            Console.WriteLine($"Value type: {value.GetType()} \r\nValue: {value} ASSIGNMENTEVALUATOR 11");
             if (a.IsCompound)
             {
                 CompoundExpressionEvaluator.EvaluateCompoundOperator(a, value, eval);

@@ -46,8 +46,6 @@ namespace Uranium.CodeAnalysis.Lexing.LexerSupport
                 lexer.diagnostics.ReportInvalidNumber(new(lexer.Start, length), text, typeof(double));
             }
 
-            //var targetType = SyntaxFacts.GetKeywordType(lexer.PreviousIdentifier?.Kind ?? SyntaxKind.DoubleKeyword);
-
             if(lexer.PreviousIdentifier is not null && 
                !SyntaxFacts.IsVarKeyword(lexer.PreviousIdentifier!.Kind))
             {
@@ -67,7 +65,7 @@ namespace Uranium.CodeAnalysis.Lexing.LexerSupport
                     }
                 }
             }
-            if(isDecimal)
+            else if(isDecimal)
             {
                 ParseDouble(text, length, lexer);
             } 

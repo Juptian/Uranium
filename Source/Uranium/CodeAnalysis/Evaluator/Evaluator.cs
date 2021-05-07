@@ -39,7 +39,6 @@ namespace Uranium.CodeAnalysis.Syntax
 
                 case BoundNodeKind.ExpressionStatement:
                     EvaluateExpressionStatement((BoundExpressionStatement)statement);
-                    Console.WriteLine($"Last value: {LastValue!.GetType() ?? typeof(object)} EVALUATOR 42");
                     return;
                 case BoundNodeKind.VariableDeclaration:
                     VariableDeclarationEvaluator.Evaluate((BoundVariableDeclaration)statement, this);
