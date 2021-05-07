@@ -8,6 +8,9 @@ namespace Uranium.CodeAnalysis.Syntax.EvaluatorSupport
     internal static class Operations
     {
         private const int intValue = 1;
+        private const int floatValue = 2;
+        private const int longValue = 3;
+        private const int doubleValue = 4;
         public static object Addition(object left, object right)
         {
             var leftPrio = SyntaxFacts.GetTypePriority(left);
@@ -16,42 +19,34 @@ namespace Uranium.CodeAnalysis.Syntax.EvaluatorSupport
             {
                 case intValue when rightPrio == leftPrio:
                     return (int)left + (int)right;
-                case intValue + 1 when rightPrio == leftPrio:
+                case floatValue when rightPrio == leftPrio:
                     return (float)left + (float)right;
-                case intValue + 2 when rightPrio == leftPrio:
+                case longValue when rightPrio == leftPrio:
                     return (long)left + (long)right;
-                case intValue + 3 when rightPrio == leftPrio:
+                case doubleValue when rightPrio == leftPrio:
                     return (double)left + (double)right;
 
-                case intValue when rightPrio == intValue + 1:
+                case intValue when rightPrio == floatValue:
                     return (int)((int)left + (float)right);
-                case intValue when rightPrio == intValue + 2:
+                case intValue when rightPrio == longValue:
                     return (int)((int)left + (long)right);
-                case intValue when rightPrio == intValue + 3:
+                case intValue when rightPrio == doubleValue:
                     return (int)((int)left + (double)right);
 
-                case intValue + 1 when rightPrio == intValue:
+                case floatValue when rightPrio == intValue:
                     return (float)((float)left + (int)right);
-                case intValue + 1 when rightPrio == intValue + 2:
-                    return (float)((float)left + (long)right);
-                case intValue + 1 when rightPrio == intValue + 3:
+                case floatValue when rightPrio == doubleValue:
                     return (float)((float)left + (double)right);
 
-                case intValue + 2 when rightPrio == intValue + 1:
-                    return (long)((long)left + (float)right);
-                case intValue + 2 when rightPrio == intValue:
-                    return (long)((long)left + (int)right);
-                case intValue + 2 when rightPrio == intValue + 3:
-                    return (long)((long)left + (double)right);
-
-                case intValue + 3 when rightPrio == intValue + 1:
+                case longValue when rightPrio == intValue:
+                    return (long)left + (int)right;
+                
+                case doubleValue when rightPrio == floatValue:
                     return (double)((double)left + (float)right);
-                case intValue + 3 when rightPrio == intValue + 2:
-                    return (double)((double)left + (long)right);
-                case intValue + 3 when rightPrio == intValue:
+                case doubleValue when rightPrio == intValue:
                     return (double)((double)left + (int)right);
                 default:
-                    throw new($"Invalid type {left.GetType()} for binary operand with {right.GetType()}");
+                    throw new($"Invalid type {left.GetType().ToString()[7..]} for binary operand with {right.GetType().ToString()[7..]}");
             }
             
         }
@@ -63,42 +58,35 @@ namespace Uranium.CodeAnalysis.Syntax.EvaluatorSupport
             {
                 case intValue when rightPrio == leftPrio:
                     return (int)left - (int)right;
-                case intValue + 1 when rightPrio == leftPrio:
+                case floatValue when rightPrio == leftPrio:
                     return (float)left - (float)right;
-                case intValue + 2 when rightPrio == leftPrio:
+                case longValue when rightPrio == leftPrio:
                     return (long)left - (long)right;
-                case intValue + 3 when rightPrio == leftPrio:
+                case doubleValue when rightPrio == leftPrio:
                     return (double)left - (double)right;
 
-                case intValue when rightPrio == intValue + 1:
+                case intValue when rightPrio == floatValue:
                     return (int)((int)left - (float)right);
-                case intValue when rightPrio == intValue + 2:
+                case intValue when rightPrio == longValue:
                     return (int)((int)left - (long)right);
-                case intValue when rightPrio == intValue + 3:
+
+                case intValue when rightPrio == doubleValue:
                     return (int)((int)left - (double)right);
 
-                case intValue + 1 when rightPrio == intValue:
+                case floatValue when rightPrio == intValue:
                     return (float)((float)left - (int)right);
-                case intValue + 1 when rightPrio == intValue + 2:
-                    return (float)((float)left - (long)right);
-                case intValue + 1 when rightPrio == intValue + 3:
+                case floatValue when rightPrio == doubleValue:
                     return (float)((float)left - (double)right);
 
-                case intValue + 2 when rightPrio == intValue + 1:
-                    return (long)((long)left - (float)right);
-                case intValue + 2 when rightPrio == intValue:
-                    return (long)((long)left - (int)right);
-                case intValue + 2 when rightPrio == intValue + 3:
-                    return (long)((long)left - (double)right);
+                case longValue when rightPrio == intValue:
+                    return (long)left - (int)right;
 
-                case intValue + 3 when rightPrio == intValue + 1:
+                case doubleValue when rightPrio == floatValue:
                     return (double)((double)left - (float)right);
-               case intValue + 3 when rightPrio == intValue + 2:
-                   return (double)((double)left - (long)right);
-               case intValue + 3 when rightPrio == intValue:
+               case doubleValue when rightPrio == intValue:
                     return (double)((double)left - (int)right);
                 default:
-                    throw new($"Invalid type {left.GetType()} for binary operand with {right.GetType()}");
+                    throw new($"Invalid type {left.GetType().ToString()[7..]} for binary operand with {right.GetType().ToString()[7..]}");
             }
         }
   
@@ -110,42 +98,34 @@ namespace Uranium.CodeAnalysis.Syntax.EvaluatorSupport
             {
                 case intValue when rightPrio == leftPrio:
                     return (int)left * (int)right;
-                case intValue + 1 when rightPrio == leftPrio:
+                case floatValue when rightPrio == leftPrio:
                     return (float)left * (float)right;
-                case intValue + 2 when rightPrio == leftPrio:
+                case longValue when rightPrio == leftPrio:
                     return (long)left * (long)right;
-                case intValue + 3 when rightPrio == leftPrio:
+                case doubleValue when rightPrio == leftPrio:
                     return (double)left * (double)right;
 
-                case intValue when rightPrio == intValue + 1:
+                case intValue when rightPrio == floatValue:
                     return (int)((int)left * (float)right);
-                case intValue when rightPrio == intValue + 2:
+                case intValue when rightPrio == longValue:
                     return (int)((int)left * (long)right);
-                case intValue when rightPrio == intValue + 3:
+                case intValue when rightPrio == doubleValue:
                     return (int)((int)left * (double)right);
 
-                case intValue + 1 when rightPrio == intValue:
+                case floatValue when rightPrio == intValue:
                     return (float)((float)left * (int)right);
-                case intValue + 1 when rightPrio == intValue + 2:
-                    return (float)((float)left * (long)right);
-                case intValue + 1 when rightPrio == intValue + 3:
+                case floatValue when rightPrio == doubleValue:
                     return (float)((float)left * (double)right);
 
-                case intValue + 2 when rightPrio == intValue + 1:
-                    return (long)((long)left * (float)right);
-                case intValue + 2 when rightPrio == intValue:
-                    return (long)((long)left * (int)right);
-                case intValue + 2 when rightPrio == intValue + 3:
-                    return (long)((long)left * (double)right);
+                case longValue when rightPrio == intValue:
+                    return (long)left * (int)right;
 
-                case intValue + 3 when rightPrio == intValue + 1:
+                case doubleValue when rightPrio == floatValue:
                     return (double)((double)left * (float)right);
-                case intValue + 3 when rightPrio == intValue + 2:
-                    return (double)((double)left * (long)right);
-                case intValue + 3 when rightPrio == intValue:
+                case doubleValue when rightPrio == intValue:
                     return (double)((double)left * (int)right);
                 default:
-                    throw new($"Invalid type {left.GetType()} for binary operand with {right.GetType()}");
+                    throw new($"Invalid type {left.GetType().ToString()[7..]} for binary operand with {right.GetType().ToString()[7..]}");
             }
         }
 
@@ -158,42 +138,34 @@ namespace Uranium.CodeAnalysis.Syntax.EvaluatorSupport
 
                 case intValue when rightPrio == leftPrio:
                     return (int)left / (int)right;
-                case intValue + 1 when rightPrio == leftPrio:
+                case floatValue when rightPrio == leftPrio:
                     return (float)left / (float)right;
-                case intValue + 2 when rightPrio == leftPrio:
+                case longValue when rightPrio == leftPrio:
                     return (long)left / (long)right;
-                case intValue + 3 when rightPrio == leftPrio:
+                case doubleValue when rightPrio == leftPrio:
                     return (double)left / (double)right;
 
-                case intValue when rightPrio == intValue + 1:
+                case intValue when rightPrio == floatValue:
                     return (int)((int)left / (float)right);
-                case intValue when rightPrio == intValue + 2:
+                case intValue when rightPrio == longValue:
                     return (int)((int)left / (long)right);
-                case intValue when rightPrio == intValue + 3:
+                case intValue when rightPrio == doubleValue:
                     return (int)((int)left / (double)right);
 
-                case intValue + 1 when rightPrio == intValue:
+                case floatValue when rightPrio == intValue:
                     return (float)((float)left / (int)right);
-                case intValue + 1 when rightPrio == intValue + 2:
-                    return (float)((float)left / (long)right);
-                case intValue + 1 when rightPrio == intValue + 3:
+                case floatValue when rightPrio == doubleValue:
                     return (float)((float)left / (double)right);
 
-                case intValue + 2 when rightPrio == intValue + 1:
-                    return (long)((long)left / (float)right);
-                case intValue + 2 when rightPrio == intValue:
+                case longValue when rightPrio == intValue:
                     return (long)((long)left / (int)right);
-                case intValue + 2 when rightPrio == intValue + 3:
-                    return (long)((long)left / (double)right);
 
-                case intValue + 3 when rightPrio == intValue + 1:
+                case doubleValue when rightPrio == floatValue:
                     return (double)((double)left / (float)right);
-                case intValue + 3 when rightPrio == intValue + 2:
-                    return (double)((double)left / (long)right);
-                case intValue + 3 when rightPrio == intValue:
+                case doubleValue when rightPrio == intValue:
                     return (double)((double)left / (int)right);
                 default:
-                    throw new($"Invalid type {left.GetType()} for binary operand with {right.GetType()}");
+                    throw new($"Invalid type {left.GetType().ToString()[7..]} for binary operand with {right.GetType().ToString()[7..]}");
             }
          
         }
@@ -205,42 +177,34 @@ namespace Uranium.CodeAnalysis.Syntax.EvaluatorSupport
             {
                 case intValue when rightPrio == leftPrio:
                     return (int)left < (int)right;
-                case intValue + 1 when rightPrio == leftPrio:
+                case floatValue when rightPrio == leftPrio:
                     return (float)left < (float)right;
-                case intValue + 2 when rightPrio == leftPrio:
+                case longValue when rightPrio == leftPrio:
                     return (long)left < (long)right;
-                case intValue + 3 when rightPrio == leftPrio:
+                case doubleValue when rightPrio == leftPrio:
                     return (double)left < (double)right;
 
-                case intValue when rightPrio == intValue + 1:
+                case intValue when rightPrio == floatValue:
                     return (int)left < (float)right;
-                case intValue when rightPrio == intValue + 2:
+                case intValue when rightPrio == longValue:
                     return (int)left < (long)right;
-                case intValue when rightPrio == intValue + 3:
+                case intValue when rightPrio == doubleValue:
                     return (int)left < (double)right;
 
-                case intValue + 1 when rightPrio == intValue:
+                case floatValue when rightPrio == intValue:
                     return (float)left < (int)right;
-                case intValue + 1 when rightPrio == intValue + 2:
-                    return (float)left < (long)right;
-                case intValue + 1 when rightPrio == intValue + 3:
+                case floatValue when rightPrio == doubleValue:
                     return (float)left < (double)right;
 
-                case intValue + 2 when rightPrio == intValue + 1:
-                    return (long)left < (float)right;
-                case intValue + 2 when rightPrio == intValue:
+                case longValue when rightPrio == intValue:
                     return (long)left < (int)right;
-                case intValue + 2 when rightPrio == intValue + 3:
-                    return (long)left < (double)right;
 
-                case intValue + 3 when rightPrio == intValue + 1:
+                case doubleValue when rightPrio == floatValue:
                     return (double)left < (float)right;
-                case intValue + 3 when rightPrio == intValue + 2:
-                    return (double)left < (long)right;
-                case intValue + 3 when rightPrio == intValue:
+                case doubleValue when rightPrio == intValue:
                     return (double)left < (int)right;
                 default:
-                    throw new($"Invalid type {left.GetType()} for binary operand with {right.GetType()}");
+                    throw new($"Invalid type {left.GetType().ToString()[7..]} for binary operand with {right.GetType().ToString()[7..]}");
             }
         }
   
@@ -252,42 +216,34 @@ namespace Uranium.CodeAnalysis.Syntax.EvaluatorSupport
             {
                 case intValue when rightPrio == leftPrio:
                     return (int)left <= (int)right;
-                case intValue + 1 when rightPrio == leftPrio:
+                case floatValue when rightPrio == leftPrio:
                     return (float)left <= (float)right;
-                case intValue + 2 when rightPrio == leftPrio:
+                case longValue when rightPrio == leftPrio:
                     return (long)left <= (long)right;
-                case intValue + 3 when rightPrio == leftPrio:
+                case doubleValue when rightPrio == leftPrio:
                     return (double)left <= (double)right;
 
-                case intValue when rightPrio == intValue + 1:
+                case intValue when rightPrio == floatValue:
                     return (int)left <= (float)right;
-                case intValue when rightPrio == intValue + 2:
+                case intValue when rightPrio == longValue:
                     return (int)left <= (long)right;
-                case intValue when rightPrio == intValue + 3:
+                case intValue when rightPrio == doubleValue:
                     return (int)left <= (double)right;
 
-                case intValue + 1 when rightPrio == intValue:
+                case floatValue when rightPrio == intValue:
                     return (float)left <= (int)right;
-                case intValue + 1 when rightPrio == intValue + 2:
-                    return (float)left <= (long)right;
-                case intValue + 1 when rightPrio == intValue + 3:
+                case floatValue when rightPrio == doubleValue:
                     return (float)left <= (double)right;
 
-                case intValue + 2 when rightPrio == intValue + 1:
-                    return (long)left <= (float)right;
-                case intValue + 2 when rightPrio == intValue:
+                case longValue when rightPrio == intValue:
                     return (long)left <= (int)right;
-                case intValue + 2 when rightPrio == intValue + 3:
-                    return (long)left <= (double)right;
-
-                case intValue + 3 when rightPrio == intValue + 1:
+                
+                case doubleValue when rightPrio == floatValue:
                     return (double)left <= (float)right;
-                case intValue + 3 when rightPrio == intValue + 2:
-                    return (double)left <= (long)right;
-                case intValue + 3 when rightPrio == intValue:
+                case doubleValue when rightPrio == intValue:
                     return (double)left <= (int)right;
                 default:
-                    throw new($"Invalid type {left.GetType()} for binary operand with {right.GetType()}");
+                    throw new($"Invalid type {left.GetType().ToString()[7..]} for binary operand with {right.GetType().ToString()[7..]}");
             }
         }
 
@@ -299,42 +255,34 @@ namespace Uranium.CodeAnalysis.Syntax.EvaluatorSupport
                 {
                 case intValue when rightPrio == leftPrio:
                     return (int)left > (int)right;
-                case intValue + 1 when rightPrio == leftPrio:
+                case floatValue when rightPrio == leftPrio:
                     return (float)left > (float)right;
-                case intValue + 2 when rightPrio == leftPrio:
+                case longValue when rightPrio == leftPrio:
                     return (long)left > (long)right;
-                case intValue + 3 when rightPrio == leftPrio:
+                case doubleValue when rightPrio == leftPrio:
                     return (double)left > (double)right;
 
-                case intValue when rightPrio == intValue + 1:
+                case intValue when rightPrio == floatValue:
                     return (int)left > (float)right;
-                case intValue when rightPrio == intValue + 2:
+                case intValue when rightPrio == longValue:
                     return (int)left > (long)right;
-                case intValue when rightPrio == intValue + 3:
+                case intValue when rightPrio == doubleValue:
                     return (int)left > (double)right;
 
-                case intValue + 1 when rightPrio == intValue:
+                case floatValue when rightPrio == intValue:
                     return (float)left > (int)right;
-                case intValue + 1 when rightPrio == intValue + 2:
-                    return (float)left > (long)right;
-                case intValue + 1 when rightPrio == intValue + 3:
+                case floatValue when rightPrio == doubleValue:
                     return (float)left > (double)right;
 
-                case intValue + 2 when rightPrio == intValue + 1:
-                    return (long)left > (float)right;
-                 case intValue + 2 when rightPrio == intValue:
+                 case longValue when rightPrio == intValue:
                     return (long)left > (int)right;
-                case intValue + 2 when rightPrio == intValue + 3:
-                    return (long)left > (double)right;
 
-                case intValue + 3 when rightPrio == intValue + 1:
+                case doubleValue when rightPrio == floatValue:
                     return (double)left > (float)right;
-                case intValue + 3 when rightPrio == intValue + 2:
-                    return (double)left > (long)right;
-                case intValue + 3 when rightPrio == intValue:
+                case doubleValue when rightPrio == intValue:
                     return (double)left > (int)right;
                 default:
-                    throw new($"Invalid type {left.GetType()} for binary operand with {right.GetType()}");
+                    throw new($"Invalid type {left.GetType().ToString()[7..]} for binary operand with {right.GetType().ToString()[7..]}");
             }
         }
         public static bool GreaterThanEquals(object left, object right)
@@ -345,42 +293,36 @@ namespace Uranium.CodeAnalysis.Syntax.EvaluatorSupport
             {
                 case intValue when rightPrio == leftPrio:
                     return (int)left >= (int)right;
-                case intValue + 1 when rightPrio == leftPrio:
+                case floatValue when rightPrio == leftPrio:
                     return (float)left >= (float)right;
-                case intValue + 2 when rightPrio == leftPrio:
+                case longValue when rightPrio == leftPrio:
                     return (long)left >= (long)right;
-                case intValue + 3 when rightPrio == leftPrio:
+                case doubleValue when rightPrio == leftPrio:
                     return (double)left >= (double)right;
 
-                case intValue when rightPrio == intValue + 1:
+                case intValue when rightPrio == floatValue:
                     return (int)left >= (float)right;
-                case intValue when rightPrio == intValue + 2:
+                case intValue when rightPrio == longValue:
                     return (int)left >= (long)right;
-                case intValue when rightPrio == intValue + 3:
+                case intValue when rightPrio == doubleValue:
                     return (int)left >= (double)right;
 
-                case intValue + 1 when rightPrio == intValue:
+                case floatValue when rightPrio == intValue:
                     return (float)left >= (int)right;
-                case intValue + 1 when rightPrio == intValue + 2:
-                    return (float)left >= (long)right;
-                case intValue + 1 when rightPrio == intValue + 3:
+                case floatValue when rightPrio == doubleValue:
                     return (float)left >= (double)right;
 
-                case intValue + 2 when rightPrio == intValue + 1:
-                    return (long)left >= (float)right;
-                case intValue + 2 when rightPrio == intValue:
+                case longValue when rightPrio == intValue:
                     return (long)left >= (int)right;
-                case intValue + 2 when rightPrio == intValue + 3:
-                    return (long)left >= (double)right;
 
-                case intValue + 3 when rightPrio == intValue + 1:
+                case doubleValue when rightPrio == floatValue:
                     return (double)left >= (float)right;
-                case intValue + 3 when rightPrio == intValue + 2:
+                case doubleValue when rightPrio == longValue:
                     return (double)left >= (long)right;
-                case intValue + 3 when rightPrio == intValue:
+                case doubleValue when rightPrio == intValue:
                     return (double)left >= (int)right;
                 default:
-                    throw new($"Invalid type {left.GetType()} for binary operand with {right.GetType()}");
+                    throw new($"Invalid type {left.GetType().ToString()[7..]} for binary operand with {right.GetType().ToString()[7..]}");
             }
         }
   
@@ -392,42 +334,34 @@ namespace Uranium.CodeAnalysis.Syntax.EvaluatorSupport
             {
                 case intValue when rightPrio == leftPrio:
                     return (int)Math.Pow((int)left, (int)right);
-                case intValue + 1 when rightPrio == leftPrio:
+                case floatValue when rightPrio == leftPrio:
                     return (float)Math.Pow((float)left, (float)right);
-                case intValue + 2 when rightPrio == leftPrio:
+                case longValue when rightPrio == leftPrio:
                     return (long)BigInteger.Pow((long)left, Convert.ToInt32(right));
-                case intValue + 3 when rightPrio == leftPrio:
+                case doubleValue when rightPrio == leftPrio:
                     return Math.Pow((double)left, (double)right);
 
-                case intValue when rightPrio == intValue + 1:
+                case intValue when rightPrio == floatValue:
                     return (int)Math.Pow((int)left, (float)right);
-                case intValue when rightPrio == intValue + 2:
+                case intValue when rightPrio == longValue:
                     return (int)Math.Pow((int)left, (long)right);
-                case intValue when rightPrio == intValue + 3:
+                case intValue when rightPrio == doubleValue:
                     return (int)Math.Pow((int)left, (double)right);
 
-                case intValue + 1 when rightPrio == intValue:
+                case floatValue when rightPrio == intValue:
                     return (float)Math.Pow((float)left, (int)right);
-                case intValue + 1 when rightPrio == intValue + 2:
-                    return (float)Math.Pow((float)left, (long)right);
-                case intValue + 1 when rightPrio == intValue + 3:
+                case floatValue when rightPrio == doubleValue:
                     return (float)Math.Pow((float)left, (double)right);
 
-                case intValue + 2 when rightPrio == intValue + 1:
-                    return (long)BigInteger.Pow((long)left, (int)right);
-                case intValue + 2 when rightPrio == intValue:
-                    return (long)BigInteger.Pow((long)left, (int)right);
-                case intValue + 2 when rightPrio == intValue + 3:
+                case longValue when rightPrio == intValue:
                     return (long)BigInteger.Pow((long)left, (int)right);
 
-                case intValue + 3 when rightPrio == intValue + 1:
+                case doubleValue when rightPrio == floatValue:
                     return Math.Pow((double)left, (float)right);
-                case intValue + 3 when rightPrio == intValue + 2:
-                    return Math.Pow((double)left, (long)right);
-                case intValue + 3 when rightPrio == intValue:
+                case doubleValue when rightPrio == intValue:
                     return Math.Pow((double)left, (int)right);
                 default:
-                    throw new($"Invalid type {left.GetType()} for binary operand with {right.GetType()}");
+                    throw new($"Invalid type {left.GetType().ToString()[7..]} for binary operand with {right.GetType().ToString()[7..]}");
             }
         }
         

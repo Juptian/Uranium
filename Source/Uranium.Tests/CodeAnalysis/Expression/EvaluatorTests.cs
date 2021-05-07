@@ -227,7 +227,7 @@ namespace Uranium.Tests.CodeAnalysis.Expression
                 yield return new object[] { "{ " + $"int i = 1; i **= {i}" + " }", 1 };
                 yield return new object[] { "{ " + $"int i = {i}; i++;" + " }", i + 1 };
                 yield return new object[] { "{ " + $"int i = {i}; i--;" + " }", i - 1 };
-
+                
                 yield return new object[] { "{ " + $"long i = {i}; i += {i}" + " }", (long)(i << 1) };
                 yield return new object[] { "{ " + $"long i = {i}; i -= {i}" + " }", (long)0 };
                 yield return new object[] { "{ " + $"long i = {i}; i /= {i}" + " }", (long)1 };
@@ -248,6 +248,106 @@ namespace Uranium.Tests.CodeAnalysis.Expression
                 yield return new object[] { "{ " + $"double i = 1; i **= {i}" + " }", (double)(1) };
                 yield return new object[] { "{ " + $"double i = {i}; i++;" + " }", (double)(i + 1) };
                 yield return new object[] { "{ " + $"double i = {i}; i--;" + " }", (double)(i - 1) };
+            }
+            {
+                int i = 1;
+
+                yield return new object[] { "{ " + $"long i = {i}; i < i" + " }", false };
+                yield return new object[] { "{ " + $"long i = {i}; i <= i" + " }", true };
+                yield return new object[] { "{ " + $"long i = {i}; i > i" + " }", false };
+                yield return new object[] { "{ " + $"long i = {i}; i >= i" + " }", true };
+
+                yield return new object[] { "{ " + $"float i = {i}; i < i" + " }", false };
+                yield return new object[] { "{ " + $"float i = {i}; i <= i" + " }", true };
+                yield return new object[] { "{ " + $"float i = {i}; i > i" + " }", false };
+                yield return new object[] { "{ " + $"float i = {i}; i >= i" + " }", true };
+
+                yield return new object[] { "{ " + $"double i = {i}; i < i" + " }", false };
+                yield return new object[] { "{ " + $"double i = {i}; i <= i" + " }", true };
+                yield return new object[] { "{ " + $"double i = {i}; i > i" + " }", false };
+                yield return new object[] { "{ " + $"double i = {i}; i >= i" + " }", true };
+                
+                yield return new object[] { "{ " + $"int i = {i}; float f = {i}; i += f;" + " }", i << 1 };
+                yield return new object[] { "{ " + $"int i = {i}; float f = {i}; i -= f;" + " }", 0 };
+                yield return new object[] { "{ " + $"int i = {i}; float f = {i}; i *= f;" + " }", i * i };
+                yield return new object[] { "{ " + $"int i = {i}; float f = {i}; i /= f;" + " }", 1 };
+                yield return new object[] { "{ " + $"int i = {i}; float f = {i}; i < f;" + " }", false };
+                yield return new object[] { "{ " + $"int i = {i}; float f = {i}; i <= f;" + " }", true };
+                yield return new object[] { "{ " + $"int i = {i}; float f = {i}; i > f;" + " }", false };
+                yield return new object[] { "{ " + $"int i = {i}; float f = {i}; i >= f;" + " }", true };
+                yield return new object[] { "{ " + $"int i = 1; float f = {i}; i ** f;" + " }", 1 };
+                
+                yield return new object[] { "{ " + $"int i = {i}; long f = {i}; i += f;" + " }", i << 1 };
+                yield return new object[] { "{ " + $"int i = {i}; long f = {i}; i -= f;" + " }", 0 };
+                yield return new object[] { "{ " + $"int i = {i}; long f = {i}; i *= f;" + " }", i * i };
+                yield return new object[] { "{ " + $"int i = {i}; long f = {i}; i /= f;" + " }", 1 };
+                yield return new object[] { "{ " + $"int i = {i}; long f = {i}; i < f;" + " }", false };
+                yield return new object[] { "{ " + $"int i = {i}; long f = {i}; i <= f;" + " }", true };
+                yield return new object[] { "{ " + $"int i = {i}; long f = {i}; i > f;" + " }", false };
+                yield return new object[] { "{ " + $"int i = {i}; long f = {i}; i >= f;" + " }", true };
+                yield return new object[] { "{ " + $"int i = 1; long f = {i}; i ** f;" + " }", 1 };
+
+                yield return new object[] { "{ " + $"int i = {i}; double f = {i}; i += f;" + " }", i << 1 };
+                yield return new object[] { "{ " + $"int i = {i}; double f = {i}; i -= f;" + " }", 0 };
+                yield return new object[] { "{ " + $"int i = {i}; double f = {i}; i *= f;" + " }", i * i };
+                yield return new object[] { "{ " + $"int i = {i}; double f = {i}; i /= f;" + " }", 1 };
+                yield return new object[] { "{ " + $"int i = {i}; double f = {i}; i < f;" + " }", false };
+                yield return new object[] { "{ " + $"int i = {i}; double f = {i}; i <= f;" + " }", true };
+                yield return new object[] { "{ " + $"int i = {i}; double f = {i}; i > f;" + " }", false };
+                yield return new object[] { "{ " + $"int i = {i}; double f = {i}; i >= f;" + " }", true };
+                yield return new object[] { "{ " + $"int i = 1; double f = {i}; i ** f;" + " }", 1 };
+
+                yield return new object[] { "{ " + $"float i = {i}; int f = {i}; i += f;" + " }", (float)(i << 1) };
+                yield return new object[] { "{ " + $"float i = {i}; int f = {i}; i -= f;" + " }", (float)(0) };
+                yield return new object[] { "{ " + $"float i = {i}; int f = {i}; i *= f;" + " }", (float)(i * i) };
+                yield return new object[] { "{ " + $"float i = {i}; int f = {i}; i /= f;" + " }", (float)(1) };
+                yield return new object[] { "{ " + $"float i = {i}; int f = {i}; i < f;" + " }", false };
+                yield return new object[] { "{ " + $"float i = {i}; int f = {i}; i <= f;" + " }", true };
+                yield return new object[] { "{ " + $"float i = {i}; int f = {i}; i > f;" + " }", false };
+                yield return new object[] { "{ " + $"float i = {i}; int f = {i}; i >= f;" + " }", true };
+                yield return new object[] { "{ " + $"float i = 1; int f = {i}; i ** f;" + " }", (float)(1) };
+
+                yield return new object[] { "{ " + $"float i = {i}; double f = {i}; i += f;" + " }", (float)(i << 1) };
+                yield return new object[] { "{ " + $"float i = {i}; double f = {i}; i -= f;" + " }", (float)(0) };
+                yield return new object[] { "{ " + $"float i = {i}; double f = {i}; i *= f;" + " }", (float)(i * i) };
+                yield return new object[] { "{ " + $"float i = {i}; double f = {i}; i /= f;" + " }", (float)(1) };
+                yield return new object[] { "{ " + $"float i = {i}; double f = {i}; i < f;" + " }", false };
+                yield return new object[] { "{ " + $"float i = {i}; double f = {i}; i <= f;" + " }", true };
+                yield return new object[] { "{ " + $"float i = {i}; double f = {i}; i > f;" + " }", false };
+                yield return new object[] { "{ " + $"float i = {i}; double f = {i}; i >= f;" + " }", true };
+                yield return new object[] { "{ " + $"float i = 1; double f = {i}; i ** f;" + " }", (float)(1) };
+
+                
+                yield return new object[] { "{ " + $"double i = {i}; float f = {i}; i += f;" + " }", (double)(i << 1) };
+                yield return new object[] { "{ " + $"double i = {i}; float f = {i}; i -= f;" + " }", (double)(0) };
+                yield return new object[] { "{ " + $"double i = {i}; float f = {i}; i *= f;" + " }", (double)(i * i) };
+                yield return new object[] { "{ " + $"double i = {i}; float f = {i}; i /= f;" + " }", (double)(1) };
+                yield return new object[] { "{ " + $"double i = {i}; float f = {i}; i < f;" + " }", false };
+                yield return new object[] { "{ " + $"double i = {i}; float f = {i}; i <= f;" + " }", true };
+                yield return new object[] { "{ " + $"double i = {i}; float f = {i}; i > f;" + " }", false };
+                yield return new object[] { "{ " + $"double i = {i}; float f = {i}; i >= f;" + " }", true };
+                yield return new object[] { "{ " + $"double i = 1; float f = {i}; i ** f;" + " }", (double)(1) };
+                
+                yield return new object[] { "{ " + $"double i = {i}; int f = {i}; i += f;" + " }", (double)(i << 1) };
+                yield return new object[] { "{ " + $"double i = {i}; int f = {i}; i -= f;" + " }", (double)(0) };
+                yield return new object[] { "{ " + $"double i = {i}; int f = {i}; i *= f;" + " }", (double)(i * i) };
+                yield return new object[] { "{ " + $"double i = {i}; int f = {i}; i /= f;" + " }", (double)(1) };
+                yield return new object[] { "{ " + $"double i = {i}; int f = {i}; i < f;" + " }", false };
+                yield return new object[] { "{ " + $"double i = {i}; int f = {i}; i <= f;" + " }", true };
+                yield return new object[] { "{ " + $"double i = {i}; int f = {i}; i > f;" + " }", false };
+                yield return new object[] { "{ " + $"double i = {i}; int f = {i}; i >= f;" + " }", true };
+                yield return new object[] { "{ " + $"double i = 1; int f = {i}; i ** f;" + " }", (double)(1) };
+                
+                yield return new object[] { "{ " + $"long i = {i}; int f = {i}; i += f;" + " }", (long)(i << 1) };
+                yield return new object[] { "{ " + $"long i = {i}; int f = {i}; i -= f;" + " }", (long)(0) };
+                yield return new object[] { "{ " + $"long i = {i}; int f = {i}; i *= f;" + " }", (long)(i * i) };
+                yield return new object[] { "{ " + $"long i = {i}; int f = {i}; i /= f;" + " }", (long)1 };
+                yield return new object[] { "{ " + $"long i = {i}; int f = {i}; i < f;" + " }", false };
+                yield return new object[] { "{ " + $"long i = {i}; int f = {i}; i <= f;" + " }", true };
+                yield return new object[] { "{ " + $"long i = {i}; int f = {i}; i > f;" + " }", false };
+                yield return new object[] { "{ " + $"long i = {i}; int f = {i}; i >= f;" + " }", true };
+                yield return new object[] { "{ " + $"long i = 1; int f = {i}; i ** f;" + " }", (long)1 };
+
             }
 
             //Testing for high numbers
