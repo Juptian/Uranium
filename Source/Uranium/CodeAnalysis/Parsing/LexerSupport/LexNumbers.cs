@@ -111,7 +111,7 @@ namespace Uranium.CodeAnalysis.Lexing.LexerSupport
 
         private static void ParseLong(string text, int length, Lexer lexer)
         {
-            if (!ulong.TryParse(text, out var value))
+            if (!long.TryParse(text, out var value))
             {
                 lexer.diagnostics.ReportInvalidNumber(new(lexer.Start, length), text, typeof(long));
             }
@@ -123,22 +123,18 @@ namespace Uranium.CodeAnalysis.Lexing.LexerSupport
                 } 
                 else
                 {
-                    lexer.CurrentValue = (long)value;
+                    lexer.CurrentValue = value;
                 }
             }
             else
             {
-                if(value <= int.MaxValue)
+                if(value <= int.MaxValue && value >= int.MinValue)
                 {
                     lexer.CurrentValue = (int)value;
                 }
                 else if(value <= uint.MaxValue && value >= uint.MinValue)
                 {
                     lexer.CurrentValue = (uint)value;
-                }
-                else if(value <= long.MaxValue)
-                {
-                    lexer.CurrentValue = (long)value;
                 }
                 else
                 {

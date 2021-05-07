@@ -8,11 +8,22 @@ namespace Uranium.CodeAnalysis.Syntax.Expression
 {
     public sealed class AssignmentExpressionSyntax : ExpressionSyntax
     {
-        public AssignmentExpressionSyntax(SyntaxToken identifierToken, SyntaxToken equalsToken, ExpressionSyntax expression, bool isCompound = false)
+        public AssignmentExpressionSyntax
+            (
+                SyntaxToken identifierToken, 
+                SyntaxToken equalsToken, 
+                ExpressionSyntax expression, bool isCompound = false
+            )
             : this(identifierToken, equalsToken, expression, isCompound, null)
         { }
 
-        public AssignmentExpressionSyntax(SyntaxToken identifierToken, SyntaxToken equalsToken, ExpressionSyntax expression, bool isCompound, SyntaxToken? compoundOperator)
+        public AssignmentExpressionSyntax
+            (
+                SyntaxToken identifierToken, 
+                SyntaxToken equalsToken, 
+                ExpressionSyntax expression, 
+                bool isCompound, SyntaxToken? compoundOperator
+            )
         {
             IdentifierToken = identifierToken;
             EqualsToken = equalsToken;

@@ -66,8 +66,22 @@ namespace Uranium.CodeAnalysis.Syntax
         public static bool IsFloatingPoint(SyntaxKind kind)
             => TypeChecker.IsFloatingPoint(kind);
 
+        public static bool IsFloatingPoint(Type t)
+            => TypeChecker.IsFloatingPoint(t);
+
+        public static bool IsFloatingPoint(object obj)
+            => TypeChecker.IsFloatingPoint(obj);
+
         public static bool IsInteger(SyntaxKind kind)
             => TypeChecker.IsInteger(kind);
 
+        public static bool IsInteger(Type t)
+            => TypeChecker.IsInteger(t);
+
+        public static bool IsInteger(object obj)
+            => TypeChecker.IsInteger(obj);
+
+        public static int GetTypePriority(object obj)
+            => TypeChecker.GetTypePriority(obj);
     }
 }

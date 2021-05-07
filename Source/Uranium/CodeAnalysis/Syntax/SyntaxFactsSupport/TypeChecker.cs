@@ -12,9 +12,41 @@ namespace Uranium.CodeAnalysis.Syntax.SyntaxFactsSupport
             => kind is SyntaxKind.DoubleKeyword ||
                kind is SyntaxKind.FloatKeyword;
 
+        public static bool IsFloatingPoint(Type t)
+            => t == typeof(float) || t == typeof(double);
+
+        public static bool IsFloatingPoint(object obj)
+            => obj is float or double;
+
         public static bool IsInteger(SyntaxKind kind)
             => kind is SyntaxKind.IntKeyword ||
                kind is SyntaxKind.LongKeyword;
 
+        public static bool IsInteger(Type t)
+            => t == typeof(int) || t == typeof(long);
+
+        public static bool IsInteger(object obj)
+            => obj is int or long;
+
+        public static int GetTypePriority(object obj)
+        {
+            if(obj is int)
+            {
+                return 1;
+            }
+            if(obj is float)
+            {
+                return 2;
+            }
+            if(obj is long)
+            {
+                return 3;
+            }
+            if(obj is double)
+            {
+                return 4;
+            }
+            return 0;
+        }
     }
 }

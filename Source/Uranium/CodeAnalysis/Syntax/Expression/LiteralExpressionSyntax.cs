@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Uranium.CodeAnalysis.Syntax.Expression
 {
@@ -7,19 +8,20 @@ namespace Uranium.CodeAnalysis.Syntax.Expression
     {
 
         public LiteralExpressionSyntax(SyntaxToken literalToken)
-            : this(literalToken, literalToken.Value ?? 0)
+            : this(literalToken, literalToken.Value ?? 0, typeof(int))
         { }
 
-        public LiteralExpressionSyntax(SyntaxToken literalToken, object value)
+        public LiteralExpressionSyntax(SyntaxToken literalToken, object value, Type type)
         {
             LiteralToken = literalToken;
             Value = value;
+            Type = type;
         }
 
         public override SyntaxKind Kind => SyntaxKind.LiteralExpression;
 
         public SyntaxToken LiteralToken { get; }
         public object Value { get; }
-
+        public Type Type { get; }
     }
 }

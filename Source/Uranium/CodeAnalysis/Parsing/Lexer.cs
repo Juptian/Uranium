@@ -14,13 +14,12 @@ namespace Uranium.CodeAnalysis.Lexing
         public char CurrentIndex => Peek(0);
         public char NextIndex => Peek(1);
 
-
+        public int Start;
+        public int Index;
+        
         public string? Text;
         public object? CurrentValue;
-
-        public int Start;
         
-        public int Index;
         public SyntaxKind Current;
 
         public SyntaxToken? PreviousIdentifier;
@@ -52,7 +51,6 @@ namespace Uranium.CodeAnalysis.Lexing
                 Index++;
                 return true;
             }
-
             return false;
         }
 
@@ -220,7 +218,6 @@ namespace Uranium.CodeAnalysis.Lexing
             }
             GetText();
         }
-
 
         private void ReadIdentifierOrKeyword()
         {

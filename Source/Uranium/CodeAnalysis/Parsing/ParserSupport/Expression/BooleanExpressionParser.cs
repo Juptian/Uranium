@@ -9,7 +9,7 @@ namespace Uranium.CodeAnalysis.Parsing.ParserSupport
         {
             var isTrue = parser.Current.Kind == SyntaxKind.TrueKeyword;
             var keywordToken = isTrue ? parser.MatchToken(SyntaxKind.TrueKeyword) : parser.MatchToken(SyntaxKind.FalseKeyword);
-            return new LiteralExpressionSyntax(keywordToken, isTrue);
+            return new LiteralExpressionSyntax(keywordToken, isTrue, typeof(bool));
         }
     }
 }

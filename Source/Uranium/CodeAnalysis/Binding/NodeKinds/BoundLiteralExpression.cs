@@ -10,14 +10,17 @@ namespace Uranium.CodeAnalysis.Binding.NodeKinds
     //It holds a value, and that's literally it.
     internal sealed class BoundLiteralExpression : BoundExpression
     {
-        public BoundLiteralExpression(object value)
+        public BoundLiteralExpression(object value, Type type)
         {
             Value = value;
+            _type = type;
         }
+
+        private readonly Type _type;
 
         public object Value { get; }
 
-        public override Type Type => Value.GetType();
+        public override Type Type => _type; 
 
         public override BoundNodeKind Kind => BoundNodeKind.LiteralExpression;
     }

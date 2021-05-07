@@ -8,7 +8,11 @@ namespace Uranium.CodeAnalysis.Parsing.ParserSupport
         public static ExpressionSyntax Parse(Parser parser)
         {
             var numberToken = parser.MatchToken(SyntaxKind.NumberToken);
-            return new LiteralExpressionSyntax(numberToken);
+            if(numberToken.Value is null)
+            {
+                return new LiteralExpressionSyntax(numberToken);
+            }
+            return new LiteralExpressionSyntax(numberToken, numberToken.Value!, numberToken.Value!.GetType());
         }
     }
 }

@@ -20,7 +20,6 @@ namespace Uranium.CodeAnalysis.Parsing.ParserSupport
             //    b  5
             //Checking for an identifier token, and a double equals
             //this way we can actually assign two identifiers
-
             if(parser.Current.Kind is SyntaxKind.IdentifierToken)
             {
                 //Declaring bool ahead of time so that we can use a single if statement

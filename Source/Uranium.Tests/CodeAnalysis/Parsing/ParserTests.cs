@@ -297,23 +297,39 @@ namespace Uranium.Tests.CodeAnalysis.Parsing
         
         public static IEnumerable<object[]> GetBinaryOperatorPairsData()
         {
-            IEnumerable<SyntaxKind> operators = SyntaxFacts.GetBinaryOperators();
-            foreach(var op1 in operators)
+            var operators = SyntaxFacts.GetBinaryOperators().ToArray();
+            /*foreach(var op1 in operators)
             {
                 foreach(var op2 in operators)
                 {
                     yield return new object[] { op1, op2 };
+                }
+            }*/
+            for(int i = 0; i < operators.Length; i++)
+            {
+                for(int x = 0; x < operators.Length; x++)
+                {
+                    yield return new object[] { operators[i], operators[x] };
                 }
             }
         }
 
         public static IEnumerable<object[]> GetUnaryOperatorPairsData()
         {
-            foreach(var unary in SyntaxFacts.GetUnaryOperators())
+            /*foreach(var unary in SyntaxFacts.GetUnaryOperators())
             {
                 foreach(var binary in SyntaxFacts.GetBinaryOperators())
                 {
                     yield return new object[] { unary, binary };
+                }
+            }*/
+            var unary = SyntaxFacts.GetUnaryOperators().ToArray();
+            var binary = SyntaxFacts.GetBinaryOperators().ToArray();
+            for(int i = 0; i < unary.Length; i++)
+            {
+                for(int x = 0; x < binary.Length; x++)
+                {
+                    yield return new object[] { unary[i], binary[x] };
                 }
             }
         }

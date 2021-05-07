@@ -46,42 +46,69 @@ namespace Uranium.CodeAnalysis.Binding.NodeKinds
         private static IEnumerable<BoundBinaryOperator> CreateOperators()
         {
             //Using a for loop here for the sake of readability
-            var numberTypes = new Type[] { typeof(int), typeof(long), typeof(double), typeof(float)};
+            var numberTypes = new Type[] { typeof(int), typeof(long), typeof(double), typeof(float) };
             for(int i = 0; i < numberTypes.Length; i++)
             {
-                yield return new(SyntaxKind.Plus, BoundBinaryOperatorKind.Addition, numberTypes[i]);
-                yield return new(SyntaxKind.Minus, BoundBinaryOperatorKind.Subtraction, numberTypes[i]);
-                yield return new(SyntaxKind.Multiply, BoundBinaryOperatorKind.Multiplication, numberTypes[i]);
-                yield return new(SyntaxKind.Divide, BoundBinaryOperatorKind.Division, numberTypes[i]);
-                yield return new(SyntaxKind.Pow, BoundBinaryOperatorKind.Pow, numberTypes[i], numberTypes[i]);
-                yield return new(SyntaxKind.DoubleEquals, BoundBinaryOperatorKind.LogicalEquals, numberTypes[i], typeof(bool));
-                yield return new(SyntaxKind.BangEquals, BoundBinaryOperatorKind.NotEquals, numberTypes[i], typeof(bool));
+                for(int x = 0; x < numberTypes.Length; x++)
+                {
+                    if(SyntaxFacts.IsFloatingPoint(numberTypes[i]) && numberTypes[x] == typeof(long))
+                    {
+                        continue;
+                    }
+                    else if (numberTypes[i] == typeof(long) && x > 1)
+                    {
+                        break;
+                    }
+                    Type resultType;
+                    if(SyntaxFacts.GetTypePriority(numberTypes[i]) > SyntaxFacts.GetTypePriority(numberTypes[x]))
+                    {
+                        resultType = numberTypes[i];
+                    }
+                    else
+                    {
+                        resultType = numberTypes[x];
+                    }
 
+                    yield return new(SyntaxKind.Plus, BoundBinaryOperatorKind.Addition, numberTypes[i], numberTypes[x], resultType);
+                    yield return new(SyntaxKind.Minus, BoundBinaryOperatorKind.Subtraction, numberTypes[i], numberTypes[x], resultType);
+                    yield return new(SyntaxKind.Multiply, BoundBinaryOperatorKind.Multiplication, numberTypes[i], numberTypes[x], resultType);
+                    yield return new(SyntaxKind.Divide, BoundBinaryOperatorKind.Division, numberTypes[i], numberTypes[x], resultType);
+                    yield return new
+                        (
+                            SyntaxKind.Pow, 
+                            BoundBinaryOperatorKind.Pow, 
+                            numberTypes[i], 
+                            numberTypes[x].GetType() == typeof(long) ? typeof(int) : numberTypes[x], 
+                            resultType
+                        );
+                    yield return new(SyntaxKind.DoubleEquals, BoundBinaryOperatorKind.LogicalEquals, numberTypes[i], numberTypes[x], typeof(bool));
+                    yield return new(SyntaxKind.BangEquals, BoundBinaryOperatorKind.NotEquals, numberTypes[i], numberTypes[x], typeof(bool));
+
+                    yield return new(SyntaxKind.DoubleEquals, BoundBinaryOperatorKind.LogicalEquals, numberTypes[i], typeof(bool), typeof(bool));
+                    yield return new(SyntaxKind.BangEquals, BoundBinaryOperatorKind.NotEquals, numberTypes[i], typeof(bool), typeof(bool));
+                    yield return new(SyntaxKind.DoubleEquals, BoundBinaryOperatorKind.LogicalEquals, typeof(bool), numberTypes[i], typeof(bool));
+                    yield return new(SyntaxKind.BangEquals, BoundBinaryOperatorKind.NotEquals, typeof(bool), numberTypes[i], typeof(bool));
+
+                    yield return new(SyntaxKind.PlusEquals, BoundBinaryOperatorKind.AdditionEquals, numberTypes[i], numberTypes[x], true);
+                    yield return new(SyntaxKind.MinusEquals, BoundBinaryOperatorKind.SubtractionEquals, numberTypes[i], numberTypes[x], true);
+                    yield return new(SyntaxKind.MultiplyEquals, BoundBinaryOperatorKind.MultiplicationEquals, numberTypes[i], numberTypes[x], true);
+                    yield return new(SyntaxKind.DivideEquals, BoundBinaryOperatorKind.DivisionEquals, numberTypes[i], numberTypes[x], true);
+
+                    yield return new(SyntaxKind.PlusPlus, BoundBinaryOperatorKind.AdditionAddition, numberTypes[i], true);
+                    yield return new(SyntaxKind.MinusMinus, BoundBinaryOperatorKind.SubtractionSubtraction, numberTypes[i], true);
+
+                    yield return new(SyntaxKind.LesserThan, BoundBinaryOperatorKind.LesserThan, numberTypes[i], numberTypes[x], typeof(bool));
+                    yield return new(SyntaxKind.LesserThanEquals, BoundBinaryOperatorKind.LesserThanEquals, numberTypes[i], numberTypes[x], typeof(bool));
+
+                    yield return new(SyntaxKind.GreaterThan, BoundBinaryOperatorKind.GreaterThan, numberTypes[i], numberTypes[x], typeof(bool));
+                    yield return new(SyntaxKind.GreaterThanEquals, BoundBinaryOperatorKind.GreaterThanEquals, numberTypes[i], numberTypes[x], typeof(bool));                
+                }
                 yield return new(SyntaxKind.DoubleEquals, BoundBinaryOperatorKind.LogicalEquals, numberTypes[i], typeof(bool), typeof(bool));
                 yield return new(SyntaxKind.BangEquals, BoundBinaryOperatorKind.NotEquals, numberTypes[i], typeof(bool), typeof(bool));
-                yield return new(SyntaxKind.DoubleEquals, BoundBinaryOperatorKind.LogicalEquals, typeof(bool), numberTypes[i], typeof(bool));
-                yield return new(SyntaxKind.BangEquals, BoundBinaryOperatorKind.NotEquals, typeof(bool), numberTypes[i], typeof(bool));
 
-                yield return new(SyntaxKind.PlusEquals, BoundBinaryOperatorKind.AdditionEquals, numberTypes[i], true);
-                yield return new(SyntaxKind.MinusEquals, BoundBinaryOperatorKind.SubtractionEquals, numberTypes[i], true);
-                yield return new(SyntaxKind.MultiplyEquals, BoundBinaryOperatorKind.MultiplicationEquals, numberTypes[i], true);
-                yield return new(SyntaxKind.DivideEquals, BoundBinaryOperatorKind.DivisionEquals, numberTypes[i], true);
-
-                yield return new(SyntaxKind.PlusPlus, BoundBinaryOperatorKind.AdditionAddition, numberTypes[i], true);
-                yield return new(SyntaxKind.MinusMinus, BoundBinaryOperatorKind.SubtractionSubtraction, numberTypes[i], true);
-
-                yield return new(SyntaxKind.LesserThan, BoundBinaryOperatorKind.LesserThan, numberTypes[i], typeof(bool));
-                yield return new(SyntaxKind.LesserThanEquals, BoundBinaryOperatorKind.LesserThanEquals, numberTypes[i], typeof(bool));
-
-                yield return new(SyntaxKind.GreaterThan, BoundBinaryOperatorKind.GreaterThan, numberTypes[i], typeof(bool));
-                yield return new(SyntaxKind.GreaterThanEquals, BoundBinaryOperatorKind.GreaterThanEquals, numberTypes[i], typeof(bool));
-                
-                yield return new(SyntaxKind.DoubleEquals, BoundBinaryOperatorKind.LogicalEquals, numberTypes[i], typeof(bool), typeof(bool));
-                yield return new(SyntaxKind.BangEquals, BoundBinaryOperatorKind.NotEquals, numberTypes[i], typeof(bool), typeof(bool));
                 yield return new(SyntaxKind.Ampersand, BoundBinaryOperatorKind.BitwiseAND, numberTypes[i], typeof(bool));
                 yield return new(SyntaxKind.Pipe, BoundBinaryOperatorKind.BitwiseOR, numberTypes[i], typeof(bool));
                 yield return new(SyntaxKind.Hat, BoundBinaryOperatorKind.BitwiseXOR, numberTypes[i]);
-
             }
             //These are down here as they do not need to be returned every iteration
             //They're always going to be the same things, so might as well

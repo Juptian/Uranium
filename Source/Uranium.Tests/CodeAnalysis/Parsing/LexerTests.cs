@@ -32,7 +32,7 @@ namespace Uranium.Tests.CodeAnalysis.Lexing
             Assert.Equal(kind, singleToken.Kind);
             Assert.Equal(text, singleToken.Text);
         }
-
+        
         [Theory]
         [InlineData("     ")]
         public void LexerLexesWhitespace(string text)
@@ -70,9 +70,9 @@ namespace Uranium.Tests.CodeAnalysis.Lexing
         
         [Theory]
         [InlineData("100 233", typeof(int))]
-        [InlineData("2147483648", typeof(uint))]
         [InlineData("4294967299", typeof(long))]
-        [InlineData("9223372036854775810", typeof(ulong))]
+        [InlineData("10.01", typeof(float))]
+        [InlineData("10.1234567890", typeof(double))]
         public void LexerLexesNumbersProperly(string text, Type expectedType)
         {
             var tokens = SyntaxTree.LexTokens(text);
@@ -113,17 +113,19 @@ namespace Uranium.Tests.CodeAnalysis.Lexing
 
         public static IEnumerable<object[]> GetTokensData()
         {
-            foreach(var (kind, text) in _testCases)
+            var arr = _testCases.ToArray();
+            for(int i = 0; i < arr.Length; i++)
             {
-                yield return new object[] { kind, text };
+                yield return new object[] { arr[i].kind, arr[i].text };
             }
         }
 
         public static IEnumerable<object[]> GetTokenPairsData()
         {
-            foreach(var (left, right) in _pairTestCases)
+            var arr = _pairTestCases.ToArray();
+            for(int i = 0; i < arr.Length; i++)
             {
-                yield return new[] { left, right };
+                yield return new object[] { arr[i].left, arr[i].right };
             }
         }
 
@@ -230,11 +232,10 @@ namespace Uranium.Tests.CodeAnalysis.Lexing
         //Bottom of the file because it does not need to be revisited very often
         private static bool RequiresSeparator(SyntaxKind leftKind, SyntaxKind rightKind)
         {
-            var tokensThatRequire = Concatenate(GetSoloOperators(), GetKeywords(), GetNumbers());
-            tokensThatRequire.ToList().Add((SyntaxKind.Pow, "**"));
-            foreach (var (kind, _) in tokensThatRequire)
+            var tokensThatRequire = Concatenate(GetSoloOperators(), GetKeywords(), GetNumbers()).ToArray();
+            for(int i = 0; i < tokensThatRequire.Length; i++)
             {
-                if(kind == leftKind || kind == rightKind)
+                if(tokensThatRequire[i].kind == leftKind || tokensThatRequire[i].kind == rightKind)
                 {
                     return true;
                 }
@@ -245,28 +246,30 @@ namespace Uranium.Tests.CodeAnalysis.Lexing
         //^^
         private static IEnumerable<(TupleContainer left, TupleContainer Right)> GetTokenPairs()
         {
-            foreach(var (kind, text) in _testCases)
+            var cases = _testCases.ToArray();
+            for(int i = 0; i < cases.Length; i++)
             {
-                foreach(var (rightKind, rightText) in _testCases)
+                for(int x = 0; x < cases.Length; x++)
                 {
-                    if(!RequiresSeparator(kind, rightKind))
+                    if(!RequiresSeparator(cases[i].kind, cases[x].kind))
                     {
-                        var left = new TupleContainer(kind, text);
-                        var right = new TupleContainer(rightKind, rightText);
-                        yield return new(left, right);    
+                        var left = new TupleContainer(cases[i].kind, cases[i].text);
+                        var right = new TupleContainer(cases[x].kind, cases[x].text);
+                        yield return new(left, right);
                     }
                 }
-            }    
+            }
         }
        
         //^^
         private static IEnumerable<T> Concatenate<T>(params IEnumerable<T>[] list)
         {
-            foreach(var element in list)
+            for(int i = 0; i < list.Length; i++)
             {
-                foreach(T subElement in element)
+                var arr = list[i].ToArray();
+                for(int x = 0; x < arr.Length; x++)
                 {
-                    yield return subElement;
+                    yield return arr[x];
                 }
             }
         }

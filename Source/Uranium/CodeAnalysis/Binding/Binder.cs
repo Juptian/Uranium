@@ -155,13 +155,14 @@ namespace Uranium.CodeAnalysis.Binding
             var name = syntax.Identifier.Text;
             var isReadOnly = syntax.KeywordToken.Kind == SyntaxKind.LetConstKeyword || syntax.KeywordToken.Kind == SyntaxKind.ConstKeyword;
             var initializer = BindExpression(syntax.Initializer);
-            var variable = new VariableSymbol(name, isReadOnly, initializer.Type);
+            var type = SyntaxFacts.GetKeywordType(syntax.KeywordToken.Kind) ?? initializer.Type;
+            var variable = new VariableSymbol(name, isReadOnly, type);
+            Console.WriteLine($"Type: {type} BINDER 161");
             
             if(!_scope.TryDeclare(variable))
             {
                 _diagnostics.ReportVariableAlreadyDeclared(syntax.Identifier.Span, name);
             }
-
             return new BoundVariableDeclaration(variable, initializer);
         }
 
@@ -193,7 +194,8 @@ namespace Uranium.CodeAnalysis.Binding
 
         //Value is being parsed into a nullable int
         //That then gets checked to see if it's null, and gets assigned to 0 if it is.
-        private static BoundExpression BindLiteralExpression(LiteralExpressionSyntax syntax) => new BoundLiteralExpression(syntax.Value ?? 0);
+        private static BoundExpression BindLiteralExpression(LiteralExpressionSyntax syntax) 
+            => new BoundLiteralExpression(syntax.Value, syntax.Type);
 
         private BoundExpression BindUnaryExpression(UnaryExpressionSyntax syntax)
         {
@@ -221,7 +223,6 @@ namespace Uranium.CodeAnalysis.Binding
             //Same as in the BindUnaryExpression but we return our boundLeft instead
             if (boundOperatorKind is null)
             {
-                Console.WriteLine(syntax.OperatorToken.Text);
                 _diagnostics.ReportUndefinedBinaryOperator(syntax.OperatorToken.Span, syntax.OperatorToken.Text, boundLeft.Type, boundRight.Type);
                 return boundLeft;
             }
@@ -239,7 +240,7 @@ namespace Uranium.CodeAnalysis.Binding
             if (!_scope.TryLookup(name, out var variable))
             {
                 _diagnostics.ReportUndefinedName(syntax.IdentifierToken.Span, name ?? "name is null");
-                return new BoundLiteralExpression(0);
+                return new BoundLiteralExpression(0, typeof(int));
             }
             return new BoundVariableExpression(variable);
         }
@@ -255,18 +256,19 @@ namespace Uranium.CodeAnalysis.Binding
                 _diagnostics.ReportUndefinedName(syntax.IdentifierToken.Span, name);
                 return boundExpression;
             }
-
+            Console.WriteLine($"Variable type: {variable.Type} BINDER 259");
             if(variable.IsReadOnly)
             {
                 _diagnostics.ReportCannotAssign(syntax.IdentifierToken.Span, syntax.EqualsToken.Span, name);
             }
 
             //A variable cannot have their type reassigned.
-            if(boundExpression.Type != variable.Type)
+            /*if(boundExpression.Type != variable.Type)
             {
                 _diagnostics.ReportCannotConvert(syntax.Expression.Span, boundExpression.Type, variable.Type);
                 return boundExpression;
-            }
+            }*/
+
             return new BoundAssignmentExpression(variable, boundExpression, syntax.CompoundOperator, syntax.IsCompound);
         }
     }
