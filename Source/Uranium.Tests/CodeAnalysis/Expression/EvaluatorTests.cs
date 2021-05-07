@@ -219,11 +219,13 @@ namespace Uranium.Tests.CodeAnalysis.Expression
                 yield return new object[] { $"{i} + -{i}", 0 };
                 yield return new object[] { $"{i} + +{i}", i << 1 };
             }
-            for (int i = 1; i <= 50; i++)
+            for(int i = 1; i <= 3; i++)
             {
+                //Compound operators
                 yield return new object[] { "{ " + $"int i = {i}; i += {i}" + " }", i << 1 };
                 yield return new object[] { "{ " + $"int i = {i}; i -= {i}" + " }", 0 };
                 yield return new object[] { "{ " + $"int i = {i}; i /= {i}" + " }", 1 };
+                yield return new object[] { "{ " + $"int i = {i}; i *= {i}" + " }", i * i };
                 yield return new object[] { "{ " + $"int i = 1; i **= {i}" + " }", 1 };
                 yield return new object[] { "{ " + $"int i = {i}; i++;" + " }", i + 1 };
                 yield return new object[] { "{ " + $"int i = {i}; i--;" + " }", i - 1 };
@@ -232,12 +234,15 @@ namespace Uranium.Tests.CodeAnalysis.Expression
                 yield return new object[] { "{ " + $"long i = {i}; i -= {i}" + " }", (long)0 };
                 yield return new object[] { "{ " + $"long i = {i}; i /= {i}" + " }", (long)1 };
                 yield return new object[] { "{ " + $"long i = 1; int b = {i}; i **= b" + " }", (long)1 };
+                yield return new object[] { "{ " + $"long i = 1; long  b = {i}; i **= b" + " }", (long)1 };
+                yield return new object[] { "{ " + $"long i = {i}; i *= {i}" + " }", (long)(i * i) };
                 yield return new object[] { "{ " + $"long i = {i}; i++;" + " }", (long)(i + 1) };
                 yield return new object[] { "{ " + $"long i = {i}; i--;" + " }", (long)(i - 1) };
 
                 yield return new object[] { "{ " + $"float i = {i}; i += {i}" + " }", (float)(i << 1) };
                 yield return new object[] { "{ " + $"float i = {i}; i -= {i}" + " }", (float)0 };
                 yield return new object[] { "{ " + $"float i = {i}; i /= {i}" + " }", (float)1 };
+                yield return new object[] { "{ " + $"float i = {i}; i *= {i}" + " }", (float)(i * i) };
                 yield return new object[] { "{ " + $"float i = 1; i **= {i}" + " }", (float)1 };
                 yield return new object[] { "{ " + $"float i = {i}; i++;" + " }", (float)(i + 1) };
                 yield return new object[] { "{ " + $"float i = {i}; i--;" + " }", (float)(i - 1) };
@@ -245,12 +250,11 @@ namespace Uranium.Tests.CodeAnalysis.Expression
                 yield return new object[] { "{ " + $"double i = {i}; i += {i}" + " }", (double)(i << 1) };
                 yield return new object[] { "{ " + $"double i = {i}; i -= {i}" + " }", (double)(0) };
                 yield return new object[] { "{ " + $"double i = {i}; i /= {i}" + " }", (double)(1) };
+                yield return new object[] { "{ " + $"double i = {i}; i *= {i}" + " }", (double)(i * i) };
+
                 yield return new object[] { "{ " + $"double i = 1; i **= {i}" + " }", (double)(1) };
                 yield return new object[] { "{ " + $"double i = {i}; i++;" + " }", (double)(i + 1) };
                 yield return new object[] { "{ " + $"double i = {i}; i--;" + " }", (double)(i - 1) };
-            }
-            {
-                int i = 1;
 
                 yield return new object[] { "{ " + $"long i = {i}; i < i" + " }", false };
                 yield return new object[] { "{ " + $"long i = {i}; i <= i" + " }", true };

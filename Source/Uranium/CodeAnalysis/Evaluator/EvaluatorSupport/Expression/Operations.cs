@@ -317,8 +317,6 @@ namespace Uranium.CodeAnalysis.Syntax.EvaluatorSupport
 
                 case doubleValue when rightPrio == floatValue:
                     return (double)left >= (float)right;
-                case doubleValue when rightPrio == longValue:
-                    return (double)left >= (long)right;
                 case doubleValue when rightPrio == intValue:
                     return (double)left >= (int)right;
                 default:
