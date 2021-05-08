@@ -5,13 +5,13 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.IO;
 using Uranium.CodeAnalysis.Syntax;
-using Uranium.CodeAnalysis.Parsing;
 using Uranium.CodeAnalysis.Binding;
-using Uranium.CodeAnalysis.Syntax.Expression;
 using Uranium.Logging;
 using Uranium.CodeAnalysis.Text;
-using System.IO;
+using Uranium.CodeAnalysis.Binding.Statements;
+using Uranium.CodeAnalysis.Lowering;
 
 namespace Uranium.CodeAnalysis
 {
@@ -61,14 +61,22 @@ namespace Uranium.CodeAnalysis
                 return new(diagnostics, null);
             }
 
-            var evaluator = new Evaluator(globalScope.Statement, variables);
+            var statement = GetStatement();
+
+            var evaluator = new Evaluator(statement, variables);
             var value = evaluator.Evaluate();
             return new(ImmutableArray<Diagnostic>.Empty, value);
         }
 
         public void EmitTree(TextWriter writer)
         {
+            var statement = GetStatement();
             GlobalScope.Statement.WriteTo(writer);
+        }
+
+        private BoundStatement GetStatement()
+        {
+            return Lowerer.Lower(GlobalScope.Statement);
         }
     }
 }

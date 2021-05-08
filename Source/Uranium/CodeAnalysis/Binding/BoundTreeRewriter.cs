@@ -57,7 +57,7 @@ namespace Uranium.CodeAnalysis.Binding
 
         protected virtual BoundStatement RewriteBlockStatement(BoundBlockStatement node)
         {
-            ImmutableArray<BoundStatement>.Builder builder = null;
+            ImmutableArray<BoundStatement>.Builder? builder = null;
             for(var i = 0; i < node.Statements.Length; i++)
             {
                 var oldStatement = node.Statements[i];
@@ -78,13 +78,13 @@ namespace Uranium.CodeAnalysis.Binding
                     builder.Add(newStatement);
                 }
             }
+
             if(builder is null)
             {
                 return node;
             }
 
             return new BoundBlockStatement(builder.MoveToImmutable());
-
         }
 
         protected virtual BoundStatement RewriteExpressionStatement(BoundExpressionStatement node)
@@ -94,22 +94,43 @@ namespace Uranium.CodeAnalysis.Binding
             {
                 return node;
             }
+
             return new BoundExpressionStatement(expression);
         }
 
         protected virtual BoundStatement RewriteVariableDeclaration(BoundVariableDeclaration node)
         {
-            return node;
+            var initializer = RewriteExpression(node.Initializer);
+            if(initializer == node.Initializer)
+            {
+                return node;
+            }
+
+            return new BoundVariableDeclaration(node.Variable, initializer);
         }
 
         protected virtual BoundStatement RewriteIfStatement(BoundIfStatement node)
         {
-            return node;
+            var condition = RewriteExpression(node.Condition);
+            var body = RewriteStatement(node.Statement);
+            var elseClause = node.ElseStatement is null ? null : RewriteStatement(node.ElseStatement);
+            if(condition == node.Condition && body == node.Statement && elseClause == node.ElseStatement)
+            {
+                return node;
+            }
+
+            return new BoundIfStatement(condition, body, elseClause);
         }
 
         protected virtual BoundStatement RewriteWhileStatement(BoundWhileStatement node)
         {
-            return node;
+            var condition = RewriteExpression(node.Condition);
+            var body = RewriteStatement(node.Body) as BoundBlockStatement;
+            if(condition == node.Condition && body == node.Body)
+            {
+                return node;
+            }
+            return new BoundWhileStatement(condition, body ?? node.Body);
         }
 
         protected virtual BoundStatement RewriteForStatement(BoundForStatement node)
@@ -117,6 +138,7 @@ namespace Uranium.CodeAnalysis.Binding
             BoundStatement? initializer = null;
             BoundExpression? condition = null;
             BoundExpression? incrementation = null;
+
             if(node.VariableDeclaration is not null)
             {
                 initializer = RewriteStatement(node.VariableDeclaration);
@@ -134,9 +156,21 @@ namespace Uranium.CodeAnalysis.Binding
 
             if(initializer is null && condition is null && incrementation is null)
             {
+                var trueExpression = new BoundLiteralExpression(true, typeof(bool));
+                return new BoundWhileStatement(trueExpression, node.Body);
             }
 
-            return node;
+            var body = RewriteBlockStatement(node.Body) as BoundBlockStatement;
+            
+            if(initializer == node.VariableDeclaration &&
+               condition == node.Condition &&
+               incrementation == node.Increment &&
+               body == node.Body)
+            {
+                return node;
+            }
+
+            return new BoundForStatement(initializer, condition, incrementation, body ?? node.Body);
         }
 
 
