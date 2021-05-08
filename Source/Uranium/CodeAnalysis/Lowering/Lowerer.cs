@@ -1,25 +1,163 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using Uranium.CodeAnalysis.Binding;
 using Uranium.CodeAnalysis.Binding.NodeKinds;
 using Uranium.CodeAnalysis.Binding.Statements;
+using Uranium.CodeAnalysis.Text;
 
 namespace Uranium.CodeAnalysis.Lowering
 {
     internal sealed class Lowerer : BoundTreeRewriter
     {
+        private int _labelCount = 0;
         private Lowerer()
         {
 
         }
 
-        public static BoundStatement Lower(BoundStatement statement)
+        private LabelSymbol GenerateLabel()
+            => new($"Label_{++_labelCount}");
+        
+        public static BoundBlockStatement Lower(BoundStatement statement)
         {
             var lowerer = new Lowerer();
-            return lowerer.RewriteStatement(statement);
+            var result = lowerer.RewriteStatement(statement);
+            return Flatten(result);
         }
 
+        private static BoundBlockStatement Flatten(BoundStatement statement)
+        {
+            var builder = ImmutableArray.CreateBuilder<BoundStatement>();
+            var stack = new Stack<BoundStatement>();
+            stack.Push(statement);
+
+            while(stack.Count > 0)
+            {
+                var current = stack.Pop();
+                if(current is BoundBlockStatement block)
+                {
+                    var reversedStatements = block.Statements.Reverse().ToArray();
+                    for(int i = 0; i < reversedStatements.Length; i++)
+                    {
+                        stack.Push(reversedStatements[i]);
+                    }
+                }
+                else
+                {
+                    builder.Add(current);
+                }
+            }
+
+            return new(builder.ToImmutable());
+        }
+
+        protected override BoundStatement RewriteIfStatement(BoundIfStatement node)
+        {
+            if (node.ElseStatement is null)
+            {
+                // if(condition)
+                // {
+                // }
+                // =======================================
+                // if <condition>
+                // gotoIfFalse <condition> end
+                //     stuffs
+                // end:
+
+                var endLabel = GenerateLabel();
+                var gotoFalse = new BoundConditionalGotoStatement(endLabel, node.Condition, true);
+                var endLabelStatement = new BoundLabelStatement(endLabel);
+                var result = new BoundBlockStatement
+                    (
+                        ImmutableArray.Create<BoundStatement>
+                        (
+                            gotoFalse,
+                            node.Statement,
+                            endLabelStatement
+                        )
+                    );
+                return RewriteStatement(result);
+            }
+            else
+            {
+                // if(condition)
+                // {
+                // }
+                // else
+                // {
+                // }
+                // =======================================
+                // if<condition>
+                // gotoIfFalse <condition> else
+                //     stuffs
+                // else:
+                //     Else stuffs
+                // end:
+                var elseLabel = GenerateLabel();
+                var endLabel = GenerateLabel();
+
+                var gotoFalse = new BoundConditionalGotoStatement(elseLabel, node.Condition, true);
+                var gotoEndStatement = new BoundGotoStatement(endLabel);
+
+                var elseLabelStatement = new BoundLabelStatement(elseLabel);
+                var endLabelStatement = new BoundLabelStatement(endLabel);
+                var result = new BoundBlockStatement
+                    (
+                        ImmutableArray.Create<BoundStatement>
+                        (
+                            gotoFalse,
+                            node.Statement,
+                            gotoEndStatement,
+                            elseLabelStatement,
+                            node.ElseStatement,
+                            endLabelStatement
+                        )
+                    );
+                return RewriteStatement(result);
+
+            }
+        }
+        protected override BoundStatement RewriteWhileStatement(BoundWhileStatement node)
+        {
+            //while <condition>
+            //{
+            //}
+            // =======================================
+            //
+            // continue: 
+            //     <body>
+            //
+            // check:
+            //     gotoTrue <condition> continue     
+            //
+            //end:
+
+            var checkLabel = GenerateLabel();
+            var continueLabel = GenerateLabel();
+            var endLabel = GenerateLabel();
+            var gotoCheck = new BoundGotoStatement(checkLabel);
+            var continueLabelStatement = new BoundLabelStatement(continueLabel);
+            var checkLabelStatement = new BoundLabelStatement(checkLabel);
+            var endLabelStatement = new BoundLabelStatement(endLabel);
+
+            var gotoTrue = new BoundConditionalGotoStatement(continueLabel, node.Condition, false);
+
+            var result = new BoundBlockStatement
+                (
+                    ImmutableArray.Create
+                    (
+                        gotoCheck,
+                        continueLabelStatement,
+                        node.Body,
+                        checkLabelStatement,
+                        gotoTrue,
+                        endLabelStatement
+                    )
+                );
+            return RewriteStatement(result);
+
+        }
         protected override BoundStatement RewriteForStatement(BoundForStatement node)
         {
             //for(var <identifier>; <identifier> <conditional operator> <condition>; <incrementation>)
@@ -34,7 +172,6 @@ namespace Uranium.CodeAnalysis.Lowering
             //      }
             //}
             //
-
             BoundVariableDeclaration? variableDeclaration = null;
             BoundBinaryExpression? condition = null;
             var trueExpression = new BoundLiteralExpression(true, typeof(bool));
@@ -74,9 +211,10 @@ namespace Uranium.CodeAnalysis.Lowering
             }
 
             builder.Add(condition is null ? whileLoop : new BoundWhileStatement(condition, body));
-            
 
-            return new BoundBlockStatement(builder.ToImmutable());
+            var result = new BoundBlockStatement(builder.ToImmutable());
+
+            return RewriteStatement(result);
         }
     }
 }

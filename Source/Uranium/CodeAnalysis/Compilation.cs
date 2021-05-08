@@ -74,7 +74,10 @@ namespace Uranium.CodeAnalysis
             statement.WriteTo(writer);
         }
 
-        private BoundStatement GetStatement()
-            => Lowerer.Lower(GlobalScope.Statement);
+        private BoundBlockStatement GetStatement()
+        {
+            var result = GlobalScope.Statement;
+            return Lowerer.Lower(result);
+        }
     }
 }

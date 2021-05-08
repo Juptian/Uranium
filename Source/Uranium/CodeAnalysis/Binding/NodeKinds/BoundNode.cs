@@ -19,7 +19,8 @@ namespace Uranium.CodeAnalysis.Binding.NodeKinds
             for(int i = 0; i < properties.Length; i++)
             {
                 if(properties[i].Name == nameof(Kind) || 
-                   properties[i].Name == nameof(BoundBinaryExpression.Op))
+                   properties[i].Name == nameof(BoundBinaryExpression.Op) ||
+                   properties[i].Name == nameof(BoundAssignmentExpression.CompoundOperator))
                 {
                     continue;
                 }

@@ -9,6 +9,7 @@ using Uranium.CodeAnalysis.Text;
 using Uranium.Logging;
 
 #pragma warning disable CS8618
+#pragma warning disable CA2211
 
 namespace Uranium
 {

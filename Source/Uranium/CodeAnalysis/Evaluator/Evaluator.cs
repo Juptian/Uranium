@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Immutable;
 using System.Collections.Generic;
 using Uranium.CodeAnalysis.Binding;
 using Uranium.CodeAnalysis.Binding.Statements;
@@ -12,12 +13,16 @@ namespace Uranium.CodeAnalysis.Syntax
     //It just evaluates
     internal sealed class Evaluator
     {
-        private readonly BoundStatement _root;
+        private readonly BoundBlockStatement _root;
         internal readonly Dictionary<VariableSymbol, object> Variables;
+        private readonly Dictionary<LabelSymbol, int> _labelIndex = new();
+
+        private int _index = 0;
 
         internal object? LastValue;
 
-        public Evaluator(BoundStatement root, Dictionary<VariableSymbol, object> variables)
+
+        public Evaluator(BoundBlockStatement root, Dictionary<VariableSymbol, object> variables)
         {
             _root = root;
             Variables = variables;
@@ -25,7 +30,19 @@ namespace Uranium.CodeAnalysis.Syntax
 
         public object Evaluate()
         {
-            EvaluateStatement(_root);
+            for(int i = 0; i < _root.Statements.Length; i++)
+            {
+                if(_root.Statements[i] is BoundLabelStatement l)
+                {
+                    _labelIndex.Add(l.Symbol, i + 1);
+                }
+            }
+
+            for(; _index < _root.Statements.Length; _index++)
+            {
+                EvaluateStatement(_root.Statements[_index]);
+            }
+
             return LastValue!;
         }
 
@@ -33,28 +50,43 @@ namespace Uranium.CodeAnalysis.Syntax
         {
             switch (statement.Kind)
             {
-                case BoundNodeKind.BlockStatement:
+                /*case BoundNodeKind.BlockStatement:
                     BlockStatementEvaluator.Evaluate((BoundBlockStatement)statement, this);
-                    return;
+                    return;*/
 
                 case BoundNodeKind.ExpressionStatement:
                     EvaluateExpressionStatement((BoundExpressionStatement)statement);
+
                     return;
                 case BoundNodeKind.VariableDeclaration:
                     VariableDeclarationEvaluator.Evaluate((BoundVariableDeclaration)statement, this);
                     return;
 
-                case BoundNodeKind.IfStatement:
+                /*case BoundNodeKind.IfStatement:
                     IfStatementEvaluator.Evaluate((BoundIfStatement)statement, this);
                     return;
 
                 case BoundNodeKind.WhileStatement:
                     WhileStatementEvaluator.Evaluate((BoundWhileStatement)statement, this);
+                    return;*/
+                case BoundNodeKind.LabelStatement:
                     return;
 
-                case BoundNodeKind.ForStatement:
-                    ForStatementEvaluator.Evaluate((BoundForStatement)statement, this);
+                case BoundNodeKind.GotoStatement:
+                    var gs = (BoundGotoStatement)statement;
+                    _index = _labelIndex[gs.Label] - 1;
+
                     return;
+                case BoundNodeKind.ConditionalGotoStatement:
+                    var cgs = (BoundConditionalGotoStatement)statement;
+                    var condition = (bool)ExpressionEvaluator.Evaluate(cgs.Condition, this);
+                    if(condition && !cgs.JumpIfFalse ||
+                       !condition && cgs.JumpIfFalse)
+                    {
+                        _index = _labelIndex[cgs.Label] - 1;
+                    }
+                    return;
+
                 default:
                     //Exhausted all our options, time to call it quits!
                     throw new($"Unexpected statement {statement}");

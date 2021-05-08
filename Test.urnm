@@ -1,7 +1,8 @@
 ﻿{
-	for(int i = 0; i < 10; i++)
+	var i = 0;
+	for(; i <= 10; i += 1)
 	{
 
 	}
-	var i = 10;
+	var b = i;
 }

@@ -1,31 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Uranium.CodeAnalysis.Binding.Statements;
 using Uranium.CodeAnalysis.Binding.NodeKinds;
+using Uranium.CodeAnalysis.Binding;
 
-namespace Uranium.CodeAnalysis.Binding
+namespace Uranium.CodeAnalysis.Lowering
 {
     internal abstract class BoundTreeRewriter
     {
-        /*
-        UnaryExpression,
-        LiteralExpression,
-        BinaryExpression,
-        VariableExpression,
-        AssignmentExpression,
-
-        
-        BlockStatement,
-        ExpressionStatement,
-        VariableDeclaration,
-        IfStatement,
-        ElseStatement,
-        WhileStatement,
-        ForStatement,*/
 
         public virtual BoundStatement RewriteStatement(BoundStatement node)
         {
@@ -37,9 +20,14 @@ namespace Uranium.CodeAnalysis.Binding
                 BoundNodeKind.IfStatement => RewriteIfStatement( (BoundIfStatement) node),
                 BoundNodeKind.WhileStatement => RewriteWhileStatement( (BoundWhileStatement)node),
                 BoundNodeKind.ForStatement => RewriteForStatement( (BoundForStatement)node),
+                BoundNodeKind.LabelStatement => RewriteLabelStatement( (BoundLabelStatement)node ),
+                BoundNodeKind.GotoStatement => RewriteGotoStatement( (BoundGotoStatement)node ),
+                BoundNodeKind.ConditionalGotoStatement => RewriteConditionalGotoStatement( (BoundConditionalGotoStatement)node ),
+
                 _ => throw new($"Unexpected node: {node.Kind}"),
             };
         }
+
 
         public virtual BoundExpression RewriteExpression(BoundExpression node)
         {
@@ -173,6 +161,23 @@ namespace Uranium.CodeAnalysis.Binding
             return new BoundForStatement(initializer, condition, incrementation, body ?? node.Body);
         }
 
+        protected virtual BoundStatement RewriteLabelStatement(BoundLabelStatement node)
+            => node;
+
+        protected virtual BoundStatement RewriteGotoStatement(BoundGotoStatement node)
+            => node;
+
+        protected virtual BoundStatement RewriteConditionalGotoStatement(BoundConditionalGotoStatement node)
+        {
+            var condition = RewriteExpression(node.Condition);
+            if(condition == node.Condition)
+            {
+                return node;
+            }
+
+            return new BoundConditionalGotoStatement(node.Label, condition, node.JumpIfFalse);
+        }
+
         protected virtual BoundExpression RewriteUnaryExpression(BoundUnaryExpression node)
         {
             var operand = RewriteExpression(node.Operand);
@@ -211,6 +216,5 @@ namespace Uranium.CodeAnalysis.Binding
             }
             return new BoundAssignmentExpression(node.Variable, expression, node.CompoundOperator, node.IsCompound);
         }
-
     }
 }

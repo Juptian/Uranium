@@ -24,5 +24,9 @@ namespace Uranium.CodeAnalysis.Binding
         ElseStatement,
         WhileStatement,
         ForStatement,
+
+        GotoStatement,
+        ConditionalGotoStatement,
+        LabelStatement,
     }
 }
