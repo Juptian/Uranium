@@ -127,7 +127,7 @@ namespace Uranium.Tests.CodeAnalysis.Expression
         i;
     }
 }
-", 10)]
+", 11)]
         [InlineData(@"
 {
     var a = 10;

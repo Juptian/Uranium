@@ -71,12 +71,10 @@ namespace Uranium.CodeAnalysis
         public void EmitTree(TextWriter writer)
         {
             var statement = GetStatement();
-            GlobalScope.Statement.WriteTo(writer);
+            statement.WriteTo(writer);
         }
 
         private BoundStatement GetStatement()
-        {
-            return Lowerer.Lower(GlobalScope.Statement);
-        }
+            => Lowerer.Lower(GlobalScope.Statement);
     }
 }

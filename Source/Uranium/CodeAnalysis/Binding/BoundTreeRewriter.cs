@@ -135,23 +135,23 @@ namespace Uranium.CodeAnalysis.Binding
 
         protected virtual BoundStatement RewriteForStatement(BoundForStatement node)
         {
-            BoundStatement? initializer = null;
-            BoundExpression? condition = null;
-            BoundExpression? incrementation = null;
+            BoundVariableDeclaration? initializer = null;
+            BoundBinaryExpression? condition = null;
+            BoundAssignmentExpression? incrementation = null;
 
             if(node.VariableDeclaration is not null)
             {
-                initializer = RewriteStatement(node.VariableDeclaration);
+                initializer = (BoundVariableDeclaration)RewriteStatement(node.VariableDeclaration);
             }
 
             if(node.Condition is not null)
             {
-                condition = RewriteExpression(node.Condition);
+                condition = (BoundBinaryExpression)RewriteExpression(node.Condition);
             }
 
             if(node.Increment is not null)
             {
-                incrementation = RewriteExpression(node.Increment);
+                incrementation = (BoundAssignmentExpression)RewriteExpression(node.Increment);
             }
 
             if(initializer is null && condition is null && incrementation is null)
@@ -172,7 +172,6 @@ namespace Uranium.CodeAnalysis.Binding
 
             return new BoundForStatement(initializer, condition, incrementation, body ?? node.Body);
         }
-
 
         protected virtual BoundExpression RewriteUnaryExpression(BoundUnaryExpression node)
         {

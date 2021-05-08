@@ -9,7 +9,7 @@ namespace Uranium.CodeAnalysis.Binding.Statements
 {
     internal sealed class BoundForStatement : BoundStatement
     {
-        public BoundForStatement(BoundStatement? variableDeclaration, BoundExpression? condition, BoundExpression? increment, BoundBlockStatement body)
+        public BoundForStatement(BoundVariableDeclaration? variableDeclaration, BoundBinaryExpression? condition, BoundAssignmentExpression? increment, BoundBlockStatement body)
         {
             VariableDeclaration = variableDeclaration;
             Condition = condition;
@@ -17,9 +17,9 @@ namespace Uranium.CodeAnalysis.Binding.Statements
             Body = body;
         }
 
-        public BoundStatement? VariableDeclaration { get; }
-        public BoundExpression? Condition { get; }
-        public BoundExpression? Increment { get; }
+        public BoundVariableDeclaration? VariableDeclaration { get; }
+        public BoundBinaryExpression? Condition { get; }
+        public BoundAssignmentExpression? Increment { get; }
         public BoundBlockStatement Body { get; }
 
         public override BoundNodeKind Kind => BoundNodeKind.ForStatement;
