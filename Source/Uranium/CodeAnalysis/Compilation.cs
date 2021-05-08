@@ -11,7 +11,7 @@ using Uranium.CodeAnalysis.Binding;
 using Uranium.CodeAnalysis.Syntax.Expression;
 using Uranium.Logging;
 using Uranium.CodeAnalysis.Text;
-
+using System.IO;
 
 namespace Uranium.CodeAnalysis
 {
@@ -64,6 +64,11 @@ namespace Uranium.CodeAnalysis
             var evaluator = new Evaluator(globalScope.Statement, variables);
             var value = evaluator.Evaluate();
             return new(ImmutableArray<Diagnostic>.Empty, value);
+        }
+
+        public void EmitTree(TextWriter writer)
+        {
+            GlobalScope.Statement.WriteTo(writer);
         }
     }
 }

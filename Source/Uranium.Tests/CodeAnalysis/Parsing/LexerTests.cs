@@ -188,9 +188,6 @@ namespace Uranium.Tests.CodeAnalysis.Lexing
                 (SyntaxKind.OpenBrackets, "["),
                 (SyntaxKind.CloseBrackets, "]"),
                 
-                //We don't actually care about whitespace, or what it contains
-                //As long as the parser ignores it, we're good!
-                //So it will not be included in the tests.
             };
         }
 

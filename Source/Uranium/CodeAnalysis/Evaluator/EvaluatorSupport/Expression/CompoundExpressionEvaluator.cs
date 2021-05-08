@@ -20,6 +20,5 @@ namespace Uranium.CodeAnalysis.Syntax.EvaluatorSupport
                 _ => throw new($"Unexpected compound operator {a.CompoundOperator!.Kind}"),
             };
         }
-
     }
 }

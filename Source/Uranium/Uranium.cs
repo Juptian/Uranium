@@ -15,6 +15,7 @@ namespace Uranium
     public static class Uranium
     {
         private static bool _showTree = false;
+        private static bool _showBoundTree = false;
         private static SyntaxTree _syntaxTree;
         private static Compilation? _previous = null;
 
@@ -48,6 +49,11 @@ namespace Uranium
                 _syntaxTree.Root.WriteTo(Console.Out);
                 Console.ResetColor();    
             }
+            if(_showBoundTree)
+            {
+                compilation.EmitTree(Console.Out);
+            }
+
             return true;
         }
 
@@ -58,8 +64,11 @@ namespace Uranium
                 //Using a switch statement here for future proofing!
                 switch(args[i].ToUpper())
                 {
-                    case "--TREE":
+                    case "--SHOWTREE":
                         _showTree = true;
+                        break;
+                    case "--BOUNDTREE":
+                        _showBoundTree = true;
                         break;
                     default:
                         break;

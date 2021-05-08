@@ -298,13 +298,6 @@ namespace Uranium.Tests.CodeAnalysis.Parsing
         public static IEnumerable<object[]> GetBinaryOperatorPairsData()
         {
             var operators = SyntaxFacts.GetBinaryOperators().ToArray();
-            /*foreach(var op1 in operators)
-            {
-                foreach(var op2 in operators)
-                {
-                    yield return new object[] { op1, op2 };
-                }
-            }*/
             for(int i = 0; i < operators.Length; i++)
             {
                 for(int x = 0; x < operators.Length; x++)
@@ -316,13 +309,6 @@ namespace Uranium.Tests.CodeAnalysis.Parsing
 
         public static IEnumerable<object[]> GetUnaryOperatorPairsData()
         {
-            /*foreach(var unary in SyntaxFacts.GetUnaryOperators())
-            {
-                foreach(var binary in SyntaxFacts.GetBinaryOperators())
-                {
-                    yield return new object[] { unary, binary };
-                }
-            }*/
             var unary = SyntaxFacts.GetUnaryOperators().ToArray();
             var binary = SyntaxFacts.GetBinaryOperators().ToArray();
             for(int i = 0; i < unary.Length; i++)
@@ -363,6 +349,7 @@ namespace Uranium.Tests.CodeAnalysis.Parsing
                     yield return new object[] { text, "a", compOperator, i.ToString() };
                 }
             }
+
             for(int i = 0; i < comparisons.Length; i++)
             {
                     var text = WhileLoopTestCases.MakeWhileLoop("i", comparisons[i], "b");
