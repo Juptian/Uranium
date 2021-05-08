@@ -41,8 +41,6 @@ namespace Uranium
 
             _previous = compilation;
 
-            var result = compilation.Evaluate(variables);
-            result.DealWithDiagnostics();
             
             if(_showTree)
             {
@@ -55,6 +53,9 @@ namespace Uranium
                 compilation.EmitTree(Console.Out);
             }
 
+            var result = compilation.Evaluate(variables);
+            result.DealWithDiagnostics();
+            
             return true;
         }
 
