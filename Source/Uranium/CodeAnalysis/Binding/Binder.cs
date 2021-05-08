@@ -183,9 +183,9 @@ namespace Uranium.CodeAnalysis.Binding
 
         private BoundStatement BindForStatement(ForStatementSyntax syntax)
         {
-            var variable = syntax.Variable is null ? null : BindStatement(syntax.Variable);
-            var condition = syntax.Condition is null ? null : BindExpression(syntax.Condition);
-            var increment = syntax.Incrementation is null ? null : BindExpression(syntax.Incrementation);
+            var variable = syntax.Variable is null ? null : BindStatement(syntax.Variable) as BoundVariableDeclaration;
+            var condition = syntax.Condition is null ? null : BindExpression(syntax.Condition) as BoundBinaryExpression;
+            var increment = syntax.Incrementation is null ? null : BindExpression(syntax.Incrementation) as BoundAssignmentExpression;
             var block = BindBlockStatement(syntax.Body) as BoundBlockStatement;
 
             return new BoundForStatement(variable, condition, increment, block!);

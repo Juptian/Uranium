@@ -76,6 +76,7 @@ namespace Uranium.CodeAnalysis.Syntax
             {
                 Console.ForegroundColor = node is SyntaxToken ? ConsoleColor.Green : ConsoleColor.Cyan;
             }
+
             writer.Write(node.Kind);
 
             if (node is SyntaxToken token && token.Value is not null)

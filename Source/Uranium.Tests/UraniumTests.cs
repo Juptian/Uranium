@@ -24,7 +24,7 @@ namespace Uranium.Tests
     {
         b -= 1;
     }
-}", "--tree" };
+}", "--tree", "--boundTree" };
             var shouldHaveDiagnostic = @"
 {
     int a = 10.10;

@@ -18,5 +18,8 @@ namespace Uranium.CodeAnalysis.Text
         public string Name { get; }
         public bool IsReadOnly { get; }
         public Type Type { get; }
+
+        public override string ToString()
+            => $"{Name}, {Type.ToString()[7..]}";
     }
 }

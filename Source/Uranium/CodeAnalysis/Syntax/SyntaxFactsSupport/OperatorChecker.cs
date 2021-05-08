@@ -5,7 +5,15 @@ namespace Uranium.CodeAnalysis.Syntax.SyntaxFactsSupport
 {
     internal static class OperatorChecker
     {
+
+        private const int _notProperOperator = 0;
+        private const int _pipeValue = 1;
+        private const int _ampersandValue = 2;
+        private const int _comparisonValues = 3;
         private const int _minusValue = 4;
+        private const int _multiplyValue = 5;
+        private const int _powValue = 6;
+        private const int _unaryValues = 7;
 
         //Binary operators
         public static int GetBinaryOperatorPrecedence(this SyntaxKind kind)
@@ -13,36 +21,36 @@ namespace Uranium.CodeAnalysis.Syntax.SyntaxFactsSupport
             {
                 SyntaxKind.Hat or 
                 SyntaxKind.Pipe or
-                SyntaxKind.DoublePipe => _minusValue - 3,
+                SyntaxKind.DoublePipe => _pipeValue,
                 
                 SyntaxKind.Ampersand or
-                SyntaxKind.DoubleAmpersand => _minusValue - 2, 
+                SyntaxKind.DoubleAmpersand => _ampersandValue, 
 
                 SyntaxKind.DoubleEquals or 
                 SyntaxKind.BangEquals or
                 SyntaxKind.LesserThan or 
                 SyntaxKind.LesserThanEquals or
                 SyntaxKind.GreaterThan or 
-                SyntaxKind.GreaterThanEquals => _minusValue - 1,
+                SyntaxKind.GreaterThanEquals => _comparisonValues,
 
                 SyntaxKind.Plus or 
                 SyntaxKind.Minus => _minusValue,
                 
                 SyntaxKind.Multiply or 
-                SyntaxKind.Divide => _minusValue + 1,
+                SyntaxKind.Divide => _multiplyValue,
                 
-                SyntaxKind.Pow => _minusValue + 2,
-                _ => 0,
+                SyntaxKind.Pow => _powValue,
+                _ => _notProperOperator,
             };
 
         public static IEnumerable<SyntaxKind> GetBinaryOperators()
         {
             var kinds = (SyntaxKind[])Enum.GetValues(typeof(SyntaxKind));
-            foreach(var kind in kinds)
+            for(int i = 0; i < kinds.Length; i++)
             {
-                if(GetBinaryOperatorPrecedence(kind) > 0)
+                if(GetBinaryOperatorPrecedence(kinds[i]) > _notProperOperator)
                 {
-                    yield return kind;
+                    yield return kinds[i];
                 }
             }
         }
@@ -54,8 +62,8 @@ namespace Uranium.CodeAnalysis.Syntax.SyntaxFactsSupport
                 SyntaxKind.Plus or 
                 SyntaxKind.Minus or 
                 SyntaxKind.Bang or
-                SyntaxKind.Tilde=> _minusValue + 3,
-                _ => 0,
+                SyntaxKind.Tilde=> _unaryValues,
+                _ => _notProperOperator,
             };
  
         public static IEnumerable<SyntaxKind> GetUnaryOperators()
@@ -63,7 +71,7 @@ namespace Uranium.CodeAnalysis.Syntax.SyntaxFactsSupport
             var kinds = (SyntaxKind[])Enum.GetValues(typeof(SyntaxKind));
             foreach(var kind in kinds)
             {
-                if(GetUnaryOperatorPrecedence(kind) > 0)
+                if(GetUnaryOperatorPrecedence(kind) > _notProperOperator)
                 {
                     yield return kind;
                 }
