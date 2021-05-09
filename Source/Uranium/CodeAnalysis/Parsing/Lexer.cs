@@ -204,6 +204,23 @@ namespace Uranium.CodeAnalysis.Lexing
                 case ':':
                     Current = SyntaxKind.Colon;
                     break;
+
+                case '#':
+                    if(Match('"', 1))
+                    {
+                        
+                        StringLexer.ReadString(this, true, false);
+                    }
+                    else if(Match('$',1) && Match('"', 2))
+                    {
+                        Index += 2;
+                        StringLexer.ReadString(this, true, true);
+                    }
+                    break;
+                case '"':
+                    StringLexer.ReadString(this, false, false);
+                    return;
+                
                 case '\0':
                     Current = SyntaxKind.EndOfFile;
                     return;

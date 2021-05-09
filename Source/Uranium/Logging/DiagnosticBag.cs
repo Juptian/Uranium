@@ -104,17 +104,29 @@ namespace Uranium.Logging
 
         public void ReportInvalidCompoundOperator(TextSpan span, SyntaxToken token)
         {
-            var message = $"UR00013: You cannot have a compound operator ({token.Text}) without a variable. Error at index: {token.Span.Start} through {token.Span.End}";
+            var message = $"UR00013: Cannot have a compound operator ({token.Text}) without a variable. Error at index: {token.Span.Start} through {token.Span.End}";
             Report(span, message);
         }
         public void ReportInvalidEqualsToken(TextSpan span)
         {
-            var message = $"UR00014: You Cannot have an equals expression without an identifier token";
+            var message = $"UR00014: Cannot have an equals expression without an identifier token";
             Report(span, message);
         }
         public void ReportInvalidDecimal(TextSpan span, string text, SyntaxKind previousKeyword)
         {
             var message = $"UR00015: A variable of type {SyntaxFacts.GetText(previousKeyword)} cannot have any decimals. {text}";
+            Report(span, message);
+        }
+
+        public void ReportUnfinishedSingleLineString(string text, TextSpan span)
+        {
+            var message = $"UR00016: Cannot have a single line string go through multiple lines ${text}";
+            Report(span, message);
+        }
+        
+        public void ReportUnfinishedString(string text, TextSpan span)
+        {
+            var message = $"UR00017: Cannot have a string that has no matching \". ${text}";
             Report(span, message);
         }
     }

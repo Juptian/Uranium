@@ -12,6 +12,7 @@ namespace Uranium.CodeAnalysis.Parsing.ParserSupport
                 SyntaxKind.TrueKeyword or 
                 SyntaxKind.FalseKeyword => BooleanExpressionParser.Parse(parser),
                 SyntaxKind.NumberToken => NumberLiteralParser.Parse(parser),
+                SyntaxKind.StringToken => StringLiteralParser.Parse(parser),
                 _ => NameExpressionParser.Parse(parser),
             };
 

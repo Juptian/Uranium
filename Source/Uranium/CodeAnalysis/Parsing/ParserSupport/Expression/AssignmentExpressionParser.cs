@@ -41,6 +41,7 @@ namespace Uranium.CodeAnalysis.Parsing.ParserSupport
                     {
                         right = new LiteralExpressionSyntax(new(SyntaxKind.NumberToken, operatorToken.Position, "1", 1));
                     }
+
                     if(isCompound)
                     {
                         var soloOp = SyntaxFacts.GetSoloOperator(operatorToken);
