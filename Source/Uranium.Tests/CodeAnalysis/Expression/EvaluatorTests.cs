@@ -53,8 +53,8 @@ namespace Uranium.Tests.CodeAnalysis.Expression
         
         [InlineData("1 + false", 1)]
         [InlineData("false + 1", 1)]
-        [InlineData("1 + true", 0)]
-        [InlineData("true + 1", 0)]
+        [InlineData("1 + true", 2)]
+        [InlineData("true + 1", 2)]
 
         [InlineData("1 | 2", (1 | 3))]
         [InlineData("1 | 0", (1 | 0))]
