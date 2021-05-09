@@ -39,7 +39,7 @@ namespace Uranium.CodeAnalysis.Lowering
                 BoundNodeKind.BinaryExpression => RewriteBinaryExpression((BoundBinaryExpression)node),
                 BoundNodeKind.VariableExpression => RewriteVariableExpression((BoundVariableExpression)node),
                 BoundNodeKind.AssignmentExpression => RewriteAssignmentExpression((BoundAssignmentExpression)node),
-                BoundNodeKind.ErrorExpression => new BoundErrorExpression(),
+                BoundNodeKind.ErrorExpression => RewriteErrorExpression((BoundErrorExpression)node),
                 _ => throw new($"Unexpected node: {node.Kind}"),
             };
         }
@@ -188,9 +188,7 @@ namespace Uranium.CodeAnalysis.Lowering
         }
 
         protected virtual BoundExpression RewriteLiteralExpression(BoundLiteralExpression node)
-        {
-            return node;
-        }
+            => node;
 
         protected virtual BoundExpression RewriteBinaryExpression(BoundBinaryExpression node)
         {
@@ -204,9 +202,7 @@ namespace Uranium.CodeAnalysis.Lowering
         }
 
         protected virtual BoundExpression RewriteVariableExpression(BoundVariableExpression node)
-        {
-            return node;
-        }
+            => node;
 
         protected virtual BoundExpression RewriteAssignmentExpression(BoundAssignmentExpression node)
         {
@@ -217,5 +213,7 @@ namespace Uranium.CodeAnalysis.Lowering
             }
             return new BoundAssignmentExpression(node.Variable, expression, node.CompoundOperator, node.IsCompound);
         }
+        protected virtual BoundExpression RewriteErrorExpression(BoundErrorExpression node)
+            => node;
     }
 }

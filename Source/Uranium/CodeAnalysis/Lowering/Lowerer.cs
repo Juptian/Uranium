@@ -10,7 +10,7 @@ namespace Uranium.CodeAnalysis.Lowering
 {
     internal sealed class Lowerer : BoundTreeRewriter
     {
-        private int  _labelCount = 0;
+        private int _labelCount = 0;
         private Lowerer()
         { }
 

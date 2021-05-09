@@ -153,16 +153,11 @@ namespace Uranium.CodeAnalysis.Binding
         //Variable declaration
         private BoundStatement BindVariableDeclaration(VariableDeclarationSyntax syntax)
         {
-            var name = syntax.Identifier.Text;
             var isReadOnly = syntax.KeywordToken.Kind == SyntaxKind.LetConstKeyword || syntax.KeywordToken.Kind == SyntaxKind.ConstKeyword;
             var initializer = BindExpression(syntax.Initializer);
             var type = SyntaxFacts.GetKeywordType(syntax.KeywordToken.Kind) ?? initializer.Type;
-            var variable = new VariableSymbol(name, isReadOnly, type);
-            
-            if(!_scope.TryDeclare(variable))
-            {
-                _diagnostics.ReportVariableAlreadyDeclared(syntax.Identifier.Span, name);
-            }
+            var variable = BindVariable(syntax.Identifier, isReadOnly, type); 
+
             return new BoundVariableDeclaration(variable, initializer);
         }
 
@@ -276,5 +271,19 @@ namespace Uranium.CodeAnalysis.Binding
 
             return new BoundAssignmentExpression(variable, boundExpression, syntax.CompoundOperator, syntax.IsCompound);
         }
+
+        private VariableSymbol BindVariable(SyntaxToken identifier, bool isReadOnly, TypeSymbol type)
+        {
+            var name = identifier.Text ?? "?";
+            var canDeclare = identifier is not null;
+            var variable = new VariableSymbol(name, isReadOnly, type);
+
+            if(canDeclare && !_scope.TryDeclare(variable))
+            {
+                _diagnostics.ReportVariableAlreadyDeclared(identifier!.Span, name);
+            }
+            return variable;
+        }
+
     }
 }

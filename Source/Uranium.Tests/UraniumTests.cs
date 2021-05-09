@@ -16,15 +16,9 @@ namespace Uranium.Tests
         [Fact]
         public static void ItRuns()
         {
-            var text = new string[] { @"
-{
-    var a = 10;
-    var b = 100;
-    for(; a < b; a += 1)
-    {
-        b -= 1;
-    }
-}", "--tree", "--boundTree" };
+            var text = new string[] { 
+                "\r\n{\r\n    var a = 10;\r\n    var b = 100;\r\n    for(; a < b; a += 1)\r\n    {\r\n        b -= 1;\r\n    }\r\n    var c = \"ab\\c\"\r\n}", 
+                "--tree", "--boundTree" };
             var shouldHaveDiagnostic = @"
 {
     int a = 10.10;
