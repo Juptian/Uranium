@@ -47,11 +47,19 @@ namespace Uranium.CodeAnalysis.Syntax.EvaluatorSupport
         
         public static bool ConvertToBool(object obj)
         {
-            if(obj is int or long)
+            if(obj is int)
             {
                 return (int)obj != 0;
             }
-            else if(obj is float or double)
+            else if(obj is long)
+            {
+                return (long)obj != 0;
+            }
+            else if(obj is float)
+            {
+                return (float)obj != 0;
+            }
+            else if(obj is double)
             {
                 return (double)obj != 0;
             }

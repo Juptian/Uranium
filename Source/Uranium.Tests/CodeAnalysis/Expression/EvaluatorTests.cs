@@ -30,6 +30,27 @@ namespace Uranium.Tests.CodeAnalysis.Expression
         [InlineData("false", false)]
         [InlineData("true", true)]
 
+        [InlineData("1 && true", true)]
+        [InlineData("11 && false", false)]
+        [InlineData("10.1 || false", true)]
+        [InlineData("0 && false", false)]
+        [InlineData("0 && true", false)]
+        [InlineData("0 || true", true)]
+
+        [InlineData("true && 1", true)]
+        [InlineData("false && 11", false)]
+        [InlineData("false || 10.1", true)]
+        [InlineData("false && 0", false)]
+        [InlineData("false && 1", false)]
+        [InlineData("false || 1", true)]
+
+        [InlineData("1 && 1", true)]
+        [InlineData("0 && 11", false)]
+        [InlineData("0 || 10.1", true)]
+        [InlineData("10 && 0", false)]
+        [InlineData("0 && 1", false)]
+        [InlineData("0 || 1", true)]
+
         [InlineData("1 | 2", (1 | 3))]
         [InlineData("1 | 0", (1 | 0))]
         [InlineData("1 & 2", (1 & 2))]

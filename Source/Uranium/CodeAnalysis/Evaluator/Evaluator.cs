@@ -51,10 +51,6 @@ namespace Uranium.CodeAnalysis.Syntax
         {
             switch (statement.Kind)
             {
-                /*case BoundNodeKind.BlockStatement:
-                    BlockStatementEvaluator.Evaluate((BoundBlockStatement)statement, this);
-                    return;*/
-
                 case BoundNodeKind.ExpressionStatement:
                     EvaluateExpressionStatement((BoundExpressionStatement)statement);
 
@@ -63,13 +59,6 @@ namespace Uranium.CodeAnalysis.Syntax
                     VariableDeclarationEvaluator.Evaluate((BoundVariableDeclaration)statement, this);
                     return;
 
-                /*case BoundNodeKind.IfStatement:
-                    IfStatementEvaluator.Evaluate((BoundIfStatement)statement, this);
-                    return;
-
-                case BoundNodeKind.WhileStatement:
-                    WhileStatementEvaluator.Evaluate((BoundWhileStatement)statement, this);
-                    return;*/
                 case BoundNodeKind.LabelStatement:
                     return;
 

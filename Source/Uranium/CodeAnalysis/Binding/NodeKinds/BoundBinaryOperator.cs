@@ -102,7 +102,9 @@ namespace Uranium.CodeAnalysis.Binding.NodeKinds
                     yield return new(SyntaxKind.LesserThanEquals, BoundBinaryOperatorKind.LesserThanEquals, numberTypeSymbols[i], numberTypeSymbols[x], TypeSymbol.Bool);
 
                     yield return new(SyntaxKind.GreaterThan, BoundBinaryOperatorKind.GreaterThan, numberTypeSymbols[i], numberTypeSymbols[x], TypeSymbol.Bool);
-                    yield return new(SyntaxKind.GreaterThanEquals, BoundBinaryOperatorKind.GreaterThanEquals, numberTypeSymbols[i], numberTypeSymbols[x], TypeSymbol.Bool);                
+                    yield return new(SyntaxKind.GreaterThanEquals, BoundBinaryOperatorKind.GreaterThanEquals, numberTypeSymbols[i], numberTypeSymbols[x], TypeSymbol.Bool);      
+                    yield return new(SyntaxKind.DoublePipe, BoundBinaryOperatorKind.LogicalOR, numberTypeSymbols[i], numberTypeSymbols[x], TypeSymbol.Bool);
+                    yield return new(SyntaxKind.DoubleAmpersand, BoundBinaryOperatorKind.LogicalAND, numberTypeSymbols[i], numberTypeSymbols[x], TypeSymbol.Bool);
                 }
                 yield return new(SyntaxKind.DoubleEquals, BoundBinaryOperatorKind.LogicalEquals, numberTypeSymbols[i], TypeSymbol.Bool, TypeSymbol.Bool);
                 yield return new(SyntaxKind.BangEquals, BoundBinaryOperatorKind.NotEquals, numberTypeSymbols[i], TypeSymbol.Bool, TypeSymbol.Bool);
@@ -114,9 +116,7 @@ namespace Uranium.CodeAnalysis.Binding.NodeKinds
             //These are down here as they do not need to be returned every iteration
             //They're always going to be the same things, so might as well
             yield return new(SyntaxKind.Ampersand, BoundBinaryOperatorKind.BitwiseAND, TypeSymbol.Bool);
-            yield return new(SyntaxKind.DoubleAmpersand, BoundBinaryOperatorKind.LogicalAND, TypeSymbol.Bool);
             yield return new(SyntaxKind.Pipe, BoundBinaryOperatorKind.BitwiseOR, TypeSymbol.Bool);
-            yield return new(SyntaxKind.DoublePipe, BoundBinaryOperatorKind.LogicalOR, TypeSymbol.Bool);
 
             yield return new(SyntaxKind.Hat, BoundBinaryOperatorKind.BitwiseXOR, TypeSymbol.Bool);
 
