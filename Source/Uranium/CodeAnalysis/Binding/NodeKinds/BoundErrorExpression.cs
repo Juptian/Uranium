@@ -7,9 +7,9 @@ using Uranium.CodeAnalysis.Symbols;
 
 namespace Uranium.CodeAnalysis.Binding.NodeKinds
 {
-    //Yet another base class
-    internal abstract class BoundExpression : BoundNode
+    internal sealed class BoundErrorExpression : BoundExpression
     {
-        public abstract TypeSymbol Type { get; }
+        public override TypeSymbol Type => TypeSymbol.Error;
+        public override BoundNodeKind Kind => BoundNodeKind.ErrorExpression; 
     }
 }

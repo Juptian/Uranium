@@ -16,7 +16,9 @@ namespace Uranium.CodeAnalysis.Parsing.ParserSupport
                 SyntaxKind.IntKeyword or
                 SyntaxKind.LongKeyword or 
                 SyntaxKind.DoubleKeyword or
-                SyntaxKind.FloatKeyword => VariableDeclarationParser.Parse(parser),
+                SyntaxKind.FloatKeyword or
+                SyntaxKind.StringKeyword or
+                SyntaxKind.CharKeyword => VariableDeclarationParser.Parse(parser),
                 SyntaxKind.IfKeyword => IfStatementParser.Parse(parser),
                 SyntaxKind.WhileKeyword => WhileStatementParser.Parse(parser),
                 SyntaxKind.ForKeyword => ForStatementParser.Parse(parser),

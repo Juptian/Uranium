@@ -4,6 +4,7 @@ using Xunit;
 using Uranium.CodeAnalysis.Syntax;
 using Uranium.CodeAnalysis.Text;
 using Uranium.CodeAnalysis;
+using Uranium.CodeAnalysis.Symbols;
 
 namespace Uranium.Tests.CodeAnalysis.Expression
 {
@@ -289,7 +290,6 @@ namespace Uranium.Tests.CodeAnalysis.Expression
                 yield return new object[] { "{ " + $"int i = {i}; long f = {i}; i <= f;" + " }", true };
                 yield return new object[] { "{ " + $"int i = {i}; long f = {i}; i > f;" + " }", false };
                 yield return new object[] { "{ " + $"int i = {i}; long f = {i}; i >= f;" + " }", true };
-                yield return new object[] { "{ " + $"int i = 1; long f = {i}; i ** f;" + " }", 1 };
 
                 yield return new object[] { "{ " + $"int i = {i}; double f = {i}; i += f;" + " }", i << 1 };
                 yield return new object[] { "{ " + $"int i = {i}; double f = {i}; i -= f;" + " }", 0 };

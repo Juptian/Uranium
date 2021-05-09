@@ -34,8 +34,8 @@ namespace Uranium.CodeAnalysis.Syntax.EvaluatorSupport
                 BoundBinaryOperatorKind.BitwiseXOR => Operations.BitwiseXOR(left, right),
 
                 //Bool
-                BoundBinaryOperatorKind.LogicalAND => (bool)left && (bool)right,
-                BoundBinaryOperatorKind.LogicalOR => (bool)left || (bool)right,
+                BoundBinaryOperatorKind.LogicalAND => ConvertToBool(left) && ConvertToBool(right),
+                BoundBinaryOperatorKind.LogicalOR => ConvertToBool(left) || ConvertToBool(right),
 
                 //We can throw exceptions here because we've exhausted all options,
                 //and this is an internal Uranium error, should handle this more gracefully,
@@ -44,7 +44,21 @@ namespace Uranium.CodeAnalysis.Syntax.EvaluatorSupport
                 _ => throw new($"Unexpected binary operator {b.Op.Kind}"),
             };
         }
-
-    
+        
+        public static bool ConvertToBool(object obj)
+        {
+            if(obj is int or long)
+            {
+                return (int)obj != 0;
+            }
+            else if(obj is float or double)
+            {
+                return (double)obj != 0;
+            }
+            else
+            {
+                return Convert.ToBoolean(obj);
+            }
+        }
     }
 }

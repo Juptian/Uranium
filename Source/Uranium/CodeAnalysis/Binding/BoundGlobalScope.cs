@@ -8,6 +8,7 @@ using Uranium.Logging;
 using Uranium.CodeAnalysis.Text;
 using Uranium.CodeAnalysis.Binding.NodeKinds;
 using Uranium.CodeAnalysis.Binding.Statements;
+using Uranium.CodeAnalysis.Symbols;
 
 
 namespace Uranium.CodeAnalysis.Binding

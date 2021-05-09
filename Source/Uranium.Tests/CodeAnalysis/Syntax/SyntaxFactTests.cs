@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Diagnostics;
 using Xunit;
 using Uranium.CodeAnalysis.Syntax;
+using Uranium.CodeAnalysis.Symbols;
 
 namespace Uranium.Tests.CodeAnalysis.Syntax
 {
@@ -112,26 +113,26 @@ namespace Uranium.Tests.CodeAnalysis.Syntax
         [Fact]
         public void CheckReturnTypes()
         {
-            Assert.Equal(typeof(int), SyntaxFacts.GetKeywordType("int"));
-            Assert.Equal(typeof(int), SyntaxFacts.GetKeywordType(SyntaxKind.IntKeyword));
+            Assert.Equal(TypeSymbol.Int, SyntaxFacts.GetKeywordType("int"));
+            Assert.Equal(TypeSymbol.Int, SyntaxFacts.GetKeywordType(SyntaxKind.IntKeyword));
 
-            Assert.Equal(typeof(long), SyntaxFacts.GetKeywordType("long"));
-            Assert.Equal(typeof(long), SyntaxFacts.GetKeywordType(SyntaxKind.LongKeyword));
+            Assert.Equal(TypeSymbol.Long, SyntaxFacts.GetKeywordType("long"));
+            Assert.Equal(TypeSymbol.Long, SyntaxFacts.GetKeywordType(SyntaxKind.LongKeyword));
 
-            Assert.Equal(typeof(double), SyntaxFacts.GetKeywordType("double"));
-            Assert.Equal(typeof(double), SyntaxFacts.GetKeywordType(SyntaxKind.DoubleKeyword));
+            Assert.Equal(TypeSymbol.Double, SyntaxFacts.GetKeywordType("double"));
+            Assert.Equal(TypeSymbol.Double, SyntaxFacts.GetKeywordType(SyntaxKind.DoubleKeyword));
 
-            Assert.Equal(typeof(float), SyntaxFacts.GetKeywordType("float"));
-            Assert.Equal(typeof(float), SyntaxFacts.GetKeywordType(SyntaxKind.FloatKeyword));
+            Assert.Equal(TypeSymbol.Float, SyntaxFacts.GetKeywordType("float"));
+            Assert.Equal(TypeSymbol.Float, SyntaxFacts.GetKeywordType(SyntaxKind.FloatKeyword));
 
-            Assert.Equal(typeof(char), SyntaxFacts.GetKeywordType("char"));
-            Assert.Equal(typeof(char), SyntaxFacts.GetKeywordType(SyntaxKind.CharKeyword));
+            Assert.Equal(TypeSymbol.Char, SyntaxFacts.GetKeywordType("char"));
+            Assert.Equal(TypeSymbol.Char, SyntaxFacts.GetKeywordType(SyntaxKind.CharKeyword));
 
-            Assert.Equal(typeof(string), SyntaxFacts.GetKeywordType("string"));
-            Assert.Equal(typeof(string), SyntaxFacts.GetKeywordType(SyntaxKind.StringKeyword));
+            Assert.Equal(TypeSymbol.String, SyntaxFacts.GetKeywordType("string"));
+            Assert.Equal(TypeSymbol.String, SyntaxFacts.GetKeywordType(SyntaxKind.StringKeyword));
 
-            Assert.Equal(typeof(bool), SyntaxFacts.GetKeywordType("bool"));
-            Assert.Equal(typeof(bool), SyntaxFacts.GetKeywordType(SyntaxKind.BoolKeyword));
+            Assert.Equal(TypeSymbol.Bool, SyntaxFacts.GetKeywordType("bool"));
+            Assert.Equal(TypeSymbol.Bool, SyntaxFacts.GetKeywordType(SyntaxKind.BoolKeyword));
 
             Assert.Null(SyntaxFacts.GetKeywordType("abc"));
             Assert.Null(SyntaxFacts.GetKeywordType(SyntaxKind.IfKeyword));

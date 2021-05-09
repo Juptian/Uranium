@@ -7,6 +7,7 @@ using Uranium.CodeAnalysis.Syntax;
 using Uranium.CodeAnalysis;
 using Uranium.CodeAnalysis.Text;
 using Uranium.Logging;
+using Uranium.CodeAnalysis.Symbols;
 
 #pragma warning disable CS8618
 #pragma warning disable CA2211

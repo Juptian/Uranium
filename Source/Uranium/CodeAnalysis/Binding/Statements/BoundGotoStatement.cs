@@ -9,12 +9,12 @@ namespace Uranium.CodeAnalysis.Binding.Statements
 {
     internal sealed class BoundGotoStatement : BoundStatement
     {
-        public BoundGotoStatement(LabelSymbol label)
+        public BoundGotoStatement(BoundLabel label)
         {
             Label = label;
         }
 
-        public LabelSymbol Label { get; }
+        public BoundLabel Label { get; }
         public override BoundNodeKind Kind => BoundNodeKind.GotoStatement;
     }
 

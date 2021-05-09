@@ -5,6 +5,7 @@ using Uranium.CodeAnalysis.Binding;
 using Uranium.CodeAnalysis.Binding.Statements;
 using Uranium.CodeAnalysis.Text;
 using Uranium.CodeAnalysis.Syntax.EvaluatorSupport;
+using Uranium.CodeAnalysis.Symbols;
 
 namespace Uranium.CodeAnalysis.Syntax
 {
@@ -15,7 +16,7 @@ namespace Uranium.CodeAnalysis.Syntax
     {
         private readonly BoundBlockStatement _root;
         internal readonly Dictionary<VariableSymbol, object> Variables;
-        private readonly Dictionary<LabelSymbol, int> _labelIndex = new();
+        private readonly Dictionary<BoundLabel, int> _labelIndex = new();
 
         private int _index = 0;
 

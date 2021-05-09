@@ -9,6 +9,7 @@ using Uranium.CodeAnalysis.Text;
 using Uranium.Logging;
 using Uranium.CodeAnalysis.Binding.NodeKinds;
 using Uranium.CodeAnalysis.Binding.Statements;
+using Uranium.CodeAnalysis.Symbols;
 
 namespace Uranium.CodeAnalysis.Binding
 {
@@ -42,12 +43,12 @@ namespace Uranium.CodeAnalysis.Binding
                 _ => throw new($"Unexpected syntax {syntax.Kind}"),
             };
 
-        private BoundExpression BindExpression(ExpressionSyntax syntax, Type targetType)
+        private BoundExpression BindExpression(ExpressionSyntax syntax, TypeSymbol targetType)
         {
             var result = BindExpression(syntax);
             if (result.Type != targetType)
             {
-                _diagnostics.ReportCannotConvert(syntax.Span, result.GetType(), targetType);
+                _diagnostics.ReportCannotConvert(syntax.Span, result.Type, targetType);
             }
             return result;
         }
@@ -152,22 +153,17 @@ namespace Uranium.CodeAnalysis.Binding
         //Variable declaration
         private BoundStatement BindVariableDeclaration(VariableDeclarationSyntax syntax)
         {
-            var name = syntax.Identifier.Text;
             var isReadOnly = syntax.KeywordToken.Kind == SyntaxKind.LetConstKeyword || syntax.KeywordToken.Kind == SyntaxKind.ConstKeyword;
             var initializer = BindExpression(syntax.Initializer);
             var type = SyntaxFacts.GetKeywordType(syntax.KeywordToken.Kind) ?? initializer.Type;
-            var variable = new VariableSymbol(name, isReadOnly, type);
-            
-            if(!_scope.TryDeclare(variable))
-            {
-                _diagnostics.ReportVariableAlreadyDeclared(syntax.Identifier.Span, name);
-            }
+            var variable = BindVariable(syntax.Identifier, isReadOnly, type); 
+
             return new BoundVariableDeclaration(variable, initializer);
         }
 
         private BoundStatement BindIfStatement(IfStatementSyntax syntax)
         {
-            var condition = BindExpression(syntax.Condition, typeof(bool));
+            var condition = BindExpression(syntax.Condition, TypeSymbol.Bool);
             var body = BindBlockStatement(syntax.Body);
             var elseStatement = syntax.ElseClause is null ? null : BindStatement(syntax.ElseClause.ElseStatement);
             return new BoundIfStatement(condition, body, elseStatement);
@@ -175,10 +171,9 @@ namespace Uranium.CodeAnalysis.Binding
         
         private BoundStatement BindWhileStatement(WhileStatementSyntax syntax)
         {
-            var condition = BindExpression(syntax.Expression, typeof(bool));
+            var condition = BindExpression(syntax.Expression, TypeSymbol.Bool);
             var body = BindStatement(syntax.Body);
             return new BoundWhileStatement(condition, body);
-
         }
 
         private BoundStatement BindForStatement(ForStatementSyntax syntax)
@@ -194,21 +189,26 @@ namespace Uranium.CodeAnalysis.Binding
         //Value is being parsed into a nullable int
         //That then gets checked to see if it's null, and gets assigned to 0 if it is.
         private static BoundExpression BindLiteralExpression(LiteralExpressionSyntax syntax) 
-            => new BoundLiteralExpression(syntax.Value, syntax.Type);
+            => new BoundLiteralExpression(syntax.Value);
 
         private BoundExpression BindUnaryExpression(UnaryExpressionSyntax syntax)
         {
             var boundOperand = BindExpression(syntax.Operand);
             var boundOperatorKind = BoundUnaryOperator.Bind(syntax.OperatorToken.Kind, boundOperand.Type);
 
+            if(boundOperand.Type == TypeSymbol.Error)
+            {
+                return new BoundErrorExpression();
+            }
             //Checking to see if the result of our BindUnaryOperatorKind call is null
             //And reporting it to the diagnostics
             //Then returning our boundOperand
             if (boundOperatorKind is null)
             {
                 _diagnostics.ReportUndefinedUnaryOperator(syntax.OperatorToken.Span, syntax.OperatorToken.Text ?? "null", boundOperand.Type);
-                return boundOperand;
+                return new BoundErrorExpression();
             }
+
             return new BoundUnaryExpression(boundOperatorKind, boundOperand);
         }
 
@@ -219,11 +219,16 @@ namespace Uranium.CodeAnalysis.Binding
 
             var boundOperatorKind = BoundBinaryOperator.Bind(syntax.OperatorToken.Kind, boundLeft.Type, boundRight.Type);
 
+            if(boundLeft.Type == TypeSymbol.Error || boundRight.Type == TypeSymbol.Error)
+            {
+                return new BoundErrorExpression();
+            }
+
             //Same as in the BindUnaryExpression but we return our boundLeft instead
             if (boundOperatorKind is null)
             {
                 _diagnostics.ReportUndefinedBinaryOperator(syntax.OperatorToken.Span, syntax.OperatorToken.Text, boundLeft.Type, boundRight.Type);
-                return boundLeft;
+                return new BoundErrorExpression();
             }
             return new BoundBinaryExpression(boundLeft, boundOperatorKind, boundRight);
         }
@@ -235,11 +240,15 @@ namespace Uranium.CodeAnalysis.Binding
         {
             var name = syntax.IdentifierToken.Text;
 
+            if(string.IsNullOrEmpty(name))
+            {
+                return new BoundErrorExpression();
+            }
             //Trying to get the value, if it returns then great, if not we report it
             if (!_scope.TryLookup(name, out var variable))
             {
                 _diagnostics.ReportUndefinedName(syntax.IdentifierToken.Span, name ?? "name is null");
-                return new BoundLiteralExpression(0, typeof(int));
+                return new BoundErrorExpression();
             }
             return new BoundVariableExpression(variable);
         }
@@ -253,21 +262,28 @@ namespace Uranium.CodeAnalysis.Binding
             {
                 //Null check on the name so that we can find the object
                 _diagnostics.ReportUndefinedName(syntax.IdentifierToken.Span, name);
-                return boundExpression;
+                return new BoundErrorExpression();
             }
             if(variable.IsReadOnly)
             {
                 _diagnostics.ReportCannotAssign(syntax.IdentifierToken.Span, syntax.EqualsToken.Span, name);
             }
 
-            //A variable cannot have their type reassigned.
-            /*if(boundExpression.Type != variable.Type)
-            {
-                _diagnostics.ReportCannotConvert(syntax.Expression.Span, boundExpression.Type, variable.Type);
-                return boundExpression;
-            }*/
-
             return new BoundAssignmentExpression(variable, boundExpression, syntax.CompoundOperator, syntax.IsCompound);
         }
+
+        private VariableSymbol BindVariable(SyntaxToken identifier, bool isReadOnly, TypeSymbol type)
+        {
+            var name = identifier.Text ?? "?";
+            var canDeclare = identifier is not null;
+            var variable = new VariableSymbol(name, isReadOnly, type);
+
+            if(canDeclare && !_scope.TryDeclare(variable))
+            {
+                _diagnostics.ReportVariableAlreadyDeclared(identifier!.Span, name);
+            }
+            return variable;
+        }
+
     }
 }

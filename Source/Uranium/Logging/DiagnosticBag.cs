@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Uranium.CodeAnalysis.Text;
 using Uranium.CodeAnalysis.Syntax;
 using Uranium.CodeAnalysis.Binding.NodeKinds;
+using Uranium.CodeAnalysis.Symbols;
 
 namespace Uranium.Logging
 {
@@ -42,7 +43,12 @@ namespace Uranium.Logging
 
         public void ReportInvalidToken(TextSpan span, SyntaxToken actualKind, SyntaxKind expectedKind)
         {
-            var expectedText = expectedKind == SyntaxKind.EndOfFile ? "EndOfFile token" : $"{SyntaxFacts.GetText(expectedKind)}";
+            var expectedText = expectedKind == SyntaxKind.EndOfFile ? "EndOfFileToken" : $"{SyntaxFacts.GetText(expectedKind)}";
+            if(expectedText.Equals("BadToken", StringComparison.OrdinalIgnoreCase))
+            {
+                expectedText = "IdentifierToken";
+            }
+
             var message = $"UR00003: Unexpected token: `{actualKind.Text}`. Expected: `{expectedText}`.";
             Report(span, message);
         }
@@ -53,15 +59,15 @@ namespace Uranium.Logging
             Report(span, message);
         }
 
-        public void ReportUndefinedUnaryOperator(TextSpan span, string operatorText, Type operandType)
+        public void ReportUndefinedUnaryOperator(TextSpan span, string operatorText, TypeSymbol operandType)
         {
-            var message = $"UR00005: Unary operator {operatorText} is not defined for {operandType.ToString()[7..]}.";
+            var message = $"UR00005: Unary operator {operatorText} is not defined for {operandType}.";
             Report(span, message);
         }
 
-        public void ReportUndefinedBinaryOperator(TextSpan span, string? operatorText, Type leftType, Type rightType)
+        public void ReportUndefinedBinaryOperator(TextSpan span, string? operatorText, TypeSymbol leftType, TypeSymbol rightType)
         {
-            var message = $"UR00006: Binary operator {operatorText} is undefined for {leftType.ToString()[7..]} and {rightType.ToString()[7..]}.";
+            var message = $"UR00006: Binary operator {operatorText} is undefined for {leftType} and {rightType}.";
             Report(span, message);
         }
 
@@ -77,9 +83,9 @@ namespace Uranium.Logging
             Report(span, message);
         }
 
-        public void ReportCannotConvert(TextSpan span, Type converterType, Type converteetype)
+        public void ReportCannotConvert(TextSpan span, TypeSymbol converterType, TypeSymbol converteetype)
         {
-            var message = $"UR00009: Cannot convert from type '{converterType.ToString()[7..]}' to type '{converteetype.ToString()[7..]}'.";
+            var message = $"UR00009: Cannot convert from type '{converterType}' to type '{converteetype}'.";
             Report(span, message);
         }
 
@@ -104,17 +110,29 @@ namespace Uranium.Logging
 
         public void ReportInvalidCompoundOperator(TextSpan span, SyntaxToken token)
         {
-            var message = $"UR00013: You cannot have a compound operator ({token.Text}) without a variable. Error at index: {token.Span.Start} through {token.Span.End}";
+            var message = $"UR00013: Cannot have a compound operator ({token.Text}) without a variable. Error at index: {token.Span.Start} through {token.Span.End}";
             Report(span, message);
         }
         public void ReportInvalidEqualsToken(TextSpan span)
         {
-            var message = $"UR00014: You Cannot have an equals expression without an identifier token";
+            var message = $"UR00014: Cannot have an equals expression without an identifier token";
             Report(span, message);
         }
         public void ReportInvalidDecimal(TextSpan span, string text, SyntaxKind previousKeyword)
         {
             var message = $"UR00015: A variable of type {SyntaxFacts.GetText(previousKeyword)} cannot have any decimals. {text}";
+            Report(span, message);
+        }
+
+        public void ReportUnfinishedSingleLineString(string text, TextSpan span)
+        {
+            var message = $"UR00016: Cannot have a single line string go through multiple lines ${text}";
+            Report(span, message);
+        }
+        
+        public void ReportUnfinishedString(string text, TextSpan span)
+        {
+            var message = $"UR00017: Cannot have a string that has no matching \". ${text}";
             Report(span, message);
         }
     }

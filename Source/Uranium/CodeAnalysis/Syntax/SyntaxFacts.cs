@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Uranium.CodeAnalysis.Symbols;
 using Uranium.CodeAnalysis.Syntax.SyntaxFactsSupport;
 
 namespace Uranium.CodeAnalysis.Syntax
@@ -48,10 +49,10 @@ namespace Uranium.CodeAnalysis.Syntax
         public static string GetText(SyntaxKind kind) 
             => TextChecker.GetText(kind);
 
-        public static Type? GetKeywordType(SyntaxKind kind)
+        public static TypeSymbol? GetKeywordType(SyntaxKind kind)
             => TextChecker.GetKeywordType(kind);
 
-        public static Type? GetKeywordType(string kind)
+        public static TypeSymbol? GetKeywordType(string kind)
             => TextChecker.GetKeywordType(kind);
 
         public static SyntaxKind GetKeyword(object obj)

@@ -53,9 +53,10 @@
         Bang,
         BangEquals,
 
-        //Temp
+        //TokenTypes
         NumberToken,
         IdentifierToken,
+        StringToken,
 
         //Logic keywords
         IfKeyword,

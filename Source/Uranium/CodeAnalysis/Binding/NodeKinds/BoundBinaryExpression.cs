@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Uranium.CodeAnalysis.Symbols;
 
 namespace Uranium.CodeAnalysis.Binding.NodeKinds
 {
@@ -26,7 +27,7 @@ namespace Uranium.CodeAnalysis.Binding.NodeKinds
         public BoundBinaryOperator Op { get; }
         public BoundExpression Right { get; }
 
-        public override Type Type => Op.ResultType;
+        public override TypeSymbol Type => Op.ResultType;
         public override BoundNodeKind Kind => BoundNodeKind.BinaryExpression;
     }
 }

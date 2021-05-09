@@ -39,6 +39,7 @@ namespace Uranium.CodeAnalysis.Lowering
                 BoundNodeKind.BinaryExpression => RewriteBinaryExpression((BoundBinaryExpression)node),
                 BoundNodeKind.VariableExpression => RewriteVariableExpression((BoundVariableExpression)node),
                 BoundNodeKind.AssignmentExpression => RewriteAssignmentExpression((BoundAssignmentExpression)node),
+                BoundNodeKind.ErrorExpression => RewriteErrorExpression((BoundErrorExpression)node),
                 _ => throw new($"Unexpected node: {node.Kind}"),
             };
         }
@@ -144,7 +145,7 @@ namespace Uranium.CodeAnalysis.Lowering
 
             if(initializer is null && condition is null && incrementation is null)
             {
-                var trueExpression = new BoundLiteralExpression(true, typeof(bool));
+                var trueExpression = new BoundLiteralExpression(true);
                 return new BoundWhileStatement(trueExpression, node.Body);
             }
 
@@ -187,9 +188,7 @@ namespace Uranium.CodeAnalysis.Lowering
         }
 
         protected virtual BoundExpression RewriteLiteralExpression(BoundLiteralExpression node)
-        {
-            return node;
-        }
+            => node;
 
         protected virtual BoundExpression RewriteBinaryExpression(BoundBinaryExpression node)
         {
@@ -203,9 +202,7 @@ namespace Uranium.CodeAnalysis.Lowering
         }
 
         protected virtual BoundExpression RewriteVariableExpression(BoundVariableExpression node)
-        {
-            return node;
-        }
+            => node;
 
         protected virtual BoundExpression RewriteAssignmentExpression(BoundAssignmentExpression node)
         {
@@ -216,5 +213,7 @@ namespace Uranium.CodeAnalysis.Lowering
             }
             return new BoundAssignmentExpression(node.Variable, expression, node.CompoundOperator, node.IsCompound);
         }
+        protected virtual BoundExpression RewriteErrorExpression(BoundErrorExpression node)
+            => node;
     }
 }
