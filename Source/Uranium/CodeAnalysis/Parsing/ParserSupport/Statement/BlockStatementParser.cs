@@ -1,4 +1,5 @@
-﻿using System.Collections.Immutable;
+﻿using System;
+using System.Collections.Immutable;
 using Uranium.CodeAnalysis.Syntax;
 using Uranium.CodeAnalysis.Syntax.Statement;
 
@@ -10,7 +11,7 @@ namespace Uranium.CodeAnalysis.Parsing.ParserSupport
         {
             var statements = ImmutableArray.CreateBuilder<StatementSyntax>();
             var openBraceToken = parser.MatchToken(SyntaxKind.OpenCurlyBrace);
-
+            
             while (parser.Current.Kind is not SyntaxKind.EndOfFile &&
                    parser.Current.Kind is not SyntaxKind.CloseCurlyBrace)
             {
@@ -18,6 +19,12 @@ namespace Uranium.CodeAnalysis.Parsing.ParserSupport
                 {
                     parser.Position++;
                     continue;
+                }
+
+                if (parser.Current.Kind == SyntaxKind.ElseKeyword)
+                {
+                    parser.Position--;
+                    break;
                 }
 
                 var statement = StatementParser.Parse(parser);

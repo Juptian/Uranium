@@ -37,6 +37,7 @@ namespace Uranium
             var _text = OpenFile(args[0]);
             var variables = new Dictionary<VariableSymbol, object>();
             _syntaxTree = SyntaxTree.Parse(_text);
+
             var compilation = _previous?.ContinueWith(_syntaxTree) ?? new Compilation(_syntaxTree);
 
             _previous = compilation;

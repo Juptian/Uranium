@@ -6,9 +6,5 @@
     <LangVersion>9</LangVersion>
     <Nullable>enable</Nullable>
   </PropertyGroup>
-
-  <ItemGroup>
-    <Folder Include="CodeAnalysis\Lowering\" />
-  </ItemGroup>
   
 </Project>

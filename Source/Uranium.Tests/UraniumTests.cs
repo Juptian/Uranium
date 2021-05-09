@@ -34,6 +34,32 @@ namespace Uranium.Tests
         b -= 1;
     }
 }";
+            var forLoop = @"
+{
+    for(var i = 0; i < 10; i++)
+    {}
+}
+";
+            var ifCheck = @"
+{
+    var a = 10;
+    if(a == 10)
+    {
+        a += 20;
+    }
+    else
+    {
+        a = 10;
+    }
+}
+";
+            var whileCheck = @"
+    var i = 0;
+    while(i < 100)
+    {
+        i += 10;
+    }
+";
             var shouldFallIntoDefault = "aj";
             Assert.True(Uranium.Emit(text));
 
@@ -41,6 +67,16 @@ namespace Uranium.Tests
             text[1] = shouldFallIntoDefault;
             Assert.True(Uranium.Emit(text));
             Assert.False(Uranium.Emit(Array.Empty<string>()));
+
+            text[0] = forLoop;
+            Assert.True(Uranium.Emit(text));
+
+            text[0] = ifCheck;
+            Assert.True(Uranium.Emit(text));
+ 
+            text[0] = whileCheck;
+            Assert.True(Uranium.Emit(text));
+
 
             for(int i = 0; i < _diagnostics.Length; i++)
             {

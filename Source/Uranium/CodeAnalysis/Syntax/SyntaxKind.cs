@@ -123,12 +123,10 @@
         NamespaceDeclaration,
         NumberExpression,
 
-        //Compilation Unit
         CompilationUnit,
-        //End of file
+
         EndOfFile,
 
-        //Token be bad
         BadToken
     }
 }
