@@ -11,9 +11,12 @@ namespace Uranium.CodeAnalysis
         public static int TestOne(int a)
             => a switch
             {
-                _ => testTwo(),
+                10 => TestTwo(),
+                _ => TestThree(),
             };
-        private static int testTwo()
-            => 10;
+        private static int TestTwo()
+            => 2;
+        private static int TestThree()
+            => 3;
     }
 }

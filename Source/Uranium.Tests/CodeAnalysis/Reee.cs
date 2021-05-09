@@ -14,7 +14,9 @@ namespace Uranium.Tests.CodeAnalysis
         public static void ABc()
         {
             var a = Test.TestOne(10);
-            Assert.Equal(10, a);
+            Assert.Equal(2, a);
+            var b = Test.TestOne(11);
+            Assert.Equal(3, b);
         }
     }
 }
