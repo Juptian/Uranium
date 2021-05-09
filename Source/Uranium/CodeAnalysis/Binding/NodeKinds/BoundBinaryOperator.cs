@@ -47,7 +47,7 @@ namespace Uranium.CodeAnalysis.Binding.NodeKinds
         private static IEnumerable<BoundBinaryOperator> CreateOperators()
         {
             //Using a for loop here for the sake of readability
-            var numberTypeSymbols = new TypeSymbol[] { TypeSymbol.Int, TypeSymbol.Long, TypeSymbol.Float, TypeSymbol.Double };
+            var numberTypeSymbols = new TypeSymbol[] { TypeSymbol.Bool, TypeSymbol.Int, TypeSymbol.Long, TypeSymbol.Float, TypeSymbol.Double };
             for(int i = 0; i < numberTypeSymbols.Length; i++)
             {
                 for(int x = 0; x < numberTypeSymbols.Length; x++)
@@ -56,7 +56,7 @@ namespace Uranium.CodeAnalysis.Binding.NodeKinds
                     {
                         continue;
                     }
-                    else if (numberTypeSymbols[i] == TypeSymbol.Long && x > 1)
+                    else if (numberTypeSymbols[i] == TypeSymbol.Long && x > 2)
                     {
                         break;
                     }

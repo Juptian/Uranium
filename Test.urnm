@@ -1,1 +1,3 @@
-﻿{ int i = 1; long f = 1; i ** f; }
+﻿{
+	10 * false
+}

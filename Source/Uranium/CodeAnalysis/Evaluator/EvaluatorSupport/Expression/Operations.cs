@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Numerics;
 
+#pragma warning disable IDE0038 // Use pattern matching
 #pragma warning disable IDE0066 // Convert switch statement to expressio
 // Every time I've tried I've failed for an unkown reason
 namespace Uranium.CodeAnalysis.Syntax.EvaluatorSupport
@@ -13,8 +14,11 @@ namespace Uranium.CodeAnalysis.Syntax.EvaluatorSupport
         private const int doubleValue = 4;
         public static object Addition(object left, object right)
         {
+            ConvertBoolToInt(ref left, ref right);
+
             var leftPrio = SyntaxFacts.GetTypePriority(left);
             var rightPrio = SyntaxFacts.GetTypePriority(right);
+            
             switch(leftPrio)
             {
                 case intValue when rightPrio == leftPrio:
@@ -52,6 +56,8 @@ namespace Uranium.CodeAnalysis.Syntax.EvaluatorSupport
         }
         public static object Subtraction(object left, object right)
         {
+            ConvertBoolToInt(ref left, ref right);
+
             var leftPrio = SyntaxFacts.GetTypePriority(left);
             var rightPrio = SyntaxFacts.GetTypePriority(right);
             switch(leftPrio)
@@ -92,6 +98,8 @@ namespace Uranium.CodeAnalysis.Syntax.EvaluatorSupport
   
         public static object Multiplication(object left, object right)
         {
+            ConvertBoolToInt(ref left, ref right);
+
             var leftPrio = SyntaxFacts.GetTypePriority(left);
             var rightPrio = SyntaxFacts.GetTypePriority(right);
             switch(leftPrio)
@@ -131,6 +139,8 @@ namespace Uranium.CodeAnalysis.Syntax.EvaluatorSupport
 
         public static object Division(object left, object right)
         {
+            ConvertBoolToInt(ref left, ref right);
+
             var leftPrio = SyntaxFacts.GetTypePriority(left);
             var rightPrio = SyntaxFacts.GetTypePriority(right);
             switch(leftPrio)
@@ -171,6 +181,8 @@ namespace Uranium.CodeAnalysis.Syntax.EvaluatorSupport
         }
         public static bool LesserThan(object left, object right)
         {
+            ConvertBoolToInt(ref left, ref right);
+
             var leftPrio = SyntaxFacts.GetTypePriority(left);
             var rightPrio = SyntaxFacts.GetTypePriority(right);
             switch(leftPrio)
@@ -210,6 +222,8 @@ namespace Uranium.CodeAnalysis.Syntax.EvaluatorSupport
   
         public static bool LesserThanEquals(object left, object right)
         {
+            ConvertBoolToInt(ref left, ref right);
+
             var leftPrio = SyntaxFacts.GetTypePriority(left);
             var rightPrio = SyntaxFacts.GetTypePriority(right);
             switch(leftPrio)
@@ -249,10 +263,12 @@ namespace Uranium.CodeAnalysis.Syntax.EvaluatorSupport
 
         public static bool GreaterThan(object left, object right)
         {
-                var leftPrio = SyntaxFacts.GetTypePriority(left);
-                var rightPrio = SyntaxFacts.GetTypePriority(right);
-                switch(leftPrio)
-                {
+            ConvertBoolToInt(ref left, ref right);
+
+            var leftPrio = SyntaxFacts.GetTypePriority(left);
+            var rightPrio = SyntaxFacts.GetTypePriority(right);
+            switch(leftPrio)
+            {
                 case intValue when rightPrio == leftPrio:
                     return (int)left > (int)right;
                 case floatValue when rightPrio == leftPrio:
@@ -287,6 +303,8 @@ namespace Uranium.CodeAnalysis.Syntax.EvaluatorSupport
         }
         public static bool GreaterThanEquals(object left, object right)
         {
+            ConvertBoolToInt(ref left, ref right);
+
             var leftPrio = SyntaxFacts.GetTypePriority(left);
             var rightPrio = SyntaxFacts.GetTypePriority(right);
             switch(leftPrio)
@@ -326,6 +344,7 @@ namespace Uranium.CodeAnalysis.Syntax.EvaluatorSupport
   
         public static object Pow(object left, object right)
         {
+            ConvertBoolToInt(ref left, ref right);
             var leftPrio = SyntaxFacts.GetTypePriority(left);
             var rightPrio = SyntaxFacts.GetTypePriority(right);
             switch(leftPrio)
@@ -389,6 +408,20 @@ namespace Uranium.CodeAnalysis.Syntax.EvaluatorSupport
             }
             return (int)left ^ (int)right;
         }
-
+        public static void ConvertBoolToInt(ref object left, ref object right)
+        {
+            int newRight = -1;
+            int newLeft = -1;
+            if (right is bool)
+            {
+                newRight = (bool)right ? 1 : 0;
+            }
+            if(left is bool)
+            {
+                newLeft = (bool)left ? 1 : 0;
+            }
+            left = newLeft >= 0 ? newLeft : left;
+            right = newRight >= 0 ? newRight : right;
+        }
     }
 }

@@ -15,6 +15,7 @@ namespace Uranium.CodeAnalysis.Binding
         BinaryExpression,
         VariableExpression,
         AssignmentExpression,
+        ErrorExpression,
 
         //Statements
         BlockStatement,
