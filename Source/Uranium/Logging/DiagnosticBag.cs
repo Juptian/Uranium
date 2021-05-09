@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Uranium.CodeAnalysis.Text;
 using Uranium.CodeAnalysis.Syntax;
 using Uranium.CodeAnalysis.Binding.NodeKinds;
+using Uranium.CodeAnalysis.Symbols;
 
 namespace Uranium.Logging
 {
@@ -53,15 +54,15 @@ namespace Uranium.Logging
             Report(span, message);
         }
 
-        public void ReportUndefinedUnaryOperator(TextSpan span, string operatorText, Type operandType)
+        public void ReportUndefinedUnaryOperator(TextSpan span, string operatorText, TypeSymbol operandType)
         {
-            var message = $"UR00005: Unary operator {operatorText} is not defined for {operandType.ToString()[7..]}.";
+            var message = $"UR00005: Unary operator {operatorText} is not defined for {operandType}.";
             Report(span, message);
         }
 
-        public void ReportUndefinedBinaryOperator(TextSpan span, string? operatorText, Type leftType, Type rightType)
+        public void ReportUndefinedBinaryOperator(TextSpan span, string? operatorText, TypeSymbol leftType, TypeSymbol rightType)
         {
-            var message = $"UR00006: Binary operator {operatorText} is undefined for {leftType.ToString()[7..]} and {rightType.ToString()[7..]}.";
+            var message = $"UR00006: Binary operator {operatorText} is undefined for {leftType} and {rightType}.";
             Report(span, message);
         }
 
@@ -77,9 +78,9 @@ namespace Uranium.Logging
             Report(span, message);
         }
 
-        public void ReportCannotConvert(TextSpan span, Type converterType, Type converteetype)
+        public void ReportCannotConvert(TextSpan span, TypeSymbol converterType, TypeSymbol converteetype)
         {
-            var message = $"UR00009: Cannot convert from type '{converterType.ToString()[7..]}' to type '{converteetype.ToString()[7..]}'.";
+            var message = $"UR00009: Cannot convert from type '{converterType}' to type '{converteetype}'.";
             Report(span, message);
         }
 

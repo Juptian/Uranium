@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Uranium.CodeAnalysis.Symbols;
 using Uranium.CodeAnalysis.Syntax;
 using Uranium.CodeAnalysis.Text;
 
@@ -16,7 +17,7 @@ namespace Uranium.CodeAnalysis.Binding.NodeKinds
         }
 
         public VariableSymbol Variable { get; }
-        public override Type Type => Variable.Type;
+        public override TypeSymbol Type => Variable.Type;
 
         public override BoundNodeKind Kind => BoundNodeKind.VariableExpression;
     }

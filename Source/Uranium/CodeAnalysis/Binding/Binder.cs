@@ -9,6 +9,7 @@ using Uranium.CodeAnalysis.Text;
 using Uranium.Logging;
 using Uranium.CodeAnalysis.Binding.NodeKinds;
 using Uranium.CodeAnalysis.Binding.Statements;
+using Uranium.CodeAnalysis.Symbols;
 
 namespace Uranium.CodeAnalysis.Binding
 {
@@ -42,12 +43,12 @@ namespace Uranium.CodeAnalysis.Binding
                 _ => throw new($"Unexpected syntax {syntax.Kind}"),
             };
 
-        private BoundExpression BindExpression(ExpressionSyntax syntax, Type targetType)
+        private BoundExpression BindExpression(ExpressionSyntax syntax, TypeSymbol targetType)
         {
             var result = BindExpression(syntax);
             if (result.Type != targetType)
             {
-                _diagnostics.ReportCannotConvert(syntax.Span, result.GetType(), targetType);
+                _diagnostics.ReportCannotConvert(syntax.Span, result.Type, targetType);
             }
             return result;
         }
@@ -167,7 +168,7 @@ namespace Uranium.CodeAnalysis.Binding
 
         private BoundStatement BindIfStatement(IfStatementSyntax syntax)
         {
-            var condition = BindExpression(syntax.Condition, typeof(bool));
+            var condition = BindExpression(syntax.Condition, TypeSymbol.Bool);
             var body = BindBlockStatement(syntax.Body);
             var elseStatement = syntax.ElseClause is null ? null : BindStatement(syntax.ElseClause.ElseStatement);
             return new BoundIfStatement(condition, body, elseStatement);
@@ -175,7 +176,7 @@ namespace Uranium.CodeAnalysis.Binding
         
         private BoundStatement BindWhileStatement(WhileStatementSyntax syntax)
         {
-            var condition = BindExpression(syntax.Expression, typeof(bool));
+            var condition = BindExpression(syntax.Expression, TypeSymbol.Bool);
             var body = BindStatement(syntax.Body);
             return new BoundWhileStatement(condition, body);
 
@@ -194,7 +195,7 @@ namespace Uranium.CodeAnalysis.Binding
         //Value is being parsed into a nullable int
         //That then gets checked to see if it's null, and gets assigned to 0 if it is.
         private static BoundExpression BindLiteralExpression(LiteralExpressionSyntax syntax) 
-            => new BoundLiteralExpression(syntax.Value, syntax.Type);
+            => new BoundLiteralExpression(syntax.Value);
 
         private BoundExpression BindUnaryExpression(UnaryExpressionSyntax syntax)
         {
@@ -239,7 +240,7 @@ namespace Uranium.CodeAnalysis.Binding
             if (!_scope.TryLookup(name, out var variable))
             {
                 _diagnostics.ReportUndefinedName(syntax.IdentifierToken.Span, name ?? "name is null");
-                return new BoundLiteralExpression(0, typeof(int));
+                return new BoundLiteralExpression(0);
             }
             return new BoundVariableExpression(variable);
         }

@@ -12,6 +12,7 @@ using Uranium.Logging;
 using Uranium.CodeAnalysis.Text;
 using Uranium.CodeAnalysis.Binding.Statements;
 using Uranium.CodeAnalysis.Lowering;
+using Uranium.CodeAnalysis.Symbols;
 
 namespace Uranium.CodeAnalysis
 {

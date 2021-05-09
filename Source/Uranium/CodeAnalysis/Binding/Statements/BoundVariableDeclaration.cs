@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Uranium.CodeAnalysis.Text;
 using Uranium.CodeAnalysis.Binding.NodeKinds;
+using Uranium.CodeAnalysis.Symbols;
 
 namespace Uranium.CodeAnalysis.Binding.Statements
 {

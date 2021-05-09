@@ -4,20 +4,18 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using Uranium.CodeAnalysis.Binding.NodeKinds;
 using Uranium.CodeAnalysis.Binding.Statements;
-using Uranium.CodeAnalysis.Text;
+using Uranium.CodeAnalysis.Binding;
 
 namespace Uranium.CodeAnalysis.Lowering
 {
     internal sealed class Lowerer : BoundTreeRewriter
     {
-        private int _labelCount = 0;
+        private int  _labelCount = 0;
         private Lowerer()
-        {
+        { }
 
-        }
-
-        private LabelSymbol GenerateLabel()
-            => new($"Label_{++_labelCount}");
+        private BoundLabel GenerateLabel(string name)
+            => new($"{name} {++_labelCount}");
         
         public static BoundBlockStatement Lower(BoundStatement statement)
         {
@@ -65,7 +63,7 @@ namespace Uranium.CodeAnalysis.Lowering
                 //     stuffs
                 // end:
 
-                var endLabel = GenerateLabel();
+                var endLabel = GenerateLabel("End Label");
                 var gotoFalse = new BoundConditionalGotoStatement(endLabel, node.Condition, true);
                 var endLabelStatement = new BoundLabelStatement(endLabel);
                 var result = new BoundBlockStatement
@@ -94,8 +92,8 @@ namespace Uranium.CodeAnalysis.Lowering
                 // else:
                 //     Else stuffs
                 // end:
-                var elseLabel = GenerateLabel();
-                var endLabel = GenerateLabel();
+                var elseLabel = GenerateLabel("Else Label");
+                var endLabel = GenerateLabel("End Label");
 
                 var gotoFalse = new BoundConditionalGotoStatement(elseLabel, node.Condition, true);
                 var gotoEndStatement = new BoundGotoStatement(endLabel);
@@ -133,9 +131,9 @@ namespace Uranium.CodeAnalysis.Lowering
             //
             //end:
 
-            var checkLabel = GenerateLabel();
-            var continueLabel = GenerateLabel();
-            var endLabel = GenerateLabel();
+            var checkLabel = GenerateLabel("Check Label");
+            var continueLabel = GenerateLabel("Continue Label");
+            var endLabel = GenerateLabel("End Label");
             var gotoCheck = new BoundGotoStatement(checkLabel);
             var continueLabelStatement = new BoundLabelStatement(continueLabel);
             var checkLabelStatement = new BoundLabelStatement(checkLabel);
@@ -174,7 +172,7 @@ namespace Uranium.CodeAnalysis.Lowering
             //
             BoundVariableDeclaration? variableDeclaration = null;
             BoundBinaryExpression? condition = null;
-            var trueExpression = new BoundLiteralExpression(true, typeof(bool));
+            var trueExpression = new BoundLiteralExpression(true);
             BoundAssignmentExpression? incrementation = null;
             var body = RewriteStatement(node.Body);
 

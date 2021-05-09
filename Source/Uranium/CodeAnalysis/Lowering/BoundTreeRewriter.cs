@@ -144,7 +144,7 @@ namespace Uranium.CodeAnalysis.Lowering
 
             if(initializer is null && condition is null && incrementation is null)
             {
-                var trueExpression = new BoundLiteralExpression(true, typeof(bool));
+                var trueExpression = new BoundLiteralExpression(true);
                 return new BoundWhileStatement(trueExpression, node.Body);
             }
 

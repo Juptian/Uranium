@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Uranium.CodeAnalysis.Text;
 using Uranium.CodeAnalysis.Syntax;
+using Uranium.CodeAnalysis.Symbols;
 
 namespace Uranium.CodeAnalysis.Binding.NodeKinds
 {
@@ -23,7 +24,7 @@ namespace Uranium.CodeAnalysis.Binding.NodeKinds
         public SyntaxToken? CompoundOperator { get; }
         public bool IsCompound { get; }
 
-        public override Type Type => Expression.Type;
+        public override TypeSymbol Type => Expression.Type;
 
         public override BoundNodeKind Kind => BoundNodeKind.AssignmentExpression;
     }

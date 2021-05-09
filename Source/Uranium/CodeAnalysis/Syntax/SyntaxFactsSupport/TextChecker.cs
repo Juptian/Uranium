@@ -1,4 +1,5 @@
 ﻿using System;
+using Uranium.CodeAnalysis.Symbols;
 
 namespace Uranium.CodeAnalysis.Syntax.SyntaxFactsSupport
 {
@@ -158,28 +159,28 @@ namespace Uranium.CodeAnalysis.Syntax.SyntaxFactsSupport
             _ => "BadToken"
         };
 
-        public static Type? GetKeywordType(SyntaxKind kind) 
+        public static TypeSymbol? GetKeywordType(SyntaxKind kind) 
             => kind switch
         {
-            SyntaxKind.DoubleKeyword => typeof(double),
-            SyntaxKind.CharKeyword => typeof(char),
-            SyntaxKind.StringKeyword => typeof(string), 
-            SyntaxKind.FloatKeyword => typeof(float),
-            SyntaxKind.LongKeyword => typeof(long),
-            SyntaxKind.IntKeyword => typeof(int),
-            SyntaxKind.BoolKeyword => typeof(bool),
+            SyntaxKind.DoubleKeyword => TypeSymbol.Double,
+            SyntaxKind.CharKeyword => TypeSymbol.Char,
+            SyntaxKind.StringKeyword => TypeSymbol.String, 
+            SyntaxKind.FloatKeyword => TypeSymbol.Float,
+            SyntaxKind.LongKeyword => TypeSymbol.Long,
+            SyntaxKind.IntKeyword => TypeSymbol.Int,
+            SyntaxKind.BoolKeyword => TypeSymbol.Bool,
             _ => null,
         };
-        public static Type? GetKeywordType(string kind) 
+        public static TypeSymbol? GetKeywordType(string kind) 
             => kind switch
         {
-            "double" => typeof(double),
-            "char" => typeof(char),
-            "string" => typeof(string), 
-            "float" => typeof(float),
-            "long" => typeof(long),
-            "int" => typeof(int),
-            "bool" => typeof(bool),
+            "double" => TypeSymbol.Double,
+            "char" => TypeSymbol.Char,
+            "string" => TypeSymbol.String, 
+            "float" => TypeSymbol.Float,
+            "long" => TypeSymbol.Long,
+            "int" => TypeSymbol.Int,
+            "bool" => TypeSymbol.Bool,
             _ => null,
         };
 

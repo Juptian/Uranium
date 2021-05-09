@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Uranium.CodeAnalysis.Symbols;
 
 namespace Uranium.CodeAnalysis.Syntax.SyntaxFactsSupport
 {
@@ -46,6 +47,31 @@ namespace Uranium.CodeAnalysis.Syntax.SyntaxFactsSupport
             {
                 return 4;
             }
+            return 0;
+        }
+
+        public static int GetTypePriority(TypeSymbol symbol)
+        {
+            if(symbol == TypeSymbol.Int)
+            {
+                return 1;
+            }
+            
+            if(symbol == TypeSymbol.Float)
+            {
+                return 2;
+            }
+
+            if(symbol == TypeSymbol.Long)
+            {
+                return 3;
+            }
+
+            if(symbol == TypeSymbol.Double)
+            {
+                return 4;
+            }
+
             return 0;
         }
     }
