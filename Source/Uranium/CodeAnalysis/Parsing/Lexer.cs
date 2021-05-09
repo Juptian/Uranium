@@ -208,12 +208,10 @@ namespace Uranium.CodeAnalysis.Lexing
                 case '#':
                     if(Match('"', 1))
                     {
-                        
                         StringLexer.ReadString(this, true, false);
                     }
-                    else if(Match('$',1) && Match('"', 2))
+                    else if(Match('$',1) && Match('"', 1))
                     {
-                        Index += 2;
                         StringLexer.ReadString(this, true, true);
                     }
                     break;

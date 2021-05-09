@@ -81,6 +81,41 @@ namespace Uranium.Tests.CodeAnalysis.Lexing
         }
 
         [Fact]
+        public void LexerLexesSingleLineStringCorrectly()
+        {
+            var text = "\"abc123\"";
+            var tokens = SyntaxTree.LexTokens(text);
+            var token = Assert.Single(tokens);
+            Assert.Equal("abc123", token!.Value);
+        }
+        [Fact]
+        public void LexerLexesMultiLineStringCorreclty()
+        {
+            var textA = "#\"";
+            var textB = @"abc
+123";
+            var toTest = string.Concat(textA, textB, "\"");
+
+            var tokens = SyntaxTree.LexTokens(toTest);
+            var token = Assert.Single(tokens);
+
+            Assert.Equal(@"abc
+123", token!.Value);
+        }
+
+        [Fact]
+        public void LexerLexesLiteralInterpolatedStringCorrectly()
+        {
+            var textA = "#$\"";
+            var textB = @"abcdef
+ghijk";
+            var toTest = string.Concat(textA, textB, "\"");
+            var tokens = SyntaxTree.LexTokens(toTest);
+            var token = Assert.Single(tokens);
+            Assert.Equal(@"abcdef
+ghijk", token!.Value);
+        }
+        [Fact]
         public void LexerLexesEndOfFileCorrectly()
         {
             string text = "      \0";
