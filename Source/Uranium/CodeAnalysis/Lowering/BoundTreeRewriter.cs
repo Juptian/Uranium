@@ -39,6 +39,7 @@ namespace Uranium.CodeAnalysis.Lowering
                 BoundNodeKind.BinaryExpression => RewriteBinaryExpression((BoundBinaryExpression)node),
                 BoundNodeKind.VariableExpression => RewriteVariableExpression((BoundVariableExpression)node),
                 BoundNodeKind.AssignmentExpression => RewriteAssignmentExpression((BoundAssignmentExpression)node),
+                BoundNodeKind.ErrorExpression => new BoundErrorExpression(),
                 _ => throw new($"Unexpected node: {node.Kind}"),
             };
         }
