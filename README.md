@@ -38,9 +38,14 @@ To use the compiler, please make sure you have .NET 5 installed, once you've don
 The current command line arguments accepted are:
 
 ```
---#showtree
+--showtree
 ```
 This will show the syntax tree that is produced.
+
+```
+--boundTree
+```
+This will show the bound syntax tree that is produced
 
 <h3 align="center"> How to use additional arguments: </h3>
 To use additional arguments, simply type 
@@ -52,7 +57,7 @@ dotnet run test.txt
 then add each argument, separated by a space, so for example:
 
 ``` 
-dotnet run test.txt --#showtree 
+dotnet run test.txt --showtree 
 ```
 
 
