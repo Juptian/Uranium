@@ -115,6 +115,18 @@ ghijk";
             Assert.Equal(@"abcdef
 ghijk", token!.Value);
         }
+
+        [Theory]
+        [InlineData("\"abc\\n oneTwoThree\"", "abc\\n oneTwoThree")]
+        [InlineData("\"abc\\r\\n oneTwoThree\"", "abc\\r\\n oneTwoThree")]
+        [InlineData("\"abc\\\" oneTwoThree\"", "abc\\\" oneTwoThree")]
+        public void LexerLexesEscapeCharactersCorrectly(string text, string expected)
+        {
+            var tokens = SyntaxTree.LexTokens(text);
+            var token = Assert.Single(tokens);
+            Assert.Equal(expected, token!.Value);
+        }
+
         [Fact]
         public void LexerLexesEndOfFileCorrectly()
         {
