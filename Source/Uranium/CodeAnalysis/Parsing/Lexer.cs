@@ -218,7 +218,9 @@ namespace Uranium.CodeAnalysis.Lexing
                 case '"':
                     StringLexer.ReadString(this, false, false);
                     return;
-                
+                case '\'':
+                    StringLexer.ReadChar(this);
+                    return;
                 case '\0':
                     Current = SyntaxKind.EndOfFile;
                     return;

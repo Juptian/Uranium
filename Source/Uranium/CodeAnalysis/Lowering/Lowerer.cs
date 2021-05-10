@@ -5,6 +5,7 @@ using System.Collections.Immutable;
 using Uranium.CodeAnalysis.Binding.NodeKinds;
 using Uranium.CodeAnalysis.Binding.Statements;
 using Uranium.CodeAnalysis.Binding;
+using Uranium.CodeAnalysis.Syntax.EvaluatorSupport;
 
 namespace Uranium.CodeAnalysis.Lowering
 {
@@ -213,6 +214,58 @@ namespace Uranium.CodeAnalysis.Lowering
             var result = new BoundBlockStatement(builder.ToImmutable());
 
             return RewriteStatement(result);
+        }
+
+        protected override BoundExpression RewriteBinaryExpression(BoundBinaryExpression node)
+        {
+            if(node.Left is BoundBinaryExpression b)
+            {
+                node.Left = RewriteBinaryExpression(b);
+
+            }   
+            if (node.Right is BoundBinaryExpression x)
+            {
+                node.Right = RewriteBinaryExpression(x);
+            }
+            if(node.Left is BoundLiteralExpression l && node.Right is BoundLiteralExpression r)
+            {
+                var result = node.Op.Kind switch
+                {
+                    //Universal
+                    BoundBinaryOperatorKind.LogicalEquals => EqualityEvaluator.LeftEqualsRight(l.Value, r.Value),
+                    BoundBinaryOperatorKind.NotEquals => !EqualityEvaluator.LeftEqualsRight(l.Value, r.Value),
+
+                    //Int
+                    BoundBinaryOperatorKind.Addition => Operations.Addition(l.Value, r.Value),
+                    BoundBinaryOperatorKind.Subtraction => Operations.Subtraction(l.Value, r.Value),
+                    BoundBinaryOperatorKind.Multiplication => Operations.Multiplication(l.Value, r.Value),
+                    BoundBinaryOperatorKind.Division => Operations.Division(l.Value, r.Value),
+                    BoundBinaryOperatorKind.LesserThan => Operations.LesserThan(l.Value, r.Value),
+                    BoundBinaryOperatorKind.LesserThanEquals => Operations.LesserThanEquals(l.Value, r.Value),
+                    BoundBinaryOperatorKind.GreaterThan => Operations.GreaterThan(l.Value, r.Value),
+                    BoundBinaryOperatorKind.GreaterThanEquals => Operations.GreaterThanEquals(l.Value, r.Value),
+
+                    BoundBinaryOperatorKind.Pow => Operations.Pow(l.Value, r.Value),
+
+                    BoundBinaryOperatorKind.BitwiseAND => Operations.BitwiseAND(l.Value, r.Value),
+                    BoundBinaryOperatorKind.BitwiseOR => Operations.BitwiseOR(l.Value, r.Value),
+                    BoundBinaryOperatorKind.BitwiseXOR => Operations.BitwiseXOR(l.Value, r.Value),
+
+                    BoundBinaryOperatorKind.LogicalAND => BinaryExpressionEvaluator.ConvertToBool(l.Value) && BinaryExpressionEvaluator.ConvertToBool(r.Value),
+                    BoundBinaryOperatorKind.LogicalOR => BinaryExpressionEvaluator.ConvertToBool(l.Value) || BinaryExpressionEvaluator.ConvertToBool(r.Value),
+
+
+                    //We can throw exceptions here because we've exhausted all options,
+                    //and this is an internal Uranium error, should handle this more gracefully,
+                    //but during the development stage, and exception will provide more info,
+                    //on the stack trace :)
+                    _ => throw new($"Unexpected binary operator {node.Op.Kind}"),
+
+                };
+
+                return new BoundLiteralExpression(result);
+            }
+            return base.RewriteBinaryExpression(node);
         }
     }
 }

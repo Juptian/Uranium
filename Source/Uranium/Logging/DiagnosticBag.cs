@@ -135,5 +135,11 @@ namespace Uranium.Logging
             var message = $"UR00017: Cannot have a string that has no matching \". ${text}";
             Report(span, message);
         }
+
+        public void ReportInvalidChar(TextSpan span)
+        {
+            var message = "UR00018: Cannot have more than one character within a char";
+            Report(span, message);
+        }
     }
 }

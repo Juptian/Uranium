@@ -23,9 +23,9 @@ namespace Uranium.CodeAnalysis.Binding.NodeKinds
             Right = right;
         }
 
-        public BoundExpression Left { get; }
+        public BoundExpression Left { get; set; }
         public BoundBinaryOperator Op { get; }
-        public BoundExpression Right { get; }
+        public BoundExpression Right { get; set; }
 
         public override TypeSymbol Type => Op.ResultType;
         public override BoundNodeKind Kind => BoundNodeKind.BinaryExpression;

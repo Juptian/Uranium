@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Reflection.Emit;
-using System.Reflection;
 using Uranium.CodeAnalysis.Binding.NodeKinds;
 
 namespace Uranium.CodeAnalysis.Syntax.EvaluatorSupport
@@ -17,7 +15,6 @@ namespace Uranium.CodeAnalysis.Syntax.EvaluatorSupport
                 BoundBinaryOperatorKind.LogicalEquals => EqualityEvaluator.LeftEqualsRight(left, right),
                 BoundBinaryOperatorKind.NotEquals => !EqualityEvaluator.LeftEqualsRight(left, right),
 
-                //Int
                 BoundBinaryOperatorKind.Addition => Operations.Addition(left, right),
                 BoundBinaryOperatorKind.Subtraction => Operations.Subtraction(left, right),
                 BoundBinaryOperatorKind.Multiplication => Operations.Multiplication(left, right),
@@ -33,7 +30,6 @@ namespace Uranium.CodeAnalysis.Syntax.EvaluatorSupport
                 BoundBinaryOperatorKind.BitwiseOR => Operations.BitwiseOR(left, right),
                 BoundBinaryOperatorKind.BitwiseXOR => Operations.BitwiseXOR(left, right),
 
-                //Bool
                 BoundBinaryOperatorKind.LogicalAND => ConvertToBool(left) && ConvertToBool(right),
                 BoundBinaryOperatorKind.LogicalOR => ConvertToBool(left) || ConvertToBool(right),
 
@@ -47,26 +43,14 @@ namespace Uranium.CodeAnalysis.Syntax.EvaluatorSupport
         
         public static bool ConvertToBool(object obj)
         {
-            if(obj is int)
+            return obj switch
             {
-                return (int)obj != 0;
-            }
-            else if(obj is long)
-            {
-                return (long)obj != 0;
-            }
-            else if(obj is float)
-            {
-                return (float)obj != 0;
-            }
-            else if(obj is double)
-            {
-                return (double)obj != 0;
-            }
-            else
-            {
-                return Convert.ToBoolean(obj);
-            }
+                int => (int)obj != 0,
+                long => (long)obj != 0,
+                float => (float)obj != 0,
+                double => (double)obj != 0,
+                _ => Convert.ToBoolean(obj)
+            };
         }
     }
 }

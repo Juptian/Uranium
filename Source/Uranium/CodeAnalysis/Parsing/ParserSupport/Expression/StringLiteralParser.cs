@@ -12,7 +12,17 @@ namespace Uranium.CodeAnalysis.Parsing.ParserSupport
             {
                 return new LiteralExpressionSyntax(stringToken);
             }
-            return new LiteralExpressionSyntax(stringToken, stringToken.Value!, stringToken.Value!.GetType());
+            return new LiteralExpressionSyntax(stringToken, stringToken.Value!, typeof(string));
+        }
+
+        public static ExpressionSyntax ParseChar(Parser parser)
+        {
+            var charToken = parser.MatchToken(SyntaxKind.CharToken);
+            if(charToken.Value is null)
+            {
+                return new LiteralExpressionSyntax(charToken);
+            }
+            return new LiteralExpressionSyntax(charToken, charToken.Value!, typeof(char));
         }
     }
 }

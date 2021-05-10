@@ -57,6 +57,7 @@
         NumberToken,
         IdentifierToken,
         StringToken,
+        CharToken,
 
         //Logic keywords
         IfKeyword,

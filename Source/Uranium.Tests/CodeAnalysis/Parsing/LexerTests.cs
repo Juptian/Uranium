@@ -113,13 +113,30 @@ ghijk";
             var tokens = SyntaxTree.LexTokens(toTest);
             var token = Assert.Single(tokens);
             Assert.Equal(@"abcdef
-ghijk", token!.Value);
+ghijk", token.Value!);
+        }
+
+        [Fact]
+        public void LexerLexesCharCorrectly()
+        {
+            var a = "'a'";
+            var b = "''";
+
+            var tokensA = SyntaxTree.LexTokens(a);
+            var tokenA = Assert.Single(tokensA);
+            var tokensB = SyntaxTree.LexTokens(b);
+            var tokenB = Assert.Single(tokensB);
+
+            Assert.Equal('a', tokenA.Value!);
+            Assert.Equal(string.Empty, tokenB.Value!);
+
         }
 
         [Theory]
         [InlineData("\"abc\\n oneTwoThree\"", "abc\\n oneTwoThree")]
         [InlineData("\"abc\\r\\n oneTwoThree\"", "abc\\r\\n oneTwoThree")]
         [InlineData("\"abc\\\" oneTwoThree\"", "abc\\\" oneTwoThree")]
+        [InlineData("'\\n'", "\\n")]
         public void LexerLexesEscapeCharactersCorrectly(string text, string expected)
         {
             var tokens = SyntaxTree.LexTokens(text);

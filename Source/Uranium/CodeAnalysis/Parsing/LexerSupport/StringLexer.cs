@@ -39,7 +39,7 @@ namespace Uranium.CodeAnalysis.Lexing.LexerSupport
                         }
                         break;
                     case '\\':
-                        if(IsEscapableCharacter(lexer.NextIndex))
+                        if(IsEscapableCharacter(lexer.NextIndex, true))
                         {
                             var toAppend = $"\\{lexer.NextIndex}";
                             sb.Append(toAppend);
@@ -66,7 +66,38 @@ namespace Uranium.CodeAnalysis.Lexing.LexerSupport
             lexer.Current = SyntaxKind.StringToken;
         }
 
-        public static bool IsEscapableCharacter(char ch)
-            => ch.Equals('n') || ch.Equals('r') || ch.Equals('"');
+        public static void ReadChar(Lexer lexer)
+        {
+            lexer.Index++;
+            
+            if (lexer.CurrentIndex.Equals('\\') && IsEscapableCharacter(lexer.NextIndex, false))
+            {
+                lexer.Index++;
+                lexer.CurrentValue = string.Join("", '\\', lexer.CurrentIndex);
+                lexer.Index++;
+                if(lexer.CurrentIndex != '\'')
+                {
+                    lexer.diagnostics.ReportInvalidChar(new(lexer.Index - 2, 2));
+                }
+            }
+            else if (lexer.CurrentIndex != '\'')
+            {
+                lexer.CurrentValue = lexer.CurrentIndex;
+                lexer.Index++;
+                if(lexer.CurrentIndex != '\'')
+                {
+                    lexer.diagnostics.ReportInvalidChar(new(lexer.Index - 2, 2));
+                }
+            }
+            else
+            {
+                lexer.CurrentValue = string.Empty;
+            }
+
+            lexer.Current = SyntaxKind.CharToken;
+        }
+
+        public static bool IsEscapableCharacter(char ch, bool isString)
+            => ch.Equals('n') || ch.Equals('r') || ch.Equals('t') || (ch.Equals('"') && isString) || (ch.Equals('\'') && !isString);
     }
 }
