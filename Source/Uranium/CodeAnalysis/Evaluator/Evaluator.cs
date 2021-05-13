@@ -69,7 +69,7 @@ namespace Uranium.CodeAnalysis.Syntax
                     return;
                 case BoundNodeKind.ConditionalGotoStatement:
                     var cgs = (BoundConditionalGotoStatement)statement;
-                    var condition = (bool)ExpressionEvaluator.Evaluate(cgs.Condition, this);
+                    var condition = (bool)ExpressionEvaluator.Evaluate(cgs.Condition, this, true);
                     if(condition && !cgs.JumpIfFalse ||
                        !condition && cgs.JumpIfFalse)
                     {

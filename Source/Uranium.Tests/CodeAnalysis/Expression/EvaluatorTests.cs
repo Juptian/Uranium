@@ -84,9 +84,8 @@ namespace Uranium.Tests.CodeAnalysis.Expression
         [InlineData("false == false", true)]
         [InlineData("!false", true)]
         [InlineData("!true", false)]
-        [InlineData("let a = 10 * 10;", 100)]
         [InlineData("var a = 10 * 10;", 100)]
-        [InlineData("const a = 10 * 10;", 100)]
+        [InlineData("const int a = 10 * 10;", 100)]
         [InlineData("3 == true", true)]
         [InlineData("100 == false", false)]
         [InlineData("0 == false", true)]
@@ -215,8 +214,7 @@ namespace Uranium.Tests.CodeAnalysis.Expression
                 yield return new object[] { $"{i} * {i}", i * i };
                 yield return new object[] { $"{i} * 2 / {i}", 2 };
                 yield return new object[] { $"var a = {i};", i };
-                yield return new object[] { $"let a = {i};", i };
-                yield return new object[] { $"const a = {i};", i };
+                yield return new object[] { $"const int a = {i};", i };
                 yield return new object[] { $"{i} <= {i + 1}", true };
                 yield return new object[] { $"{i} < {i}", false };
                 yield return new object[] { $"{i + 1} > {i}", true };
@@ -382,15 +380,14 @@ namespace Uranium.Tests.CodeAnalysis.Expression
 
             //Testing for high numbers
             //To cover most cases
-            for(int i = 999_950; i < 1_000_000; i++)
+            for(int i = 999_950; i <= 1_000_000; i++)
             {
                 yield return new object[] { $"{i} + {i}", i << 1 };
                 yield return new object[] { $"{i} + -{i}/2", i + -(i >> 1) };
                 yield return new object[] { $"{i} * {i}", i * i };
                 yield return new object[] { $"{i} * 2 / {i}", 2 };
                 yield return new object[] { $"var a = {i};", i };
-                yield return new object[] { $"let a = {i};", i };
-                yield return new object[] { $"const a = {i};", i };
+                yield return new object[] { $"const int a = {i};", i };
                 yield return new object[] { $"{i} <= {i + 1}", true };
                 yield return new object[] { $"{i} < {i}", false };
                 yield return new object[] { $"{i + 1} > {i}", true };

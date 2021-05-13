@@ -55,7 +55,6 @@ namespace Uranium.CodeAnalysis.Lexing.LexerSupport
                             lexer.Index++;
                             finished = true;
                         }
-                        lexer.Index++;
                         break;
                     default:
                         lexer.Index++;
@@ -64,7 +63,5 @@ namespace Uranium.CodeAnalysis.Lexing.LexerSupport
             }
             lexer.CurrentValue = SyntaxKind.SingleLineComment;
         }
-
-
     }
 }

@@ -18,12 +18,20 @@ This has been moved to the ParserSupport.Statement namespace, and it's called St
 //If it doesn't fit any of our current conditions, we take it as an expression
 public static StatementSyntax Parse()
     => Current.Kind switch
-     {
-        SyntaxKind.OpenCurlyBrace => ParseBlockStatement(),
-        SyntaxKind.LetConstKeyword or 
-        SyntaxKind.ConstKeyword or 
-        SyntaxKind.VarKeyword => ParseVariableDeclaration(),
-        _ => ParseExpressionStatement(),
+    {
+        SyntaxKind.OpenCurlyBrace => BlockStatementParser.Parse(parser),
+        SyntaxKind.ConstKeyword or
+        SyntaxKind.VarKeyword or 
+        SyntaxKind.IntKeyword or
+        SyntaxKind.LongKeyword or 
+        SyntaxKind.DoubleKeyword or
+        SyntaxKind.FloatKeyword or
+        SyntaxKind.StringKeyword or
+        SyntaxKind.CharKeyword => VariableDeclarationParser.Parse(parser),
+        SyntaxKind.IfKeyword => IfStatementParser.Parse(parser),
+        SyntaxKind.WhileKeyword => WhileStatementParser.Parse(parser),
+        SyntaxKind.ForKeyword => ForStatementParser.Parse(parser),
+        _ => Parser.ParseExpressionStatement(parser),
     };
 ```
 There's a lot going on in this function, what we're doing here, is we're checking what the `Current.Kind` is, if it matches one of our `SyntaxKind.` expressions, we call the according function, `_ => ParseExpressionStatement()` is just a fancy way of writing `if it doesn't fit any of the previous conditions, just call ParseExpressionStatement()`

@@ -10,7 +10,6 @@ namespace Uranium.CodeAnalysis.Parsing.ParserSupport
             => parser.Current.Kind switch
             {
                 SyntaxKind.OpenCurlyBrace => BlockStatementParser.Parse(parser),
-                SyntaxKind.LetConstKeyword or
                 SyntaxKind.ConstKeyword or
                 SyntaxKind.VarKeyword or 
                 SyntaxKind.IntKeyword or

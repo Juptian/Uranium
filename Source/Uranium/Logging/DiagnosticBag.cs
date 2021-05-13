@@ -141,5 +141,11 @@ namespace Uranium.Logging
             var message = "UR00018: Cannot have more than one character within a char";
             Report(span, message);
         }
+
+        public void ReportInvalidConstKeyword(TextSpan span)
+        {
+            var message = $"UR00019: Cannot have a const keyword without a variable type keyword after";
+            Report(span, message);
+        }
     }
 }

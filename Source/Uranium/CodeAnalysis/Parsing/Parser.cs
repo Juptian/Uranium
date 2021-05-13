@@ -79,8 +79,10 @@ namespace Uranium.CodeAnalysis.Parsing
         internal static ExpressionSyntax ParseExpression(Parser parser) => AssignmentExpressionParser.Parse(parser);
 
         internal static bool IsIgnoredToken(SyntaxToken token)
-            => token.Kind is SyntaxKind.WhiteSpace || 
-               token.Kind is SyntaxKind.BadToken ||
-               token.Kind is SyntaxKind.LineBreak;
+            => token.Kind == SyntaxKind.WhiteSpace || 
+               token.Kind == SyntaxKind.BadToken ||
+               token.Kind == SyntaxKind.LineBreak ||
+               token.Kind == SyntaxKind.SingleLineComment ||
+               token.Kind == SyntaxKind.MultiLineComment;
     }
 }

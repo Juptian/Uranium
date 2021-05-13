@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
-using System.Linq;
 using Uranium.Logging;
 using Uranium.CodeAnalysis.Syntax;
 using Uranium.CodeAnalysis.Text;
@@ -33,6 +31,7 @@ namespace Uranium.CodeAnalysis.Lexing
         {
             CurrentValue = null;
             Current = SyntaxKind.BadToken;
+            Text = null;
             ReadSpecialChars(false);
             LexToken(CurrentIndex);
 

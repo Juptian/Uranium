@@ -1,3 +1,8 @@
 ﻿{
-	var b = '';
+	var a = 10;
+	for(int i = 10; i; i--)
+	{
+
+	}
+	var i = 10;
 }

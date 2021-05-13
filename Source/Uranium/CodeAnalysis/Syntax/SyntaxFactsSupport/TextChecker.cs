@@ -18,7 +18,6 @@ namespace Uranium.CodeAnalysis.Syntax.SyntaxFactsSupport
                 "int" => SyntaxKind.IntKeyword,
                 "bool" => SyntaxKind.BoolKeyword,
                 "var" => SyntaxKind.VarKeyword,
-                "let" => SyntaxKind.LetConstKeyword,
                 "const" => SyntaxKind.ConstKeyword,
                 "struct" => SyntaxKind.StructKeyword,
                 "class" => SyntaxKind.ClassKeyword,
@@ -95,7 +94,6 @@ namespace Uranium.CodeAnalysis.Syntax.SyntaxFactsSupport
             SyntaxKind.IntKeyword => "int",
             SyntaxKind.BoolKeyword => "bool",
             SyntaxKind.VarKeyword => "var",
-            SyntaxKind.LetConstKeyword => "let",
             SyntaxKind.ConstKeyword => "const",
             SyntaxKind.StructKeyword => "struct",
             SyntaxKind.ClassKeyword => "class",
@@ -196,7 +194,6 @@ namespace Uranium.CodeAnalysis.Syntax.SyntaxFactsSupport
         
         public static bool IsVarKeyword(SyntaxKind kind)
             => kind is SyntaxKind.VarKeyword ||
-               kind is SyntaxKind.LetConstKeyword ||
                kind is SyntaxKind.ConstKeyword;
     }
 }
