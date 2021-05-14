@@ -70,9 +70,9 @@ namespace Uranium.CodeAnalysis.Binding
             {
                 previous = stack.Pop();
                 var scope = new BoundScope(parent);
-                foreach(var variable in previous.Variables)
+                for(int i = 0; i < previous.Variables.Length; i++)
                 {
-                    scope.TryDeclare(variable);
+                    scope.TryDeclare(previous.Variables[i]);
                 }
 
                 parent = scope;
@@ -126,9 +126,9 @@ namespace Uranium.CodeAnalysis.Binding
 
             //Adding each and every thing within the current syntax's statements 
             //Into the array before making it immutable
-            foreach(var statementSyntax in syntax.Statements)
+            for(int i = 0; i < syntax.Statements.Length; i++)
             {
-                var statement = BindStatement(statementSyntax);
+                var statement = BindStatement(syntax.Statements[i]);
                 statements.Add(statement);
             }
             _scope = _scope.Parent ?? _scope;

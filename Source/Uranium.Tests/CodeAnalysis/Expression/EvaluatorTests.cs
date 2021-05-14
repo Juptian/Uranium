@@ -185,6 +185,11 @@ namespace Uranium.Tests.CodeAnalysis.Expression
     var b = 1 + 2;
     a **= a - 10 + (b - 1);
 }", 100)]
+        [InlineData(@"
+for(int i = 10; i; i--)
+{}", 0) ]
+        [InlineData("string s = \"Abc123\";", "Abc123")]
+        [InlineData("char ch = '1';", '1')]
         [InlineData("{ var a = 10; { var b = a; } }", 10)]
         [InlineData("4**8", fourPowEight)]
         [InlineData("4**9", 262144)]

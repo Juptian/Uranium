@@ -69,9 +69,13 @@ namespace Uranium.CodeAnalysis.Syntax
                     return;
                 case BoundNodeKind.ConditionalGotoStatement:
                     var cgs = (BoundConditionalGotoStatement)statement;
-                    var condition = (bool)ExpressionEvaluator.Evaluate(cgs.Condition, this, true);
-                    if(condition && !cgs.JumpIfFalse ||
-                       !condition && cgs.JumpIfFalse)
+                    var condition = ExpressionEvaluator.Evaluate(cgs.Condition, this);
+                    if(condition is not bool b)
+                    {
+                        b = BinaryExpressionEvaluator.ConvertToBool(condition);
+                    }
+                    if(b && !cgs.JumpIfFalse ||
+                       !b && cgs.JumpIfFalse)
                     {
                         _index = _labelIndex[cgs.Label] - 1;
                     }

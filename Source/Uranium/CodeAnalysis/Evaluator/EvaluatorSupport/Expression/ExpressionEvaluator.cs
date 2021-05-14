@@ -5,11 +5,11 @@ namespace Uranium.CodeAnalysis.Syntax.EvaluatorSupport
 {
     internal static class ExpressionEvaluator
     {
-        public static object Evaluate(BoundExpression node, Evaluator eval, bool shouldBeBool = false)
+        public static object Evaluate(BoundExpression node, Evaluator eval)
             => node switch
             {
                 //if it's a literal expression, return it's value
-                BoundLiteralExpression n => shouldBeBool ? BinaryExpressionEvaluator.ConvertToBool(n.Value) : n.Value,
+                BoundLiteralExpression n => n.Value,
                 //if it's a Unary expression, we just evaluate the operand
                 //and return it's value according to the symbol
                 //Moved into it's own function because it's kinda chonky

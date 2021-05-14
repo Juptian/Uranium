@@ -21,11 +21,11 @@ namespace Uranium.CodeAnalysis.Parsing.ParserSupport
                     continue;
                 }
 
-                if (parser.Current.Kind == SyntaxKind.ElseKeyword)
+                /*if (parser.Current.Kind == SyntaxKind.ElseKeyword)
                 {
                     parser.Position--;
                     break;
-                }
+                }*/
 
                 var statement = StatementParser.Parse(parser);
                 statements.Add(statement);
