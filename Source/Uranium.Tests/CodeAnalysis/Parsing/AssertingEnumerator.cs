@@ -67,8 +67,8 @@ namespace Uranium.Tests.CodeAnalysis.Parsing
                 var token = Assert.IsType<SyntaxToken>(_enumerator.Current);
                 if(asSoloOperator)
                 {
-                    var asSolo = SyntaxFacts.GetSoloOperator(token);
-                    Assert.Equal(text, SyntaxFacts.GetText(asSolo.Kind));
+                    var asSolo = OperatorChecker.GetSoloOperator(token);
+                    Assert.Equal(text, TextChecker.GetText(asSolo.Kind));
                 }
                 else
                 {
@@ -142,7 +142,7 @@ namespace Uranium.Tests.CodeAnalysis.Parsing
         public void AssertVariableDeclaration(SyntaxKind keyword, string identifer)
         {
             AssertNode(SyntaxKind.VariableDeclaration);
-            AssertToken(keyword, SyntaxFacts.GetText(keyword));
+            AssertToken(keyword, TextChecker.GetText(keyword));
             AssertToken(SyntaxKind.IdentifierToken, identifer);
         }
         public void AssertCondition
@@ -155,7 +155,7 @@ namespace Uranium.Tests.CodeAnalysis.Parsing
                 AssertNameExpression();
                     AssertToken(SyntaxKind.IdentifierToken, initializerName);
 
-                AssertToken(conditionToken, SyntaxFacts.GetText(conditionToken));
+                AssertToken(conditionToken, TextChecker.GetText(conditionToken));
                 AssertLiteralExpression();
                     AssertToken(SyntaxKind.NumberToken, conditionText);
         }
@@ -175,7 +175,7 @@ namespace Uranium.Tests.CodeAnalysis.Parsing
                     AssertToken(SyntaxKind.NumberToken, incrementationText);
                 //This one is because in our Assignment expression syntax we save our compound operator
                 //So, we have to assert it here as well.
-                AssertToken(incrementor, SyntaxFacts.GetText(incrementor));
+                AssertToken(incrementor, TextChecker.GetText(incrementor));
         }
 
         public void AssertBlockStatement(bool ignoreStatements)

@@ -20,7 +20,7 @@ namespace Uranium.CodeAnalysis.Syntax.EvaluatorSupport
         {
             result = 0.0;
 
-            var isNumber = SyntaxFacts.IsNumber(value);
+            var isNumber = TypeChecker.IsNumber(value);
             if (isNumber)
                 result = Convert.ToDouble(value);
 

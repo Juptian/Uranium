@@ -147,7 +147,7 @@ namespace Uranium.CodeAnalysis.Binding
         {
             var isReadOnly = syntax.ConstKeywordToken is not null;
             var initializer = BindExpression(syntax.Initializer);
-            var type = SyntaxFacts.GetKeywordType(syntax.KeywordToken.Kind) ?? initializer.Type;
+            var type = TextChecker.GetKeywordType(syntax.KeywordToken.Kind) ?? initializer.Type;
             var variable = BindVariable(syntax.Identifier, isReadOnly, type); 
 
             return new BoundVariableDeclaration(variable, initializer);

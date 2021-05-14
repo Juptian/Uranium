@@ -16,8 +16,8 @@ namespace Uranium.CodeAnalysis.Syntax.EvaluatorSupport
         {
             ConvertBoolToInt(ref left, ref right);
 
-            var leftPrio = SyntaxFacts.GetTypePriority(left);
-            var rightPrio = SyntaxFacts.GetTypePriority(right);
+            var leftPrio = TypeChecker.GetTypePriority(left);
+            var rightPrio = TypeChecker.GetTypePriority(right);
             
             switch(leftPrio)
             {
@@ -58,8 +58,8 @@ namespace Uranium.CodeAnalysis.Syntax.EvaluatorSupport
         {
             ConvertBoolToInt(ref left, ref right);
 
-            var leftPrio = SyntaxFacts.GetTypePriority(left);
-            var rightPrio = SyntaxFacts.GetTypePriority(right);
+            var leftPrio = TypeChecker.GetTypePriority(left);
+            var rightPrio = TypeChecker.GetTypePriority(right);
             switch(leftPrio)
             {
                 case intValue when rightPrio == leftPrio:
@@ -100,8 +100,8 @@ namespace Uranium.CodeAnalysis.Syntax.EvaluatorSupport
         {
             ConvertBoolToInt(ref left, ref right);
 
-            var leftPrio = SyntaxFacts.GetTypePriority(left);
-            var rightPrio = SyntaxFacts.GetTypePriority(right);
+            var leftPrio = TypeChecker.GetTypePriority(left);
+            var rightPrio = TypeChecker.GetTypePriority(right);
             switch(leftPrio)
             {
                 case intValue when rightPrio == leftPrio:
@@ -141,8 +141,8 @@ namespace Uranium.CodeAnalysis.Syntax.EvaluatorSupport
         {
             ConvertBoolToInt(ref left, ref right);
 
-            var leftPrio = SyntaxFacts.GetTypePriority(left);
-            var rightPrio = SyntaxFacts.GetTypePriority(right);
+            var leftPrio = TypeChecker.GetTypePriority(left);
+            var rightPrio = TypeChecker.GetTypePriority(right);
             switch(leftPrio)
             {
 
@@ -183,8 +183,8 @@ namespace Uranium.CodeAnalysis.Syntax.EvaluatorSupport
         {
             ConvertBoolToInt(ref left, ref right);
 
-            var leftPrio = SyntaxFacts.GetTypePriority(left);
-            var rightPrio = SyntaxFacts.GetTypePriority(right);
+            var leftPrio = TypeChecker.GetTypePriority(left);
+            var rightPrio = TypeChecker.GetTypePriority(right);
             switch(leftPrio)
             {
                 case intValue when rightPrio == leftPrio:
@@ -224,8 +224,8 @@ namespace Uranium.CodeAnalysis.Syntax.EvaluatorSupport
         {
             ConvertBoolToInt(ref left, ref right);
 
-            var leftPrio = SyntaxFacts.GetTypePriority(left);
-            var rightPrio = SyntaxFacts.GetTypePriority(right);
+            var leftPrio = TypeChecker.GetTypePriority(left);
+            var rightPrio = TypeChecker.GetTypePriority(right);
             switch(leftPrio)
             {
                 case intValue when rightPrio == leftPrio:
@@ -265,8 +265,8 @@ namespace Uranium.CodeAnalysis.Syntax.EvaluatorSupport
         {
             ConvertBoolToInt(ref left, ref right);
 
-            var leftPrio = SyntaxFacts.GetTypePriority(left);
-            var rightPrio = SyntaxFacts.GetTypePriority(right);
+            var leftPrio = TypeChecker.GetTypePriority(left);
+            var rightPrio = TypeChecker.GetTypePriority(right);
             switch(leftPrio)
             {
                 case intValue when rightPrio == leftPrio:
@@ -305,8 +305,8 @@ namespace Uranium.CodeAnalysis.Syntax.EvaluatorSupport
         {
             ConvertBoolToInt(ref left, ref right);
 
-            var leftPrio = SyntaxFacts.GetTypePriority(left);
-            var rightPrio = SyntaxFacts.GetTypePriority(right);
+            var leftPrio = TypeChecker.GetTypePriority(left);
+            var rightPrio = TypeChecker.GetTypePriority(right);
             switch(leftPrio)
             {
                 case intValue when rightPrio == leftPrio:
@@ -345,8 +345,8 @@ namespace Uranium.CodeAnalysis.Syntax.EvaluatorSupport
         public static object Pow(object left, object right)
         {
             ConvertBoolToInt(ref left, ref right);
-            var leftPrio = SyntaxFacts.GetTypePriority(left);
-            var rightPrio = SyntaxFacts.GetTypePriority(right);
+            var leftPrio = TypeChecker.GetTypePriority(left);
+            var rightPrio = TypeChecker.GetTypePriority(right);
             switch(leftPrio)
             {
                 case intValue when rightPrio == leftPrio:

@@ -16,7 +16,7 @@ namespace Uranium.Tests.CodeAnalysis.Syntax
         [MemberData(nameof(GetSyntaxKindData))]
         public void SyntaxFactGetTextRoundTrips(SyntaxKind kind)
         {
-            var text = SyntaxFacts.GetText(kind);
+            var text = TextChecker.GetText(kind);
 
             if(text.Equals("BadToken"))
             {
@@ -34,7 +34,7 @@ namespace Uranium.Tests.CodeAnalysis.Syntax
         [MemberData(nameof(GetSyntaxKindData))]
         public void SyntaxFactsBinaryOperatorsRoundTrips(SyntaxKind kind)
         {
-            var text = SyntaxFacts.GetText(kind);
+            var text = TextChecker.GetText(kind);
 
             if(text.Equals("BadToken"))
             {
@@ -59,10 +59,10 @@ namespace Uranium.Tests.CodeAnalysis.Syntax
 
             var tokens = SyntaxTree.LexTokens(text);
             var token = Assert.Single(tokens);
-            Assert.Equal(text, SyntaxFacts.GetText(kind));
-            Assert.Equal(kind, SyntaxFacts.GetKind(text));
+            Assert.Equal(text, TextChecker.GetText(kind));
+            Assert.Equal(kind, TextChecker.GetSyntaxKind(text));
             Assert.Equal(text, token.Text);
-            Assert.Equal(kind, SyntaxFacts.GetKind(token.Text));
+            Assert.Equal(kind, TextChecker.GetSyntaxKind(token.Text));
         }
 
         [Fact]
@@ -75,8 +75,8 @@ namespace Uranium.Tests.CodeAnalysis.Syntax
                 var t = tokens[i];
                 if(t.Kind is not SyntaxKind.IdentifierToken)
                 {
-                    Assert.Equal(t.Text, SyntaxFacts.GetText(t.Kind));
-                    Assert.Equal(t.Kind, SyntaxFacts.GetKind(t.Text));
+                    Assert.Equal(t.Text, TextChecker.GetText(t.Kind));
+                    Assert.Equal(t.Kind, TextChecker.GetSyntaxKind(t.Text));
                 }
             }
         }
@@ -84,17 +84,17 @@ namespace Uranium.Tests.CodeAnalysis.Syntax
         [Fact]
         public static void TestTypes()
         {
-            Assert.True(SyntaxFacts.IsInteger(SyntaxKind.IntKeyword));
-            Assert.True(SyntaxFacts.IsInteger(SyntaxKind.LongKeyword));
+            Assert.True(TypeChecker.IsInteger(SyntaxKind.IntKeyword));
+            Assert.True(TypeChecker.IsInteger(SyntaxKind.LongKeyword));
 
-            Assert.True(SyntaxFacts.IsFloatingPoint(SyntaxKind.FloatKeyword));
-            Assert.True(SyntaxFacts.IsFloatingPoint(SyntaxKind.DoubleKeyword));
+            Assert.True(TypeChecker.IsFloatingPoint(SyntaxKind.FloatKeyword));
+            Assert.True(TypeChecker.IsFloatingPoint(SyntaxKind.DoubleKeyword));
 
-            Assert.False(SyntaxFacts.IsInteger(SyntaxKind.FloatKeyword));
-            Assert.False(SyntaxFacts.IsInteger(SyntaxKind.DoubleKeyword));
+            Assert.False(TypeChecker.IsInteger(SyntaxKind.FloatKeyword));
+            Assert.False(TypeChecker.IsInteger(SyntaxKind.DoubleKeyword));
 
-            Assert.False(SyntaxFacts.IsFloatingPoint(SyntaxKind.IntKeyword));
-            Assert.False(SyntaxFacts.IsFloatingPoint(SyntaxKind.IntKeyword));
+            Assert.False(TypeChecker.IsFloatingPoint(SyntaxKind.IntKeyword));
+            Assert.False(TypeChecker.IsFloatingPoint(SyntaxKind.IntKeyword));
         }
 
         [Theory]
@@ -105,46 +105,46 @@ namespace Uranium.Tests.CodeAnalysis.Syntax
             {
                 return;
             }
-            var resultKind = SyntaxFacts.GetKind(kind);
+            var resultKind = TextChecker.GetSyntaxKind(kind);
             Assert.Equal(resultKind, expected);
-            Assert.Equal(kind, SyntaxFacts.GetText(resultKind));
+            Assert.Equal(kind, TextChecker.GetText(resultKind));
         }
 
         [Fact]
         public void CheckReturnTypes()
         {
-            Assert.Equal(TypeSymbol.Int, SyntaxFacts.GetKeywordType("int"));
-            Assert.Equal(TypeSymbol.Int, SyntaxFacts.GetKeywordType(SyntaxKind.IntKeyword));
+            Assert.Equal(TypeSymbol.Int, TextChecker.GetKeywordType("int"));
+            Assert.Equal(TypeSymbol.Int, TextChecker.GetKeywordType(SyntaxKind.IntKeyword));
 
-            Assert.Equal(TypeSymbol.Long, SyntaxFacts.GetKeywordType("long"));
-            Assert.Equal(TypeSymbol.Long, SyntaxFacts.GetKeywordType(SyntaxKind.LongKeyword));
+            Assert.Equal(TypeSymbol.Long, TextChecker.GetKeywordType("long"));
+            Assert.Equal(TypeSymbol.Long, TextChecker.GetKeywordType(SyntaxKind.LongKeyword));
 
-            Assert.Equal(TypeSymbol.Double, SyntaxFacts.GetKeywordType("double"));
-            Assert.Equal(TypeSymbol.Double, SyntaxFacts.GetKeywordType(SyntaxKind.DoubleKeyword));
+            Assert.Equal(TypeSymbol.Double, TextChecker.GetKeywordType("double"));
+            Assert.Equal(TypeSymbol.Double, TextChecker.GetKeywordType(SyntaxKind.DoubleKeyword));
 
-            Assert.Equal(TypeSymbol.Float, SyntaxFacts.GetKeywordType("float"));
-            Assert.Equal(TypeSymbol.Float, SyntaxFacts.GetKeywordType(SyntaxKind.FloatKeyword));
+            Assert.Equal(TypeSymbol.Float, TextChecker.GetKeywordType("float"));
+            Assert.Equal(TypeSymbol.Float, TextChecker.GetKeywordType(SyntaxKind.FloatKeyword));
 
-            Assert.Equal(TypeSymbol.Char, SyntaxFacts.GetKeywordType("char"));
-            Assert.Equal(TypeSymbol.Char, SyntaxFacts.GetKeywordType(SyntaxKind.CharKeyword));
+            Assert.Equal(TypeSymbol.Char, TextChecker.GetKeywordType("char"));
+            Assert.Equal(TypeSymbol.Char, TextChecker.GetKeywordType(SyntaxKind.CharKeyword));
 
-            Assert.Equal(TypeSymbol.String, SyntaxFacts.GetKeywordType("string"));
-            Assert.Equal(TypeSymbol.String, SyntaxFacts.GetKeywordType(SyntaxKind.StringKeyword));
+            Assert.Equal(TypeSymbol.String, TextChecker.GetKeywordType("string"));
+            Assert.Equal(TypeSymbol.String, TextChecker.GetKeywordType(SyntaxKind.StringKeyword));
 
-            Assert.Equal(TypeSymbol.Bool, SyntaxFacts.GetKeywordType("bool"));
-            Assert.Equal(TypeSymbol.Bool, SyntaxFacts.GetKeywordType(SyntaxKind.BoolKeyword));
+            Assert.Equal(TypeSymbol.Bool, TextChecker.GetKeywordType("bool"));
+            Assert.Equal(TypeSymbol.Bool, TextChecker.GetKeywordType(SyntaxKind.BoolKeyword));
 
-            Assert.Null(SyntaxFacts.GetKeywordType("abc"));
-            Assert.Null(SyntaxFacts.GetKeywordType(SyntaxKind.IfKeyword));
+            Assert.Null(TextChecker.GetKeywordType("abc"));
+            Assert.Null(TextChecker.GetKeywordType(SyntaxKind.IfKeyword));
         }
 
         [Fact]
         public void GetUnaryOperator()
         {
-            var operators = SyntaxFacts.GetUnaryOperators().ToArray();
+            var operators = OperatorChecker.GetUnaryOperators().ToArray();
             for(int i = 0; i < operators.Length; i++)
             {
-                Assert.False(SyntaxFacts.GetUnaryOperatorPrecedence(operators[i]) == 0);
+                Assert.False(OperatorChecker.GetUnaryOperatorPrecedence(operators[i]) == 0);
             }
         }
 
@@ -163,7 +163,7 @@ namespace Uranium.Tests.CodeAnalysis.Syntax
             var syntaxKinds = (SyntaxKind[])Enum.GetValues(typeof(SyntaxKind));
             for(int i = 0; i < syntaxKinds.Length; i++)
             {
-                yield return new object[] { SyntaxFacts.GetText(syntaxKinds[i]), syntaxKinds[i] };
+                yield return new object[] { TextChecker.GetText(syntaxKinds[i]), syntaxKinds[i] };
             }
         }
         public static string AllTokens()
@@ -172,7 +172,7 @@ namespace Uranium.Tests.CodeAnalysis.Syntax
             var result = new StringBuilder();
             for(int i = 0; i < syntaxKinds.Length; i++)
             {
-                result.Append(SyntaxFacts.GetText(syntaxKinds[i]) + " ");
+                result.Append(TextChecker.GetText(syntaxKinds[i]) + " ");
             }
             return result.ToString();
         }

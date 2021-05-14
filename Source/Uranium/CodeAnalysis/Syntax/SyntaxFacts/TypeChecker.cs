@@ -1,14 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Uranium.CodeAnalysis.Symbols;
 
-namespace Uranium.CodeAnalysis.Syntax.SyntaxFactsSupport
+namespace Uranium.CodeAnalysis.Syntax
 {
-    internal static class TypeChecker
+    public static class TypeChecker
     {
+        public static bool IsNumber(object obj)
+            => obj is int or long or float or double;
+
+        public static bool IsNumber(SyntaxKind kind)
+            => IsFloatingPoint(kind) || IsInteger(kind);
+
         public static bool IsFloatingPoint(SyntaxKind kind)
             => kind is SyntaxKind.DoubleKeyword ||
                kind is SyntaxKind.FloatKeyword;
@@ -29,25 +32,19 @@ namespace Uranium.CodeAnalysis.Syntax.SyntaxFactsSupport
         public static bool IsInteger(object obj)
             => obj is int or long;
 
+        public static bool IsVarKeyword(this SyntaxKind kind)
+            => kind == SyntaxKind.VarKeyword;
+
         public static int GetTypePriority(object obj)
         {
-            if(obj is int)
+            return obj switch
             {
-                return 1;
-            }
-            if(obj is float)
-            {
-                return 2;
-            }
-            if(obj is long)
-            {
-                return 3;
-            }
-            if(obj is double)
-            {
-                return 4;
-            }
-            return 0;
+                int => 1,
+                float => 2,
+                long => 3,
+                double => 4,
+                _ => 0
+            };
         }
 
         public static int GetTypePriority(TypeSymbol symbol)
@@ -71,7 +68,6 @@ namespace Uranium.CodeAnalysis.Syntax.SyntaxFactsSupport
             {
                 return 4;
             }
-
             return 0;
         }
     }

@@ -78,9 +78,9 @@ namespace Uranium.Tests.CodeAnalysis.Parsing
                 SyntaxKind incrementationOperator, string incrementationAmount
             )
         {
-            var identifierTokenText = SyntaxFacts.GetText(identifierToken);
-            var conditionalText = SyntaxFacts.GetText(condition);
-            var incrementOpText = SyntaxFacts.GetText(incrementationOperator);
+            var identifierTokenText = TextChecker.GetText(identifierToken);
+            var conditionalText = TextChecker.GetText(condition);
+            var incrementOpText = TextChecker.GetText(incrementationOperator);
             var result = $@"
     for({identifierTokenText} {identifier} = {initializer}; {identifier} {conditionalText} {conditionNumber}; {identifier} {incrementOpText} {incrementationAmount})" + @"
     {

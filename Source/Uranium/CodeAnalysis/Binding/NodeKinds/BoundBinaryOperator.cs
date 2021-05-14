@@ -52,7 +52,7 @@ namespace Uranium.CodeAnalysis.Binding.NodeKinds
             {
                 for(int x = 0; x < numberTypeSymbols.Length; x++)
                 {
-                    if(SyntaxFacts.IsFloatingPoint(numberTypeSymbols[i]) && numberTypeSymbols[x] == TypeSymbol.Long)
+                    if(TypeChecker.IsFloatingPoint(numberTypeSymbols[i]) && numberTypeSymbols[x] == TypeSymbol.Long)
                     {
                         continue;
                     }
@@ -61,7 +61,7 @@ namespace Uranium.CodeAnalysis.Binding.NodeKinds
                         break;
                     }
                     TypeSymbol resultTypeSymbol;
-                    if(SyntaxFacts.GetTypePriority(numberTypeSymbols[i]) > SyntaxFacts.GetTypePriority(numberTypeSymbols[x]))
+                    if(TypeChecker.GetTypePriority(numberTypeSymbols[i]) > TypeChecker.GetTypePriority(numberTypeSymbols[x]))
                     {
                         resultTypeSymbol = numberTypeSymbols[i];
                     }

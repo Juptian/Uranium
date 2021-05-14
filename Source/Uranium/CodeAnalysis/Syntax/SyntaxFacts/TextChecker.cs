@@ -1,9 +1,9 @@
 ﻿using System;
 using Uranium.CodeAnalysis.Symbols;
 
-namespace Uranium.CodeAnalysis.Syntax.SyntaxFactsSupport
+namespace Uranium.CodeAnalysis.Syntax
 {
-    internal static class TextChecker
+    public static class TextChecker
     {
         public static SyntaxKind GetSyntaxKind(string text)
             => text switch

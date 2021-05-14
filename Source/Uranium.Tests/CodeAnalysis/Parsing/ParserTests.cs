@@ -16,10 +16,10 @@ namespace Uranium.Tests.CodeAnalysis.Parsing
         [MemberData(nameof(GetBinaryOperatorPairsData))]
         public void ParserBinaryExpresionFollowsPrecedences(SyntaxKind op1, SyntaxKind op2)
         {
-            var op1Precedence = SyntaxFacts.GetBinaryOperatorPrecedence(op1);
-            var op2Precedence = SyntaxFacts.GetBinaryOperatorPrecedence(op2);
-            var op1Text = SyntaxFacts.GetText(op1);
-            var op2Text = SyntaxFacts.GetText(op2);
+            var op1Precedence = OperatorChecker.GetBinaryOperatorPrecedence(op1);
+            var op2Precedence = OperatorChecker.GetBinaryOperatorPrecedence(op2);
+            var op1Text = TextChecker.GetText(op1);
+            var op2Text = TextChecker.GetText(op2);
             var text = $"a {op1Text} b {op2Text} c";
 
             var expression = ParseExpression(text);
@@ -78,10 +78,10 @@ namespace Uranium.Tests.CodeAnalysis.Parsing
         [MemberData(nameof(GetUnaryOperatorPairsData))]
         public void ParserUnaryExpresionFollowsPrecedences(SyntaxKind unaryKind, SyntaxKind binarykind)
         {
-            var unaryPrecedence = SyntaxFacts.GetUnaryOperatorPrecedence(unaryKind);
-            var binaryPrecedence = SyntaxFacts.GetBinaryOperatorPrecedence(binarykind);
-            var unaryText = SyntaxFacts.GetText(unaryKind);
-            var binaryText = SyntaxFacts.GetText(binarykind);
+            var unaryPrecedence = OperatorChecker.GetUnaryOperatorPrecedence(unaryKind);
+            var binaryPrecedence = OperatorChecker.GetBinaryOperatorPrecedence(binarykind);
+            var unaryText = TextChecker.GetText(unaryKind);
+            var binaryText = TextChecker.GetText(binarykind);
             var text = $"{unaryText}a {binaryText} b";
 
             var expression = ParseExpression(text);
@@ -158,12 +158,12 @@ namespace Uranium.Tests.CodeAnalysis.Parsing
                 string incrementationText, SyntaxKind incrementor
             )
         {
-            var soloOperator = SyntaxFacts.GetSoloOperator(incrementor);
-            var soloText = SyntaxFacts.GetText(soloOperator);
+            var soloOperator = OperatorChecker.GetSoloOperator(incrementor);
+            var soloText = TextChecker.GetText(soloOperator);
             var expression = ParseForLoop(data);
             using var e = new AssertingEnumerator(expression);
 
-            Assert.Equal(incrementor, SyntaxFacts.GetKind(SyntaxFacts.GetText(incrementor)));
+            Assert.Equal(incrementor, TextChecker.GetSyntaxKind(TextChecker.GetText(incrementor)));
             //This is indented according to the AST produced from for loops
             e.AssertNode(SyntaxKind.ForStatement);
                 e.AssertToken(SyntaxKind.ForKeyword, "for");
@@ -203,13 +203,13 @@ namespace Uranium.Tests.CodeAnalysis.Parsing
             var expression = ParseVariableDeclaration(data);
             using var e = new AssertingEnumerator(expression);
             e.AssertNode(SyntaxKind.VariableDeclaration);
-            e.AssertToken(keyword, SyntaxFacts.GetText(keyword));
+            e.AssertToken(keyword, TextChecker.GetText(keyword));
             e.AssertToken(SyntaxKind.IdentifierToken, identifier);
             e.AssertToken(SyntaxKind.Equals, "=");
             e.AssertNode(SyntaxKind.BinaryExpression);
             e.AssertLiteralExpression();
             e.AssertToken(SyntaxKind.NumberToken, valueLeft);
-            e.AssertToken(op, SyntaxFacts.GetText(op));
+            e.AssertToken(op, TextChecker.GetText(op));
             e.AssertLiteralExpression();
             e.AssertToken(SyntaxKind.NumberToken, valueRight);
         }
@@ -248,7 +248,7 @@ namespace Uranium.Tests.CodeAnalysis.Parsing
                 e.AssertNode(SyntaxKind.NameExpression);
                 e.AssertToken(SyntaxKind.IdentifierToken, compared);
             }
-            e.AssertToken(op, SyntaxFacts.GetText(op));
+            e.AssertToken(op, TextChecker.GetText(op));
             if(compareeLiteral)
             {
                 e.AssertLiteralExpression();
@@ -297,7 +297,7 @@ namespace Uranium.Tests.CodeAnalysis.Parsing
         
         public static IEnumerable<object[]> GetBinaryOperatorPairsData()
         {
-            var operators = SyntaxFacts.GetBinaryOperators().ToArray();
+            var operators = OperatorChecker.GetBinaryOperators().ToArray();
             for(int i = 0; i < operators.Length; i++)
             {
                 for(int x = 0; x < operators.Length; x++)
@@ -309,8 +309,8 @@ namespace Uranium.Tests.CodeAnalysis.Parsing
 
         public static IEnumerable<object[]> GetUnaryOperatorPairsData()
         {
-            var unary = SyntaxFacts.GetUnaryOperators().ToArray();
-            var binary = SyntaxFacts.GetBinaryOperators().ToArray();
+            var unary = OperatorChecker.GetUnaryOperators().ToArray();
+            var binary = OperatorChecker.GetBinaryOperators().ToArray();
             for(int i = 0; i < unary.Length; i++)
             {
                 for(int x = 0; x < binary.Length; x++)
@@ -328,7 +328,7 @@ namespace Uranium.Tests.CodeAnalysis.Parsing
                 for(int x = 0; x < keywords.Length; x++)
                 {
                     var text = ForLoopTestCases.MakeForLoop(keywords[x], "i", "0", SyntaxKind.LesserThan, i, SyntaxKind.PlusEquals, "1");
-                    yield return new object[] { text, keywords[x], SyntaxFacts.GetText(keywords[x]), "i", "0", SyntaxKind.LesserThan, i.ToString(), "1", SyntaxKind.PlusEquals};
+                    yield return new object[] { text, keywords[x], TextChecker.GetText(keywords[x]), "i", "0", SyntaxKind.LesserThan, i.ToString(), "1", SyntaxKind.PlusEquals};
                 }
             }
         }

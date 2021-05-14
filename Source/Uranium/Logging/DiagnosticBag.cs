@@ -43,7 +43,7 @@ namespace Uranium.Logging
 
         public void ReportInvalidToken(TextSpan span, SyntaxToken actualKind, SyntaxKind expectedKind)
         {
-            var expectedText = expectedKind == SyntaxKind.EndOfFile ? "EndOfFileToken" : $"{SyntaxFacts.GetText(expectedKind)}";
+            var expectedText = expectedKind == SyntaxKind.EndOfFile ? "EndOfFileToken" : $"{TextChecker.GetText(expectedKind)}";
             if(expectedText.Equals("BadToken", StringComparison.OrdinalIgnoreCase))
             {
                 expectedText = "IdentifierToken";
@@ -120,7 +120,7 @@ namespace Uranium.Logging
         }
         public void ReportInvalidDecimal(TextSpan span, string text, SyntaxKind previousKeyword)
         {
-            var message = $"UR00015: A variable of type {SyntaxFacts.GetText(previousKeyword)} cannot have any decimals. {text}";
+            var message = $"UR00015: A variable of type {TextChecker.GetText(previousKeyword)} cannot have any decimals. {text}";
             Report(span, message);
         }
 

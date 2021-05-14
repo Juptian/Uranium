@@ -36,7 +36,7 @@ namespace Uranium.CodeAnalysis.Lexing
             LexToken(CurrentIndex);
 
             var token = new SyntaxToken(Current, Index++, Text ?? PreviousIndex.ToString(), CurrentValue);
-            if (SyntaxFacts.GetKeywordType(Current) is not null)
+            if (TextChecker.GetKeywordType(Current) is not null)
             {
                 PreviousIdentifier = token;
             }
@@ -244,7 +244,7 @@ namespace Uranium.CodeAnalysis.Lexing
             }
             var length = Index - Start;
             var text = Source.ToString(Start, length);
-            var kind = SyntaxFacts.GetKind(text);
+            var kind = TextChecker.GetSyntaxKind(text);
             
             Current = kind == SyntaxKind.BadToken ? SyntaxKind.IdentifierToken : kind;
             Text = text;
@@ -255,10 +255,10 @@ namespace Uranium.CodeAnalysis.Lexing
         {
             //Checking here for if it's an identifier token, this way we don't do anything with it.
             //This is because Identifier tokens should not be modified.
-            if(!SyntaxFacts.GetText(Current).Equals("BadToken", StringComparison.OrdinalIgnoreCase))
+            if(!TextChecker.GetText(Current).Equals("BadToken", StringComparison.OrdinalIgnoreCase))
             {
                 var length = Index - Start;
-                var text = SyntaxFacts.GetText(Current);
+                var text = TextChecker.GetText(Current);
 
                 //If I remove the "text is null"
                 //The tests fucking die

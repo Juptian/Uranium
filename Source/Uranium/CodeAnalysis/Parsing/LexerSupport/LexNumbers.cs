@@ -47,9 +47,9 @@ namespace Uranium.CodeAnalysis.Lexing.LexerSupport
             }
 
             if(lexer.PreviousIdentifier is not null && 
-               !SyntaxFacts.IsVarKeyword(lexer.PreviousIdentifier!.Kind))
+               lexer.PreviousIdentifier!.Kind != SyntaxKind.VarKeyword)
             {
-                if(SyntaxFacts.IsFloatingPoint(lexer.PreviousIdentifier!.Kind))
+                if(TypeChecker.IsFloatingPoint(lexer.PreviousIdentifier!.Kind))
                 {
                     ParseDouble(text, length, lexer);
                 }
@@ -83,7 +83,7 @@ namespace Uranium.CodeAnalysis.Lexing.LexerSupport
             {
                 lexer.diagnostics.ReportInvalidNumber(new(lexer.Start, length), text, typeof(double));
             }
-            else if (lexer.PreviousIdentifier is not null && !SyntaxFacts.IsVarKeyword(lexer.PreviousIdentifier.Kind))
+            else if (lexer.PreviousIdentifier is not null && lexer.PreviousIdentifier!.Kind != SyntaxKind.VarKeyword)
             {
                 if(lexer.PreviousIdentifier!.Kind is SyntaxKind.DoubleKeyword)
                 {
@@ -113,7 +113,7 @@ namespace Uranium.CodeAnalysis.Lexing.LexerSupport
             {
                 lexer.diagnostics.ReportInvalidNumber(new(lexer.Start, length), text, typeof(long));
             }
-            else if(lexer.PreviousIdentifier is not null && !SyntaxFacts.IsVarKeyword(lexer.PreviousIdentifier.Kind))
+            else if(lexer.PreviousIdentifier is not null && lexer.PreviousIdentifier!.Kind != SyntaxKind.VarKeyword)
             {
                 if(lexer.PreviousIdentifier!.Kind is SyntaxKind.IntKeyword)
                 {

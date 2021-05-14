@@ -1,9 +1,10 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 
-namespace Uranium.CodeAnalysis.Syntax.SyntaxFactsSupport
+namespace Uranium.CodeAnalysis.Syntax
 {
-    internal static class OperatorChecker
+    public static class OperatorChecker
     {
 
         private const int _notProperOperator = 0;
@@ -62,19 +63,19 @@ namespace Uranium.CodeAnalysis.Syntax.SyntaxFactsSupport
                 SyntaxKind.Plus or 
                 SyntaxKind.Minus or 
                 SyntaxKind.Bang or
-                SyntaxKind.Tilde=> _unaryValues,
+                SyntaxKind.Tilde => _unaryValues,
                 _ => _notProperOperator,
             };
  
         public static IEnumerable<SyntaxKind> GetUnaryOperators()
         {
-            var kinds = (SyntaxKind[])Enum.GetValues(typeof(SyntaxKind));
-            foreach(var kind in kinds)
+            var kinds = Enum.GetValues(typeof(SyntaxKind)) as SyntaxKind[];
+            for(int i = 0; i < kinds!.Length; i++) 
             {
-                if(GetUnaryOperatorPrecedence(kind) > _notProperOperator)
+                if(GetUnaryOperatorPrecedence(kinds[i]) > _notProperOperator)
                 {
-                    yield return kind;
-                }
+                    yield return kinds[i];
+                }    
             }
         }
 

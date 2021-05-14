@@ -23,7 +23,7 @@ namespace Uranium.CodeAnalysis.Parsing.ParserSupport
             if(parser.Current.Kind is SyntaxKind.IdentifierToken)
             {
                 //Declaring bool ahead of time so that we can use a single if statement
-                bool isCompound = SyntaxFacts.CheckForCompoundOperator(parser.Next);
+                bool isCompound = OperatorChecker.CheckForCompoundOperator(parser.Next);
                 
                 if(isCompound ||
                    parser.Next.Kind is SyntaxKind.Equals)
@@ -44,7 +44,7 @@ namespace Uranium.CodeAnalysis.Parsing.ParserSupport
 
                     if(isCompound)
                     {
-                        var soloOp = SyntaxFacts.GetSoloOperator(operatorToken);
+                        var soloOp = OperatorChecker.GetSoloOperator(operatorToken);
                         return new AssignmentExpressionSyntax(identifierToken, soloOp, right, true, operatorToken);
                     }
 
@@ -60,7 +60,7 @@ namespace Uranium.CodeAnalysis.Parsing.ParserSupport
         //This way tokens are always handled.
         private static void StopInfiniteLoops(Parser parser)
         {
-            if(SyntaxFacts.CheckForCompoundOperator(parser.Current))
+            if(OperatorChecker.CheckForCompoundOperator(parser.Current))
             {
                 parser._diagnostics.ReportInvalidCompoundOperator(parser.Current.Span, parser.Current);
                 parser.NextToken();

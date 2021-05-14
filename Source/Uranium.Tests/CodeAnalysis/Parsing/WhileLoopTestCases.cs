@@ -48,7 +48,7 @@ namespace Uranium.Tests.CodeAnalysis.Parsing
         public static string MakeWhileLoop(string identifier, SyntaxKind op, string otherIdentifier)
         {
             var text = $@"
-    while({identifier} {SyntaxFacts.GetText(op)} {otherIdentifier})
+    while({identifier} {TextChecker.GetText(op)} {otherIdentifier})
 " + @"
     {
         var wakljfglkwa = 100;
@@ -59,7 +59,7 @@ namespace Uranium.Tests.CodeAnalysis.Parsing
         public static string MakeWhileLoop(int identifier, SyntaxKind op, string otherIdentifier)
         {
             var text = $@"
-    while({identifier} {SyntaxFacts.GetText(op)} {otherIdentifier})
+    while({identifier} {TextChecker.GetText(op)} {otherIdentifier})
 " + @"
     {
         var akhflak = 100;
@@ -70,7 +70,7 @@ namespace Uranium.Tests.CodeAnalysis.Parsing
         public static string MakeWhileLoop(string identifier, SyntaxKind op, int otherIdentifier)
         {
             var text = $@"
-    while({identifier} {SyntaxFacts.GetText(op)} {otherIdentifier})
+    while({identifier} {TextChecker.GetText(op)} {otherIdentifier})
 " + @"
     {
         let aklfwjalkjkl = 20 + 1;
