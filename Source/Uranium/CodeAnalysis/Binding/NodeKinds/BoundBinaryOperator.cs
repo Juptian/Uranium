@@ -40,78 +40,78 @@ namespace Uranium.CodeAnalysis.Binding.NodeKinds
         public TypeSymbol RightType { get; }
         public TypeSymbol ResultType { get; }
         public bool IsCompound { get; }
+        private static readonly TypeSymbol[] _NumberTypeSymbols = new TypeSymbol[] { TypeSymbol.Bool, TypeSymbol.Int, TypeSymbol.Long, TypeSymbol.Float, TypeSymbol.Double };
 
-        //Just an numberTypeSymbolsay of potential operators
+
+        //Just an _NumberTypeSymbolsay of potential operators
         private readonly static BoundBinaryOperator[] _operators;
 
         private static IEnumerable<BoundBinaryOperator> CreateOperators()
         {
-            //Using a for loop here for the sake of readability
-            var numberTypeSymbols = new TypeSymbol[] { TypeSymbol.Bool, TypeSymbol.Int, TypeSymbol.Long, TypeSymbol.Float, TypeSymbol.Double };
-            for(int i = 0; i < numberTypeSymbols.Length; i++)
+                        for (int i = 0; i < _NumberTypeSymbols.Length; i++)
             {
-                for(int x = 0; x < numberTypeSymbols.Length; x++)
+                for (int x = 0; x < _NumberTypeSymbols.Length; x++)
                 {
-                    if(TypeChecker.IsFloatingPoint(numberTypeSymbols[i]) && numberTypeSymbols[x] == TypeSymbol.Long)
+                    if (TypeChecker.IsFloatingPoint(_NumberTypeSymbols[i]) && _NumberTypeSymbols[x] == TypeSymbol.Long)
                     {
                         continue;
                     }
-                    else if (numberTypeSymbols[i] == TypeSymbol.Long && x > 2)
+                    else if (_NumberTypeSymbols[i] == TypeSymbol.Long && x > 2)
                     {
                         break;
                     }
                     TypeSymbol resultTypeSymbol;
-                    if(TypeChecker.GetTypePriority(numberTypeSymbols[i]) > TypeChecker.GetTypePriority(numberTypeSymbols[x]))
+                    if (TypeChecker.GetTypePriority(_NumberTypeSymbols[i]) > TypeChecker.GetTypePriority(_NumberTypeSymbols[x]))
                     {
-                        resultTypeSymbol = numberTypeSymbols[i];
+                        resultTypeSymbol = _NumberTypeSymbols[i];
                     }
                     else
                     {
-                        resultTypeSymbol = numberTypeSymbols[x];
+                        resultTypeSymbol = _NumberTypeSymbols[x];
                     }
 
-                    yield return new(SyntaxKind.Plus, BoundBinaryOperatorKind.Addition, numberTypeSymbols[i], numberTypeSymbols[x], resultTypeSymbol);
-                    yield return new(SyntaxKind.Minus, BoundBinaryOperatorKind.Subtraction, numberTypeSymbols[i], numberTypeSymbols[x], resultTypeSymbol);
-                    yield return new(SyntaxKind.Multiply, BoundBinaryOperatorKind.Multiplication, numberTypeSymbols[i], numberTypeSymbols[x], resultTypeSymbol);
-                    yield return new(SyntaxKind.Divide, BoundBinaryOperatorKind.Division, numberTypeSymbols[i], numberTypeSymbols[x], resultTypeSymbol);
+                    yield return new(SyntaxKind.Plus, BoundBinaryOperatorKind.Addition, _NumberTypeSymbols[i], _NumberTypeSymbols[x], resultTypeSymbol);
+                    yield return new(SyntaxKind.Minus, BoundBinaryOperatorKind.Subtraction, _NumberTypeSymbols[i], _NumberTypeSymbols[x], resultTypeSymbol);
+                    yield return new(SyntaxKind.Multiply, BoundBinaryOperatorKind.Multiplication, _NumberTypeSymbols[i], _NumberTypeSymbols[x], resultTypeSymbol);
+                    yield return new(SyntaxKind.Divide, BoundBinaryOperatorKind.Division, _NumberTypeSymbols[i], _NumberTypeSymbols[x], resultTypeSymbol);
                     yield return new
                         (
-                            SyntaxKind.Pow, 
-                            BoundBinaryOperatorKind.Pow, 
-                            numberTypeSymbols[i], 
-                            numberTypeSymbols[x] == TypeSymbol.Long ? TypeSymbol.Int : numberTypeSymbols[x], 
+                            SyntaxKind.Pow,
+                            BoundBinaryOperatorKind.Pow,
+                            _NumberTypeSymbols[i],
+                            _NumberTypeSymbols[x] == TypeSymbol.Long ? TypeSymbol.Int : _NumberTypeSymbols[x],
                             resultTypeSymbol
                         );
-                    yield return new(SyntaxKind.DoubleEquals, BoundBinaryOperatorKind.LogicalEquals, numberTypeSymbols[i], numberTypeSymbols[x], TypeSymbol.Bool);
-                    yield return new(SyntaxKind.BangEquals, BoundBinaryOperatorKind.NotEquals, numberTypeSymbols[i], numberTypeSymbols[x], TypeSymbol.Bool);
+                    yield return new(SyntaxKind.DoubleEquals, BoundBinaryOperatorKind.LogicalEquals, _NumberTypeSymbols[i], _NumberTypeSymbols[x], TypeSymbol.Bool);
+                    yield return new(SyntaxKind.BangEquals, BoundBinaryOperatorKind.NotEquals, _NumberTypeSymbols[i], _NumberTypeSymbols[x], TypeSymbol.Bool);
 
-                    yield return new(SyntaxKind.DoubleEquals, BoundBinaryOperatorKind.LogicalEquals, numberTypeSymbols[i], TypeSymbol.Bool, TypeSymbol.Bool);
-                    yield return new(SyntaxKind.BangEquals, BoundBinaryOperatorKind.NotEquals, numberTypeSymbols[i], TypeSymbol.Bool, TypeSymbol.Bool);
-                    yield return new(SyntaxKind.DoubleEquals, BoundBinaryOperatorKind.LogicalEquals, TypeSymbol.Bool, numberTypeSymbols[i], TypeSymbol.Bool);
-                    yield return new(SyntaxKind.BangEquals, BoundBinaryOperatorKind.NotEquals, TypeSymbol.Bool, numberTypeSymbols[i], TypeSymbol.Bool);
+                    yield return new(SyntaxKind.DoubleEquals, BoundBinaryOperatorKind.LogicalEquals, _NumberTypeSymbols[i], TypeSymbol.Bool, TypeSymbol.Bool);
+                    yield return new(SyntaxKind.BangEquals, BoundBinaryOperatorKind.NotEquals, _NumberTypeSymbols[i], TypeSymbol.Bool, TypeSymbol.Bool);
+                    yield return new(SyntaxKind.DoubleEquals, BoundBinaryOperatorKind.LogicalEquals, TypeSymbol.Bool, _NumberTypeSymbols[i], TypeSymbol.Bool);
+                    yield return new(SyntaxKind.BangEquals, BoundBinaryOperatorKind.NotEquals, TypeSymbol.Bool, _NumberTypeSymbols[i], TypeSymbol.Bool);
 
-                    yield return new(SyntaxKind.PlusEquals, BoundBinaryOperatorKind.AdditionEquals, numberTypeSymbols[i], numberTypeSymbols[x], true);
-                    yield return new(SyntaxKind.MinusEquals, BoundBinaryOperatorKind.SubtractionEquals, numberTypeSymbols[i], numberTypeSymbols[x], true);
-                    yield return new(SyntaxKind.MultiplyEquals, BoundBinaryOperatorKind.MultiplicationEquals, numberTypeSymbols[i], numberTypeSymbols[x], true);
-                    yield return new(SyntaxKind.DivideEquals, BoundBinaryOperatorKind.DivisionEquals, numberTypeSymbols[i], numberTypeSymbols[x], true);
+                    yield return new(SyntaxKind.PlusEquals, BoundBinaryOperatorKind.AdditionEquals, _NumberTypeSymbols[i], _NumberTypeSymbols[x], true);
+                    yield return new(SyntaxKind.MinusEquals, BoundBinaryOperatorKind.SubtractionEquals, _NumberTypeSymbols[i], _NumberTypeSymbols[x], true);
+                    yield return new(SyntaxKind.MultiplyEquals, BoundBinaryOperatorKind.MultiplicationEquals, _NumberTypeSymbols[i], _NumberTypeSymbols[x], true);
+                    yield return new(SyntaxKind.DivideEquals, BoundBinaryOperatorKind.DivisionEquals, _NumberTypeSymbols[i], _NumberTypeSymbols[x], true);
 
-                    yield return new(SyntaxKind.PlusPlus, BoundBinaryOperatorKind.AdditionAddition, numberTypeSymbols[i], true);
-                    yield return new(SyntaxKind.MinusMinus, BoundBinaryOperatorKind.SubtractionSubtraction, numberTypeSymbols[i], true);
+                    yield return new(SyntaxKind.PlusPlus, BoundBinaryOperatorKind.AdditionAddition, _NumberTypeSymbols[i], true);
+                    yield return new(SyntaxKind.MinusMinus, BoundBinaryOperatorKind.SubtractionSubtraction, _NumberTypeSymbols[i], true);
 
-                    yield return new(SyntaxKind.LesserThan, BoundBinaryOperatorKind.LesserThan, numberTypeSymbols[i], numberTypeSymbols[x], TypeSymbol.Bool);
-                    yield return new(SyntaxKind.LesserThanEquals, BoundBinaryOperatorKind.LesserThanEquals, numberTypeSymbols[i], numberTypeSymbols[x], TypeSymbol.Bool);
+                    yield return new(SyntaxKind.LesserThan, BoundBinaryOperatorKind.LesserThan, _NumberTypeSymbols[i], _NumberTypeSymbols[x], TypeSymbol.Bool);
+                    yield return new(SyntaxKind.LesserThanEquals, BoundBinaryOperatorKind.LesserThanEquals, _NumberTypeSymbols[i], _NumberTypeSymbols[x], TypeSymbol.Bool);
 
-                    yield return new(SyntaxKind.GreaterThan, BoundBinaryOperatorKind.GreaterThan, numberTypeSymbols[i], numberTypeSymbols[x], TypeSymbol.Bool);
-                    yield return new(SyntaxKind.GreaterThanEquals, BoundBinaryOperatorKind.GreaterThanEquals, numberTypeSymbols[i], numberTypeSymbols[x], TypeSymbol.Bool);      
-                    yield return new(SyntaxKind.DoublePipe, BoundBinaryOperatorKind.LogicalOR, numberTypeSymbols[i], numberTypeSymbols[x], TypeSymbol.Bool);
-                    yield return new(SyntaxKind.DoubleAmpersand, BoundBinaryOperatorKind.LogicalAND, numberTypeSymbols[i], numberTypeSymbols[x], TypeSymbol.Bool);
+                    yield return new(SyntaxKind.GreaterThan, BoundBinaryOperatorKind.GreaterThan, _NumberTypeSymbols[i], _NumberTypeSymbols[x], TypeSymbol.Bool);
+                    yield return new(SyntaxKind.GreaterThanEquals, BoundBinaryOperatorKind.GreaterThanEquals, _NumberTypeSymbols[i], _NumberTypeSymbols[x], TypeSymbol.Bool);
+                    yield return new(SyntaxKind.DoublePipe, BoundBinaryOperatorKind.LogicalOR, _NumberTypeSymbols[i], _NumberTypeSymbols[x], TypeSymbol.Bool);
+                    yield return new(SyntaxKind.DoubleAmpersand, BoundBinaryOperatorKind.LogicalAND, _NumberTypeSymbols[i], _NumberTypeSymbols[x], TypeSymbol.Bool);
                 }
-                yield return new(SyntaxKind.DoubleEquals, BoundBinaryOperatorKind.LogicalEquals, numberTypeSymbols[i], TypeSymbol.Bool, TypeSymbol.Bool);
-                yield return new(SyntaxKind.BangEquals, BoundBinaryOperatorKind.NotEquals, numberTypeSymbols[i], TypeSymbol.Bool, TypeSymbol.Bool);
+                yield return new(SyntaxKind.DoubleEquals, BoundBinaryOperatorKind.LogicalEquals, _NumberTypeSymbols[i], TypeSymbol.Bool, TypeSymbol.Bool);
+                yield return new(SyntaxKind.BangEquals, BoundBinaryOperatorKind.NotEquals, _NumberTypeSymbols[i], TypeSymbol.Bool, TypeSymbol.Bool);
 
-                yield return new(SyntaxKind.Ampersand, BoundBinaryOperatorKind.BitwiseAND, numberTypeSymbols[i], TypeSymbol.Bool);
-                yield return new(SyntaxKind.Pipe, BoundBinaryOperatorKind.BitwiseOR, numberTypeSymbols[i], TypeSymbol.Bool);
-                yield return new(SyntaxKind.Hat, BoundBinaryOperatorKind.BitwiseXOR, numberTypeSymbols[i]);
+                yield return new(SyntaxKind.Ampersand, BoundBinaryOperatorKind.BitwiseAND, _NumberTypeSymbols[i], TypeSymbol.Bool);
+                yield return new(SyntaxKind.Pipe, BoundBinaryOperatorKind.BitwiseOR, _NumberTypeSymbols[i], TypeSymbol.Bool);
+                yield return new(SyntaxKind.Hat, BoundBinaryOperatorKind.BitwiseXOR, _NumberTypeSymbols[i]);
             }
             //These are down here as they do not need to be returned every iteration
             //They're always going to be the same things, so might as well
@@ -122,6 +122,20 @@ namespace Uranium.CodeAnalysis.Binding.NodeKinds
 
             yield return new(SyntaxKind.DoubleEquals, BoundBinaryOperatorKind.LogicalEquals, TypeSymbol.Bool);
             yield return new(SyntaxKind.BangEquals, BoundBinaryOperatorKind.NotEquals, TypeSymbol.Bool);
+            foreach (var op in BindStringOperators()) 
+            {
+                yield return op;
+            }
+        }
+
+        private static IEnumerable<BoundBinaryOperator> BindStringOperators() 
+        {
+            for (int i = 0; i < _NumberTypeSymbols.Length; i++) 
+            {
+                yield return new(SyntaxKind.Plus, BoundBinaryOperatorKind.Addition, TypeSymbol.String, _NumberTypeSymbols[i], TypeSymbol.String);
+            }
+            yield return new(SyntaxKind.Plus, BoundBinaryOperatorKind.Addition, TypeSymbol.String);
+            yield return new(SyntaxKind.Plus, BoundBinaryOperatorKind.Addition, TypeSymbol.String, TypeSymbol.Char, TypeSymbol.String);
         }
 
         public static BoundBinaryOperator? Bind(SyntaxKind syntaxKind, TypeSymbol leftTypeSymbol, TypeSymbol rightTypeSymbol)

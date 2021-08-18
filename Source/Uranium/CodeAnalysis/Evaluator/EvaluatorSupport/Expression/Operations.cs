@@ -2,7 +2,7 @@
 using System.Numerics;
 
 #pragma warning disable IDE0038 // Use pattern matching
-#pragma warning disable IDE0066 // Convert switch statement to expressio
+#pragma warning disable IDE0066 // Convert switch statement to expression
 // Every time I've tried I've failed for an unkown reason
 namespace Uranium.CodeAnalysis.Syntax.EvaluatorSupport
 {
@@ -12,6 +12,7 @@ namespace Uranium.CodeAnalysis.Syntax.EvaluatorSupport
         private const int floatValue = 2;
         private const int longValue = 3;
         private const int doubleValue = 4;
+        private const int stringValue = 5;
         public static object Addition(object left, object right)
         {
             ConvertBoolToInt(ref left, ref right);
@@ -29,6 +30,8 @@ namespace Uranium.CodeAnalysis.Syntax.EvaluatorSupport
                     return (long)left + (long)right;
                 case doubleValue when rightPrio == leftPrio:
                     return (double)left + (double)right;
+                case stringValue when rightPrio == leftPrio:
+                    return (string)left + (string)right;
 
                 case intValue when rightPrio == floatValue:
                     return (int)((int)left + (float)right);
@@ -49,6 +52,17 @@ namespace Uranium.CodeAnalysis.Syntax.EvaluatorSupport
                     return (double)((double)left + (float)right);
                 case doubleValue when rightPrio == intValue:
                     return (double)((double)left + (int)right);
+
+                case stringValue when rightPrio == intValue:
+                    return (string)(left) + ((int)(right)).ToString();
+                case stringValue when rightPrio == floatValue:
+                    return (string)(left) + ((float)(right)).ToString();
+                case stringValue when rightPrio == longValue:
+                    return (string)(left) + ((long)(right)).ToString();
+                case stringValue when rightPrio == doubleValue:
+                    return (string)(left) + ((double)(right)).ToString();
+
+
                 default:
                     throw new($"Invalid type {left.GetType().ToString()[7..]} for binary operand with {right.GetType().ToString()[7..]}");
             }

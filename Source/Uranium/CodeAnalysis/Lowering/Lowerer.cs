@@ -142,6 +142,24 @@ namespace Uranium.CodeAnalysis.Lowering
 
             var gotoTrue = new BoundConditionalGotoStatement(continueLabel, node.Condition, false);
 
+            if(node.Condition is BoundLiteralExpression expression && expression.Value is bool b && b)
+            {
+                var gotoContinue = new BoundGotoStatement(continueLabel);
+                var trueResult = new BoundBlockStatement
+                (
+                    ImmutableArray.Create
+                    (
+                        continueLabelStatement,
+                        node.Body,
+                        checkLabelStatement,
+                        gotoContinue,
+                        endLabelStatement
+                    )
+                );
+                return RewriteStatement(trueResult);
+            }
+
+
             var result = new BoundBlockStatement
                 (
                     ImmutableArray.Create

@@ -130,10 +130,6 @@ namespace Uranium.CodeAnalysis.Lexing.LexerSupport
                 {
                     lexer.CurrentValue = (int)value;
                 }
-                else if(value <= uint.MaxValue && value >= uint.MinValue)
-                {
-                    lexer.CurrentValue = (uint)value;
-                }
                 else
                 {
                     lexer.CurrentValue = value;

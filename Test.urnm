@@ -1,9 +1,5 @@
 ﻿{
-var a = 10;
-	if(a)
-	{}
-	else
-	{
-		a = 100;
-	}
+	string s = "foobar";
+	double d = 10.10;
+	string b = "hello" + " world!";
 }

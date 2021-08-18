@@ -43,6 +43,7 @@ namespace Uranium.CodeAnalysis.Syntax
                 float => 2,
                 long => 3,
                 double => 4,
+                string => 5,
                 _ => 0
             };
         }
@@ -67,6 +68,11 @@ namespace Uranium.CodeAnalysis.Syntax
             if(symbol == TypeSymbol.Double)
             {
                 return 4;
+            }
+
+            if (symbol == TypeSymbol.String) 
+            {
+                return 5;
             }
             return 0;
         }
