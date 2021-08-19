@@ -188,11 +188,31 @@ namespace Uranium.Tests.CodeAnalysis.Expression
         [InlineData(@"
 for(int i = 10; i; i--)
 {}", 0) ]
+        [InlineData(@"
+{
+    if(10)
+    {
+        int i = 10;
+    }
+}", 10)]
+
         [InlineData("string s = \"Abc123\";", "Abc123")]
         [InlineData("char ch = '1';", '1')]
         [InlineData("{ var a = 10; { var b = a; } }", 10)]
         [InlineData("4**8", fourPowEight)]
         [InlineData("4**9", 262144)]
+        [InlineData("{ double d = 10; double b = double(d); }", (double)(10))]
+        [InlineData("{ bool b = true; int i = b; }", 1)]
+        [InlineData("{ int a = 10; string s = string(a); }", "10")]
+        [InlineData("{ int i = 10; long l = long(i); }", (long)(10))]
+        [InlineData("{ string i = string(10); long l = long(i); }", (long)(10))]
+        [InlineData("{ float f = 10.1; double d = f; }", (double)(10.1f))]
+        [InlineData("{ float f = 10; int i = int(f); }", 10)]
+        [InlineData("{ double d = 10; int a = int(d); }", 10)]
+        [InlineData("{ char ch = 'a'; string s = ch; }", "a")]
+        [InlineData("{ char ch = 'a'; int b = ch; }", 97)]
+        [InlineData("{ print(string(10)); }", null)]
+        [InlineData("{ double d = 10; println(string(d)) }", null)]
         [MemberData(nameof(TestCases))]
         public void EvaluatorTestCases(string text, object expectedResult)
         {
@@ -210,8 +230,6 @@ for(int i = 10; i; i--)
         }
         public static IEnumerable<object[]> TestCases()
         {
-            //Low numbers
-            //Unrolled for effieciency sake
             for (int i = 1; i <= 50; i++)
             {
                 yield return new object[] { $"{i} + {i}", i << 1 };

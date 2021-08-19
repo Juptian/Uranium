@@ -3,27 +3,33 @@ codecov:
 
 coverage:
   precision: 2
-  range: "50...100"
+  range: "60...100"
   round: down
   status:
     project:
       default:
-        target: auto
+        target: 75
         threshold: 15%
         base: auto
         paths: 
           - "Uranium"
         if_ci_failed: ignore #success, failure, error, ignore
-        informational: false
+        informational: true
         only_pulls: false
         fixes:
           - "before/::after/"  # move path   e.g., "before/path" => "after/path"
           - "::after/"         # move root   e.g., "path/" => "after/path/"
           - "before/::"        # reduce root e.g., "before/path/" => "path/"
-        ignore:
-          - "Source/Uranium/CodeAnalysis/Syntax/SyntaxFactsSupport/*"
+
+        if_not_found: failure
+ignore:
+  - "/Source/Uranium/CodeAnalysis/Syntax/SyntaxFacts/**/*.cs"
+  - "/Source/Uranium/CodeAnalysis/Evaluator/EvaluatorSupport/Expression/**/*.cs"
 
 comment:
   layout: "reach,diff,flags,files,footer"
-  behavior: default
-  require_changes: no
+  behavior: new
+  require_changes: false
+  require_base: false
+  require_head: false
+  

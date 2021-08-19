@@ -11,13 +11,13 @@ namespace Uranium.CodeAnalysis.Syntax.EvaluatorSupport
             switch (u.Op.Kind)
             {
                 case BoundUnaryOperatorKind.Identity:
-                    return (int)operand;
+                    return (int)operand!;
                 case BoundUnaryOperatorKind.Negation:
-                    return -(int)operand;
+                    return -(int)operand!;
                 case BoundUnaryOperatorKind.LogicalNegation:
-                    return !(bool)operand;
+                    return !(bool)operand!;
                 case BoundUnaryOperatorKind.BitwiseNegation:
-                    return ~(int)operand;
+                    return ~(int)operand!;
             }
             Console.Error.WriteLine($"Unexpected unary operator {u.Kind}");
             return new object();

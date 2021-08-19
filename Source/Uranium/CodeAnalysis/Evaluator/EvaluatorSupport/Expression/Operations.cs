@@ -2,8 +2,14 @@
 using System.Numerics;
 
 #pragma warning disable IDE0038 // Use pattern matching
-#pragma warning disable IDE0066 // Convert switch statement to expressio
+#pragma warning disable IDE0066 // Convert switch statement to expression
 // Every time I've tried I've failed for an unkown reason
+
+
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
+#pragma warning disable CS8605 // Unboxing a possibly null value.
+#pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type.
+// The values literally cannot be null
 namespace Uranium.CodeAnalysis.Syntax.EvaluatorSupport
 {
     internal static class Operations
@@ -12,9 +18,12 @@ namespace Uranium.CodeAnalysis.Syntax.EvaluatorSupport
         private const int floatValue = 2;
         private const int longValue = 3;
         private const int doubleValue = 4;
-        public static object Addition(object left, object right)
+        private const int stringValue = 5;
+        public static object Addition(object? left, object? right)
         {
-            ConvertBoolToInt(ref left, ref right);
+            if(left is null) { left = 0; }
+            if(right is null) { right = 0; }
+            ConversionEvaluator.ConvertBoolToInt(ref left, ref right);
 
             var leftPrio = TypeChecker.GetTypePriority(left);
             var rightPrio = TypeChecker.GetTypePriority(right);
@@ -29,6 +38,8 @@ namespace Uranium.CodeAnalysis.Syntax.EvaluatorSupport
                     return (long)left + (long)right;
                 case doubleValue when rightPrio == leftPrio:
                     return (double)left + (double)right;
+                case stringValue when rightPrio == leftPrio:
+                    return (string)left + (string)right;
 
                 case intValue when rightPrio == floatValue:
                     return (int)((int)left + (float)right);
@@ -49,14 +60,28 @@ namespace Uranium.CodeAnalysis.Syntax.EvaluatorSupport
                     return (double)((double)left + (float)right);
                 case doubleValue when rightPrio == intValue:
                     return (double)((double)left + (int)right);
+
+                case stringValue when rightPrio == intValue:
+                    return (string)(left) + ((int)(right)).ToString();
+                case stringValue when rightPrio == floatValue:
+                    return (string)(left) + ((float)(right)).ToString();
+                case stringValue when rightPrio == longValue:
+                    return (string)(left) + ((long)(right)).ToString();
+                case stringValue when rightPrio == doubleValue:
+                    return (string)(left) + ((double)(right)).ToString();
+
+
                 default:
                     throw new($"Invalid type {left.GetType().ToString()[7..]} for binary operand with {right.GetType().ToString()[7..]}");
             }
             
         }
-        public static object Subtraction(object left, object right)
+        public static object Subtraction(object? left, object? right)
         {
-            ConvertBoolToInt(ref left, ref right);
+            if(left is null) { left = 0; }
+            if(right is null) { right = 0; }
+
+            ConversionEvaluator.ConvertBoolToInt(ref left, ref right);
 
             var leftPrio = TypeChecker.GetTypePriority(left);
             var rightPrio = TypeChecker.GetTypePriority(right);
@@ -96,9 +121,12 @@ namespace Uranium.CodeAnalysis.Syntax.EvaluatorSupport
             }
         }
   
-        public static object Multiplication(object left, object right)
+        public static object Multiplication(object? left, object? right)
         {
-            ConvertBoolToInt(ref left, ref right);
+            if(left is null) { left = 0; }
+            if(right is null) { right = 0; }
+
+            ConversionEvaluator.ConvertBoolToInt(ref left, ref right);
 
             var leftPrio = TypeChecker.GetTypePriority(left);
             var rightPrio = TypeChecker.GetTypePriority(right);
@@ -137,9 +165,12 @@ namespace Uranium.CodeAnalysis.Syntax.EvaluatorSupport
             }
         }
 
-        public static object Division(object left, object right)
+        public static object Division(object? left, object? right)
         {
-            ConvertBoolToInt(ref left, ref right);
+            if(left is null) { left = 0; }
+            if(right is null) { right = 0; }
+
+            ConversionEvaluator.ConvertBoolToInt(ref left, ref right);
 
             var leftPrio = TypeChecker.GetTypePriority(left);
             var rightPrio = TypeChecker.GetTypePriority(right);
@@ -179,9 +210,12 @@ namespace Uranium.CodeAnalysis.Syntax.EvaluatorSupport
             }
          
         }
-        public static bool LesserThan(object left, object right)
+        public static bool LesserThan(object? left, object? right)
         {
-            ConvertBoolToInt(ref left, ref right);
+            if(left is null) { left = 0; }
+            if(right is null) { right = 0; }
+
+            ConversionEvaluator.ConvertBoolToInt(ref left, ref right);
 
             var leftPrio = TypeChecker.GetTypePriority(left);
             var rightPrio = TypeChecker.GetTypePriority(right);
@@ -220,9 +254,12 @@ namespace Uranium.CodeAnalysis.Syntax.EvaluatorSupport
             }
         }
   
-        public static bool LesserThanEquals(object left, object right)
+        public static bool LesserThanEquals(object? left, object? right)
         {
-            ConvertBoolToInt(ref left, ref right);
+            if(left is null) { left = 0; }
+            if(right is null) { right = 0; }
+
+            ConversionEvaluator.ConvertBoolToInt(ref left, ref right);
 
             var leftPrio = TypeChecker.GetTypePriority(left);
             var rightPrio = TypeChecker.GetTypePriority(right);
@@ -261,9 +298,12 @@ namespace Uranium.CodeAnalysis.Syntax.EvaluatorSupport
             }
         }
 
-        public static bool GreaterThan(object left, object right)
+        public static bool GreaterThan(object? left, object? right)
         {
-            ConvertBoolToInt(ref left, ref right);
+            if(left is null) { left = 0; }
+            if(right is null) { right = 0; }
+
+            ConversionEvaluator.ConvertBoolToInt(ref left, ref right);
 
             var leftPrio = TypeChecker.GetTypePriority(left);
             var rightPrio = TypeChecker.GetTypePriority(right);
@@ -301,9 +341,12 @@ namespace Uranium.CodeAnalysis.Syntax.EvaluatorSupport
                     throw new($"Invalid type {left.GetType().ToString()[7..]} for binary operand with {right.GetType().ToString()[7..]}");
             }
         }
-        public static bool GreaterThanEquals(object left, object right)
+        public static bool GreaterThanEquals(object? left, object? right)
         {
-            ConvertBoolToInt(ref left, ref right);
+            if(left is null) { left = 0; }
+            if(right is null) { right = 0; }
+
+            ConversionEvaluator.ConvertBoolToInt(ref left, ref right);
 
             var leftPrio = TypeChecker.GetTypePriority(left);
             var rightPrio = TypeChecker.GetTypePriority(right);
@@ -342,9 +385,12 @@ namespace Uranium.CodeAnalysis.Syntax.EvaluatorSupport
             }
         }
   
-        public static object Pow(object left, object right)
+        public static object Pow(object? left, object? right)
         {
-            ConvertBoolToInt(ref left, ref right);
+            if(left is null) { left = 0; }
+            if(right is null) { right = 0; }
+
+            ConversionEvaluator.ConvertBoolToInt(ref left, ref right);
             var leftPrio = TypeChecker.GetTypePriority(left);
             var rightPrio = TypeChecker.GetTypePriority(right);
             switch(leftPrio)
@@ -382,8 +428,11 @@ namespace Uranium.CodeAnalysis.Syntax.EvaluatorSupport
             }
         }
         
-        public static object BitwiseOR(object left, object right)
+        public static object BitwiseOR(object? left, object? right)
         {
+            if(left is null) { left = 0; }
+            if(right is null) { right = 0; }
+
             if(left is bool)
             {
                 return (bool)left | (bool)right;
@@ -391,8 +440,11 @@ namespace Uranium.CodeAnalysis.Syntax.EvaluatorSupport
             return (int)left | (int)right;
         }
 
-        public static object BitwiseAND(object left, object right)
+        public static object BitwiseAND(object? left, object? right)
         {
+            if(left is null) { left = 0; }
+            if(right is null) { right = 0; }
+
             if(left is bool || right is bool)
             {
                 return (bool)left & (bool)right;
@@ -400,28 +452,16 @@ namespace Uranium.CodeAnalysis.Syntax.EvaluatorSupport
             return (int)left & (int)right;
         }
 
-        public static object BitwiseXOR(object left, object right)
+        public static object BitwiseXOR(object? left, object? right)
         {
+            if(left is null) { left = 0; }
+            if(right is null) { right = 0; }
+
             if(left is bool || right is bool)
             {
                 return (bool)left ^ (bool)right;
             }
             return (int)left ^ (int)right;
-        }
-        public static void ConvertBoolToInt(ref object left, ref object right)
-        {
-            int newRight = -1;
-            int newLeft = -1;
-            if (right is bool)
-            {
-                newRight = (bool)right ? 1 : 0;
-            }
-            if(left is bool)
-            {
-                newLeft = (bool)left ? 1 : 0;
-            }
-            left = newLeft >= 0 ? newLeft : left;
-            right = newRight >= 0 ? newRight : right;
         }
     }
 }

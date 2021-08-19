@@ -1,9 +1,4 @@
 ﻿{
-var a = 10;
-	if(a)
-	{}
-	else
-	{
-		a = 100;
-	}
+	int b = false;
+	print(string(b));
 }

@@ -6,6 +6,7 @@ using Uranium.CodeAnalysis.Binding.Statements;
 using Uranium.CodeAnalysis.Text;
 using Uranium.CodeAnalysis.Syntax.EvaluatorSupport;
 using Uranium.CodeAnalysis.Symbols;
+using Uranium.CodeAnalysis.Binding.NodeKinds;
 
 namespace Uranium.CodeAnalysis.Syntax
 {
@@ -29,7 +30,7 @@ namespace Uranium.CodeAnalysis.Syntax
             Variables = variables;
         }
 
-        public object Evaluate()
+        public object? Evaluate()
         {
             for(int i = 0; i < _root.Statements.Length; i++)
             {
@@ -44,21 +45,22 @@ namespace Uranium.CodeAnalysis.Syntax
                 EvaluateStatement(_root.Statements[_index]);
             }
 
-            return LastValue!;
+            return LastValue;
         }
 
         public void EvaluateStatement(BoundStatement statement)
         {
             switch (statement.Kind)
             {
-                case BoundNodeKind.ExpressionStatement:
+                case BoundNodeKind.ExpressionStatement or 
+                     BoundNodeKind.CallExpression or
+                     BoundNodeKind.ConversionExpression:
                     EvaluateExpressionStatement((BoundExpressionStatement)statement);
-
                     return;
+
                 case BoundNodeKind.VariableDeclaration:
                     VariableDeclarationEvaluator.Evaluate((BoundVariableDeclaration)statement, this);
                     return;
-
                 case BoundNodeKind.LabelStatement:
                     return;
 
@@ -72,7 +74,7 @@ namespace Uranium.CodeAnalysis.Syntax
                     var condition = ExpressionEvaluator.Evaluate(cgs.Condition, this);
                     if(condition is not bool b)
                     {
-                        b = BinaryExpressionEvaluator.ConvertToBool(condition);
+                        b = ConversionEvaluator.ConvertToBool(condition ?? 0);
                     }
                     if(b && !cgs.JumpIfFalse ||
                        !b && cgs.JumpIfFalse)

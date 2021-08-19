@@ -5,8 +5,10 @@ namespace Uranium.CodeAnalysis.Syntax.EvaluatorSupport
     internal static class EqualityEvaluator
     {
 
-        public static bool LeftEqualsRight(object left, object right)
+        public static bool LeftEqualsRight(object? left, object? right)
         {
+            if(left is null) { throw new ArgumentNullException("Left hand of operand may not be null"); }
+            if(right is null) { throw new ArgumentNullException("Right hand of operand may not be null"); }
             if (right is bool rightAsBool && TryGetNumber(left, out var leftAsDouble))
                 return rightAsBool == (leftAsDouble != 0.0);
 

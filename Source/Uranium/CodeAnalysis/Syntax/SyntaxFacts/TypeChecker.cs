@@ -6,6 +6,12 @@ namespace Uranium.CodeAnalysis.Syntax
 {
     public static class TypeChecker
     {
+        public static bool IsTypeKeyword(SyntaxToken token)
+            => IsTypeKeyword(token.Kind);
+
+        public static bool IsTypeKeyword(SyntaxKind kind)
+            => IsFloatingPoint(kind) || IsInteger(kind) || IsCharOrString(kind);
+
         public static bool IsNumber(object obj)
             => obj is int or long or float or double;
 
@@ -35,7 +41,48 @@ namespace Uranium.CodeAnalysis.Syntax
         public static bool IsVarKeyword(this SyntaxKind kind)
             => kind == SyntaxKind.VarKeyword;
 
-        public static int GetTypePriority(object obj)
+        public static bool IsCharOrString(SyntaxKind kind)
+            => kind == SyntaxKind.StringKeyword || kind == SyntaxKind.CharKeyword;
+
+        public static Type GetType(TypeSymbol type)
+        {
+            if(type == TypeSymbol.Int)
+            {
+                return typeof(int);
+            }
+            if(type == TypeSymbol.Bool)
+            {
+                return typeof(bool);
+            }
+
+            if(type == TypeSymbol.Float)
+            {
+                return typeof(float);
+            }
+
+            if(type == TypeSymbol.Long)
+            {
+                return typeof(long);
+            }
+
+            if(type == TypeSymbol.Double)
+            {
+                return typeof(double);
+            }
+
+            if(type == TypeSymbol.String)
+            {
+                return typeof(string);
+            }
+
+            if(type == TypeSymbol.Char)
+            {
+                return typeof(char);
+            }
+            return typeof(void);
+        }
+
+        public static int GetTypePriority(object? obj)
         {
             return obj switch
             {
@@ -43,6 +90,7 @@ namespace Uranium.CodeAnalysis.Syntax
                 float => 2,
                 long => 3,
                 double => 4,
+                string => 5,
                 _ => 0
             };
         }
@@ -67,6 +115,11 @@ namespace Uranium.CodeAnalysis.Syntax
             if(symbol == TypeSymbol.Double)
             {
                 return 4;
+            }
+
+            if (symbol == TypeSymbol.String) 
+            {
+                return 5;
             }
             return 0;
         }

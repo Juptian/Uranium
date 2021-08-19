@@ -5,11 +5,12 @@ using System.Linq;
 using Uranium.CodeAnalysis.Syntax;
 using Uranium.CodeAnalysis.Syntax.Expression;
 using Uranium.CodeAnalysis.Syntax.Statement;
-using Uranium.CodeAnalysis.Text;
 using Uranium.Logging;
 using Uranium.CodeAnalysis.Binding.NodeKinds;
 using Uranium.CodeAnalysis.Binding.Statements;
+using Uranium.CodeAnalysis.Binding.Converting;
 using Uranium.CodeAnalysis.Symbols;
+using Uranium.CodeAnalysis.Parsing.ParserSupport.Expression;
 
 namespace Uranium.CodeAnalysis.Binding
 {
@@ -63,8 +64,8 @@ namespace Uranium.CodeAnalysis.Binding
                 previous = previous.Previous ?? null;
             }
 
-            BoundScope? parent = null;
 
+            var parent = CreateRootScope();
             //Removing the items from stack, while also declaring variables
             while (stack.Count > 0)
             {
@@ -72,12 +73,28 @@ namespace Uranium.CodeAnalysis.Binding
                 var scope = new BoundScope(parent);
                 for(int i = 0; i < previous.Variables.Length; i++)
                 {
-                    scope.TryDeclare(previous.Variables[i]);
+                    scope.TryDeclareVariable(previous.Variables[i]);
                 }
 
                 parent = scope;
             }
             return parent;
+        }
+
+        private static BoundScope CreateRootScope()
+        {
+            var result = new BoundScope(null);
+                
+            foreach(var f in BuiltInFunctions.GetAll())
+            {
+                if(f is null)
+                {
+                    continue;
+                }
+                result.TryDeclareFunction(f);
+            }
+
+            return result;
         }
 
         //Binding the Statement 
@@ -99,7 +116,18 @@ namespace Uranium.CodeAnalysis.Binding
 
         
         //Binding the expression
-        private BoundExpression BindExpression(ExpressionSyntax syntax)
+        private BoundExpression BindExpression(ExpressionSyntax syntax, bool canBeVoid = false)
+        {
+            var result = BindExpressionInternal(syntax);
+            if(!canBeVoid && result.Type == TypeSymbol.Void)
+            {
+                _diagnostics.ReportExpressionMustHaveValue(syntax.Span);
+                return new BoundErrorExpression();
+            }
+            return result;
+        }
+
+        private BoundExpression BindExpressionInternal(ExpressionSyntax syntax)
             => syntax.Kind switch // Calling the correct function based off of the syntax kind and returning it's value.
             {
                 //Base expressions
@@ -111,8 +139,10 @@ namespace Uranium.CodeAnalysis.Binding
                 //Name + Assignments
                 SyntaxKind.NameExpression => BindNameExpression( (NameExpressionSyntax)syntax ),
                 SyntaxKind.AssignmentExpression => BindAssignmentExpression( (AssignmentExpressionSyntax)syntax ),
+                SyntaxKind.CallExpression => BindCallExpression( (CallExpressionSyntax)syntax),
                 _ => throw new($"Unexpected syntax {syntax.Kind}"),
             };
+
 
         //Scoping
         private BoundStatement BindBlockStatement(BlockStatementSyntax syntax)
@@ -138,7 +168,7 @@ namespace Uranium.CodeAnalysis.Binding
         //Expressions
         private BoundStatement BindExpressionStatement(ExpressionStatementSyntax syntax)
         {
-            var expression = BindExpression(syntax.Expression);
+            var expression = BindExpression(syntax.Expression, true);
             return new BoundExpressionStatement(expression);
         }
 
@@ -264,7 +294,7 @@ namespace Uranium.CodeAnalysis.Binding
                 return new BoundErrorExpression();
             }
             //Trying to get the value, if it returns then great, if not we report it
-            if (!_scope.TryLookup(name, out var variable))
+            if (!_scope.TryLookupVariable(name, out var variable))
             {
                 _diagnostics.ReportUndefinedName(syntax.IdentifierToken.Span, name ?? "name is null");
                 return new BoundErrorExpression();
@@ -277,7 +307,7 @@ namespace Uranium.CodeAnalysis.Binding
             var name = syntax.IdentifierToken.Text;
             var boundExpression = BindExpression(syntax.Expression);
 
-            if(!_scope.TryLookup(name, out var variable))
+            if(!_scope.TryLookupVariable(name, out var variable))
             {
                 //Null check on the name so that we can find the object
                 _diagnostics.ReportUndefinedName(syntax.IdentifierToken.Span, name);
@@ -291,13 +321,66 @@ namespace Uranium.CodeAnalysis.Binding
             return new BoundAssignmentExpression(variable, boundExpression, syntax.CompoundOperator, syntax.IsCompound);
         }
 
+        private BoundExpression BindCallExpression(CallExpressionSyntax syntax)
+        {
+            if(syntax.Arguments.Count == 1 && LookupType(syntax.Identifier.Text) is TypeSymbol t)
+            {
+                return BindConversion(t, syntax.Arguments[0]);
+            }
+
+            var arguments = ImmutableArray.CreateBuilder<BoundExpression>();
+
+            foreach(var arg in syntax.Arguments)
+            {
+                var boundArg = BindExpression(arg);
+                arguments.Add(boundArg);
+            }
+
+            if(!_scope.TryLookupFunction(syntax.Identifier.Text, out var identifiedFunction))
+            {
+                _diagnostics.ReportUndefinedFunction(syntax.Identifier.Span, syntax.Identifier.Text);
+                return new BoundErrorExpression();
+            }
+
+            if(syntax.Arguments.Count != identifiedFunction.Parameters.Length)
+            {
+                _diagnostics.ReportWrongArgumentCount(syntax.Arguments.Count, identifiedFunction.Parameters.Length, syntax.Identifier.Text, syntax.Identifier.Span);
+                return new BoundErrorExpression();
+            }
+
+            for(var i = 0; i < syntax.Arguments.Count; i++)
+            {
+                var argument = arguments[i];
+                var parameter = identifiedFunction.Parameters[i];
+                
+                if(argument.Type != parameter.Type)
+                {
+                    _diagnostics.ReportInvalidParameter(syntax.Span, identifiedFunction.Name, parameter.Name, parameter.Type, argument.Type);
+                    return new BoundErrorExpression();
+                }
+            }
+            return new BoundCallExpression(identifiedFunction, arguments.ToImmutable());
+        }
+
+        private BoundExpression BindConversion(TypeSymbol type, ExpressionSyntax syntax)
+        {
+            var expression = BindExpression(syntax);
+            var conversion = Conversion.Classify(expression.Type, type);
+            if(!conversion.Exists)
+            {
+                _diagnostics.ReportCannotConvert(syntax.Span, expression.Type, type);
+                return new BoundErrorExpression();
+            }
+            return new BoundConversionExpression(type, expression);
+        }
+
         private VariableSymbol BindVariable(SyntaxToken identifier, bool isReadOnly, TypeSymbol type)
         {
             var name = identifier.Text ?? "?";
             var canDeclare = identifier is not null;
             var variable = new VariableSymbol(name, isReadOnly, type, identifier);
 
-            if(canDeclare && !_scope.TryDeclare(variable))
+            if(canDeclare && !_scope.TryDeclareVariable(variable))
             {
                 _diagnostics.ReportVariableAlreadyDeclared(identifier!.Span, name);
             }
@@ -318,7 +401,7 @@ namespace Uranium.CodeAnalysis.Binding
 
                 var initializer = BindExpression(variableDec.Initializer);
 
-                if(!_scope.TryLookup(variableDec.Identifier.Text ?? "?", out var symbol))
+                if(!_scope.TryLookupVariable(variableDec.Identifier.Text ?? "?", out var symbol))
                 {
                     _diagnostics.ReportUndefinedName(variableDec.Identifier.Span, variableDec.Identifier.Text ?? "?");
                 }
@@ -331,5 +414,7 @@ namespace Uranium.CodeAnalysis.Binding
                 return new BoundBinaryExpression(identifier, boundOp, falseLiteral);
             }
         }
+
+        private static TypeSymbol? LookupType(string name) => TextChecker.GetKeywordType(name);
     }
 }
