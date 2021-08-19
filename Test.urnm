@@ -1,1 +1,1 @@
-﻿print("foobar");
+﻿const int a = 10;

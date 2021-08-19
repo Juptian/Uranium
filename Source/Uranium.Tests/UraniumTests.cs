@@ -11,7 +11,7 @@ namespace Uranium.Tests
             "{ int a = 0.10 }", "{ var a = 10; var a = 11; }", "{ const a = 10; a = 11}", "{10 += 1}", "{10 = 1}",
             "{ int a = 10; double b = 11; float c = a + b; }", "{ var a = 10;", "/*", "a = 100", "a", "int a = 10.1", "{ int a = -10; long b = -a; long c = -b }",
             "10.10.10", "10.2147483647214748364721474836472147483647", " \" ", "var = 10", "var x = print(\"foobar\")", "var x = println(\"foobar\")", "print()", "println()",
-            "input(\"foobar\"",
+            "input(\"foobar\"", "{ long a = 10; double d = 20; var b = a + d; }", "{ const a = 10; a = 20; }", "{ char ch = 'ff'; }", "foobar()", "print(10)", 
         };
 
         [Fact]
