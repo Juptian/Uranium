@@ -1,3 +1,1 @@
-﻿{
-	var x = print("foobar");
-}
+﻿print("foobar");

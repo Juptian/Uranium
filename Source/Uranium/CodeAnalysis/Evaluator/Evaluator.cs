@@ -45,7 +45,7 @@ namespace Uranium.CodeAnalysis.Syntax
                 EvaluateStatement(_root.Statements[_index]);
             }
 
-            return LastValue!;
+            return LastValue;
         }
 
         public void EvaluateStatement(BoundStatement statement)
@@ -88,6 +88,6 @@ namespace Uranium.CodeAnalysis.Syntax
         }
 
         private void EvaluateExpressionStatement(BoundExpressionStatement statement) 
-            => LastValue = ExpressionEvaluator.Evaluate(statement.Expression, this) ?? LastValue;
+            => LastValue = ExpressionEvaluator.Evaluate(statement.Expression, this);
     }
 }

@@ -193,6 +193,8 @@ for(int i = 10; i; i--)
         [InlineData("{ var a = 10; { var b = a; } }", 10)]
         [InlineData("4**8", fourPowEight)]
         [InlineData("4**9", 262144)]
+        [InlineData("{ print(\"Tests make me hurt inside\") }", null)]
+        [InlineData("{ println(\"Tests make me sadge\") }", null)]
         [MemberData(nameof(TestCases))]
         public void EvaluatorTestCases(string text, object expectedResult)
         {
