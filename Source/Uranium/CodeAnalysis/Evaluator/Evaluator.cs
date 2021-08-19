@@ -30,7 +30,7 @@ namespace Uranium.CodeAnalysis.Syntax
             Variables = variables;
         }
 
-        public object Evaluate()
+        public object? Evaluate()
         {
             for(int i = 0; i < _root.Statements.Length; i++)
             {

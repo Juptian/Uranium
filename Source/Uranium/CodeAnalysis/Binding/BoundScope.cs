@@ -12,6 +12,7 @@ namespace Uranium.CodeAnalysis.Binding
     internal sealed class BoundScope
     {
         private readonly Dictionary<string, VariableSymbol> _variables = new();
+        private readonly Dictionary<string, FunctionSymbol> _functions = new();
 
         public BoundScope? Parent { get; }
 
@@ -20,7 +21,7 @@ namespace Uranium.CodeAnalysis.Binding
             Parent = parent;
         }
 
-        public bool TryDeclare(VariableSymbol variable)
+        public bool TryDeclareVariable(VariableSymbol variable)
         {
             if(_variables.ContainsKey(variable.Name))
             {
@@ -31,16 +32,38 @@ namespace Uranium.CodeAnalysis.Binding
             return true;
         }
 
-        public bool TryLookup(string name, out VariableSymbol variable)
+        public bool TryLookupVariable(string name, out VariableSymbol variable)
         {
             if(_variables.TryGetValue(name, out variable!))
             {
                 return true;
             }
-            return Parent?.TryLookup(name, out variable) ?? false;
+            return Parent?.TryLookupVariable(name, out variable) ?? false;
         }
 
+        public bool TryDeclareFunction(FunctionSymbol function)
+        {
+            if(_functions.ContainsKey(function.Name))
+            {
+                return false;
+            }
+
+            _functions.Add(function.Name, function);
+            return true;
+        }
+
+        public bool TryLookupFunction(string name, out FunctionSymbol function)
+        {
+            if(_functions.TryGetValue(name, out function!))
+            {
+                return true;
+            }
+            return Parent?.TryLookupFunction(name, out function) ?? false;
+        }
+
+
         public ImmutableArray<VariableSymbol> GetDeclaredVariables() => _variables.Values.ToImmutableArray();
+        public ImmutableArray<FunctionSymbol> GetDeclaredFunctions() => _functions.Values.ToImmutableArray();
 
     }
 }

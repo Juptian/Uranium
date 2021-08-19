@@ -64,8 +64,8 @@ namespace Uranium.CodeAnalysis.Binding
                 previous = previous.Previous ?? null;
             }
 
-            BoundScope? parent = null;
 
+            var parent = CreateRootScope();
             //Removing the items from stack, while also declaring variables
             while (stack.Count > 0)
             {
@@ -73,12 +73,28 @@ namespace Uranium.CodeAnalysis.Binding
                 var scope = new BoundScope(parent);
                 for(int i = 0; i < previous.Variables.Length; i++)
                 {
-                    scope.TryDeclare(previous.Variables[i]);
+                    scope.TryDeclareVariable(previous.Variables[i]);
                 }
 
                 parent = scope;
             }
             return parent;
+        }
+
+        private static BoundScope CreateRootScope()
+        {
+            var result = new BoundScope(null);
+                
+            foreach(var f in BuiltInFunctions.GetAll())
+            {
+                if(f is null)
+                {
+                    continue;
+                }
+                result.TryDeclareFunction(f);
+            }
+
+            return result;
         }
 
         //Binding the Statement 
@@ -278,7 +294,7 @@ namespace Uranium.CodeAnalysis.Binding
                 return new BoundErrorExpression();
             }
             //Trying to get the value, if it returns then great, if not we report it
-            if (!_scope.TryLookup(name, out var variable))
+            if (!_scope.TryLookupVariable(name, out var variable))
             {
                 _diagnostics.ReportUndefinedName(syntax.IdentifierToken.Span, name ?? "name is null");
                 return new BoundErrorExpression();
@@ -291,7 +307,7 @@ namespace Uranium.CodeAnalysis.Binding
             var name = syntax.IdentifierToken.Text;
             var boundExpression = BindExpression(syntax.Expression);
 
-            if(!_scope.TryLookup(name, out var variable))
+            if(!_scope.TryLookupVariable(name, out var variable))
             {
                 //Null check on the name so that we can find the object
                 _diagnostics.ReportUndefinedName(syntax.IdentifierToken.Span, name);
@@ -315,9 +331,7 @@ namespace Uranium.CodeAnalysis.Binding
                 arguments.Add(boundArg);
             }
 
-            var builtInFunctions = BuiltInFunctions.GetAll();
-            var identifiedFunction = builtInFunctions.SingleOrDefault(f => f?.Name == syntax.Identifier.Text);
-            if(identifiedFunction is null)
+            if(!_scope.TryLookupFunction(syntax.Identifier.Text, out var identifiedFunction))
             {
                 _diagnostics.ReportUndefinedFunction(syntax.Identifier.Span, syntax.Identifier.Text);
                 return new BoundErrorExpression();
@@ -349,7 +363,7 @@ namespace Uranium.CodeAnalysis.Binding
             var canDeclare = identifier is not null;
             var variable = new VariableSymbol(name, isReadOnly, type, identifier);
 
-            if(canDeclare && !_scope.TryDeclare(variable))
+            if(canDeclare && !_scope.TryDeclareVariable(variable))
             {
                 _diagnostics.ReportVariableAlreadyDeclared(identifier!.Span, name);
             }
@@ -370,7 +384,7 @@ namespace Uranium.CodeAnalysis.Binding
 
                 var initializer = BindExpression(variableDec.Initializer);
 
-                if(!_scope.TryLookup(variableDec.Identifier.Text ?? "?", out var symbol))
+                if(!_scope.TryLookupVariable(variableDec.Identifier.Text ?? "?", out var symbol))
                 {
                     _diagnostics.ReportUndefinedName(variableDec.Identifier.Span, variableDec.Identifier.Text ?? "?");
                 }
