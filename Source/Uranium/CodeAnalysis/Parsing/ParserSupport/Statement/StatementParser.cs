@@ -11,7 +11,8 @@ namespace Uranium.CodeAnalysis.Parsing.ParserSupport
             {
                 SyntaxKind.OpenCurlyBrace => BlockStatementParser.Parse(parser),
                 SyntaxKind.ConstKeyword or
-                SyntaxKind.VarKeyword or 
+                SyntaxKind.VarKeyword or
+                SyntaxKind.BoolKeyword or
                 SyntaxKind.IntKeyword or
                 SyntaxKind.LongKeyword or 
                 SyntaxKind.DoubleKeyword or

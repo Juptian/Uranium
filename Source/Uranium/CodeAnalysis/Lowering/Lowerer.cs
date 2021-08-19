@@ -269,8 +269,8 @@ namespace Uranium.CodeAnalysis.Lowering
                     BoundBinaryOperatorKind.BitwiseOR => Operations.BitwiseOR(l.Value, r.Value),
                     BoundBinaryOperatorKind.BitwiseXOR => Operations.BitwiseXOR(l.Value, r.Value),
 
-                    BoundBinaryOperatorKind.LogicalAND => BinaryExpressionEvaluator.ConvertToBool(l.Value) && BinaryExpressionEvaluator.ConvertToBool(r.Value),
-                    BoundBinaryOperatorKind.LogicalOR => BinaryExpressionEvaluator.ConvertToBool(l.Value) || BinaryExpressionEvaluator.ConvertToBool(r.Value),
+                    BoundBinaryOperatorKind.LogicalAND => ConversionEvaluator.ConvertToBool(l.Value) && ConversionEvaluator.ConvertToBool(r.Value),
+                    BoundBinaryOperatorKind.LogicalOR => ConversionEvaluator.ConvertToBool(l.Value) || ConversionEvaluator.ConvertToBool(r.Value),
 
 
                     //We can throw exceptions here because we've exhausted all options,

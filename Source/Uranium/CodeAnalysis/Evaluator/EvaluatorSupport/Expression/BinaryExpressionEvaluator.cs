@@ -30,8 +30,8 @@ namespace Uranium.CodeAnalysis.Syntax.EvaluatorSupport
                 BoundBinaryOperatorKind.BitwiseOR => Operations.BitwiseOR(left, right),
                 BoundBinaryOperatorKind.BitwiseXOR => Operations.BitwiseXOR(left, right),
 
-                BoundBinaryOperatorKind.LogicalAND => ConvertToBool(left) && ConvertToBool(right),
-                BoundBinaryOperatorKind.LogicalOR => ConvertToBool(left) || ConvertToBool(right),
+                BoundBinaryOperatorKind.LogicalAND => ConversionEvaluator.ConvertToBool(left) && ConversionEvaluator.ConvertToBool(right),
+                BoundBinaryOperatorKind.LogicalOR => ConversionEvaluator.ConvertToBool(left) || ConversionEvaluator.ConvertToBool(right),
 
                 //We can throw exceptions here because we've exhausted all options,
                 //and this is an internal Uranium error, should handle this more gracefully,
@@ -41,18 +41,5 @@ namespace Uranium.CodeAnalysis.Syntax.EvaluatorSupport
             };
         }
         
-        public static bool ConvertToBool(object? obj)
-        {
-            return obj switch
-            {
-                int => (int)obj != 0,
-                long => (long)obj != 0,
-                float => (float)obj != 0,
-                double => (double)obj != 0,
-                string => (string)obj == "true" || (string)obj != "0",
-                char => (char)obj != '0',
-                _ => Convert.ToBoolean(obj)
-            };
-        }
     }
 }

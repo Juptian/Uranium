@@ -5,10 +5,10 @@ using System.Linq;
 using Uranium.CodeAnalysis.Syntax;
 using Uranium.CodeAnalysis.Syntax.Expression;
 using Uranium.CodeAnalysis.Syntax.Statement;
-using Uranium.CodeAnalysis.Text;
 using Uranium.Logging;
 using Uranium.CodeAnalysis.Binding.NodeKinds;
 using Uranium.CodeAnalysis.Binding.Statements;
+using Uranium.CodeAnalysis.Binding.Converting;
 using Uranium.CodeAnalysis.Symbols;
 using Uranium.CodeAnalysis.Parsing.ParserSupport.Expression;
 
@@ -323,6 +323,11 @@ namespace Uranium.CodeAnalysis.Binding
 
         private BoundExpression BindCallExpression(CallExpressionSyntax syntax)
         {
+            if(syntax.Arguments.Count == 1 && LookupType(syntax.Identifier.Text) is TypeSymbol t)
+            {
+                return BindConversion(t, syntax.Arguments[0]);
+            }
+
             var arguments = ImmutableArray.CreateBuilder<BoundExpression>();
 
             foreach(var arg in syntax.Arguments)
@@ -355,6 +360,18 @@ namespace Uranium.CodeAnalysis.Binding
                 }
             }
             return new BoundCallExpression(identifiedFunction, arguments.ToImmutable());
+        }
+
+        private BoundExpression BindConversion(TypeSymbol type, ExpressionSyntax syntax)
+        {
+            var expression = BindExpression(syntax);
+            var conversion = Conversion.Classify(expression.Type, type);
+            if(!conversion.Exists)
+            {
+                _diagnostics.ReportCannotConvert(syntax.Span, expression.Type, type);
+                return new BoundErrorExpression();
+            }
+            return new BoundConversionExpression(type, expression);
         }
 
         private VariableSymbol BindVariable(SyntaxToken identifier, bool isReadOnly, TypeSymbol type)
@@ -397,5 +414,7 @@ namespace Uranium.CodeAnalysis.Binding
                 return new BoundBinaryExpression(identifier, boundOp, falseLiteral);
             }
         }
+
+        private static TypeSymbol? LookupType(string name) => TextChecker.GetKeywordType(name);
     }
 }

@@ -4,6 +4,12 @@ using System.Numerics;
 #pragma warning disable IDE0038 // Use pattern matching
 #pragma warning disable IDE0066 // Convert switch statement to expression
 // Every time I've tried I've failed for an unkown reason
+
+
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
+#pragma warning disable CS8605 // Unboxing a possibly null value.
+#pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type.
+// The values literally cannot be null
 namespace Uranium.CodeAnalysis.Syntax.EvaluatorSupport
 {
     internal static class Operations
@@ -17,7 +23,7 @@ namespace Uranium.CodeAnalysis.Syntax.EvaluatorSupport
         {
             if(left is null) { left = 0; }
             if(right is null) { right = 0; }
-            ConvertBoolToInt(ref left, ref right);
+            ConversionEvaluator.ConvertBoolToInt(ref left, ref right);
 
             var leftPrio = TypeChecker.GetTypePriority(left);
             var rightPrio = TypeChecker.GetTypePriority(right);
@@ -75,7 +81,7 @@ namespace Uranium.CodeAnalysis.Syntax.EvaluatorSupport
             if(left is null) { left = 0; }
             if(right is null) { right = 0; }
 
-            ConvertBoolToInt(ref left, ref right);
+            ConversionEvaluator.ConvertBoolToInt(ref left, ref right);
 
             var leftPrio = TypeChecker.GetTypePriority(left);
             var rightPrio = TypeChecker.GetTypePriority(right);
@@ -120,7 +126,7 @@ namespace Uranium.CodeAnalysis.Syntax.EvaluatorSupport
             if(left is null) { left = 0; }
             if(right is null) { right = 0; }
 
-            ConvertBoolToInt(ref left, ref right);
+            ConversionEvaluator.ConvertBoolToInt(ref left, ref right);
 
             var leftPrio = TypeChecker.GetTypePriority(left);
             var rightPrio = TypeChecker.GetTypePriority(right);
@@ -164,7 +170,7 @@ namespace Uranium.CodeAnalysis.Syntax.EvaluatorSupport
             if(left is null) { left = 0; }
             if(right is null) { right = 0; }
 
-            ConvertBoolToInt(ref left, ref right);
+            ConversionEvaluator.ConvertBoolToInt(ref left, ref right);
 
             var leftPrio = TypeChecker.GetTypePriority(left);
             var rightPrio = TypeChecker.GetTypePriority(right);
@@ -209,7 +215,7 @@ namespace Uranium.CodeAnalysis.Syntax.EvaluatorSupport
             if(left is null) { left = 0; }
             if(right is null) { right = 0; }
 
-            ConvertBoolToInt(ref left, ref right);
+            ConversionEvaluator.ConvertBoolToInt(ref left, ref right);
 
             var leftPrio = TypeChecker.GetTypePriority(left);
             var rightPrio = TypeChecker.GetTypePriority(right);
@@ -253,7 +259,7 @@ namespace Uranium.CodeAnalysis.Syntax.EvaluatorSupport
             if(left is null) { left = 0; }
             if(right is null) { right = 0; }
 
-            ConvertBoolToInt(ref left, ref right);
+            ConversionEvaluator.ConvertBoolToInt(ref left, ref right);
 
             var leftPrio = TypeChecker.GetTypePriority(left);
             var rightPrio = TypeChecker.GetTypePriority(right);
@@ -297,7 +303,7 @@ namespace Uranium.CodeAnalysis.Syntax.EvaluatorSupport
             if(left is null) { left = 0; }
             if(right is null) { right = 0; }
 
-            ConvertBoolToInt(ref left, ref right);
+            ConversionEvaluator.ConvertBoolToInt(ref left, ref right);
 
             var leftPrio = TypeChecker.GetTypePriority(left);
             var rightPrio = TypeChecker.GetTypePriority(right);
@@ -340,7 +346,7 @@ namespace Uranium.CodeAnalysis.Syntax.EvaluatorSupport
             if(left is null) { left = 0; }
             if(right is null) { right = 0; }
 
-            ConvertBoolToInt(ref left, ref right);
+            ConversionEvaluator.ConvertBoolToInt(ref left, ref right);
 
             var leftPrio = TypeChecker.GetTypePriority(left);
             var rightPrio = TypeChecker.GetTypePriority(right);
@@ -384,7 +390,7 @@ namespace Uranium.CodeAnalysis.Syntax.EvaluatorSupport
             if(left is null) { left = 0; }
             if(right is null) { right = 0; }
 
-            ConvertBoolToInt(ref left, ref right);
+            ConversionEvaluator.ConvertBoolToInt(ref left, ref right);
             var leftPrio = TypeChecker.GetTypePriority(left);
             var rightPrio = TypeChecker.GetTypePriority(right);
             switch(leftPrio)
@@ -456,24 +462,6 @@ namespace Uranium.CodeAnalysis.Syntax.EvaluatorSupport
                 return (bool)left ^ (bool)right;
             }
             return (int)left ^ (int)right;
-        }
-        public static void ConvertBoolToInt(ref object left, ref object right)
-        {
-            if(left is null) { left = 0; }
-            if(right is null) { right = 0; }
-
-            int newRight = -1;
-            int newLeft = -1;
-            if (right is bool)
-            {
-                newRight = (bool)right ? 1 : 0;
-            }
-            if(left is bool)
-            {
-                newLeft = (bool)left ? 1 : 0;
-            }
-            left = newLeft >= 0 ? newLeft : left;
-            right = newRight >= 0 ? newRight : right;
         }
     }
 }

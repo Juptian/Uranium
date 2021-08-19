@@ -17,6 +17,7 @@ namespace Uranium.CodeAnalysis.Syntax.EvaluatorSupport
                 BoundVariableExpression v => eval.Variables[v.Variable],
                 BoundAssignmentExpression a => AssignmentEvaluator.EvaluateAssignmentExpression(a, eval),
                 BoundCallExpression c => CallExpressionEvaluator.Evaluate(c, eval),
+                BoundConversionExpression ce => ConversionEvaluator.Evaluate(ce, eval),
                 _ => throw new($"Unexpected node {node.Kind}"),
             };
     }

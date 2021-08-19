@@ -52,7 +52,9 @@ namespace Uranium.CodeAnalysis.Syntax
         {
             switch (statement.Kind)
             {
-                case BoundNodeKind.ExpressionStatement or BoundNodeKind.CallExpression:
+                case BoundNodeKind.ExpressionStatement or 
+                     BoundNodeKind.CallExpression or
+                     BoundNodeKind.ConversionExpression:
                     EvaluateExpressionStatement((BoundExpressionStatement)statement);
                     return;
 
@@ -72,7 +74,7 @@ namespace Uranium.CodeAnalysis.Syntax
                     var condition = ExpressionEvaluator.Evaluate(cgs.Condition, this);
                     if(condition is not bool b)
                     {
-                        b = BinaryExpressionEvaluator.ConvertToBool(condition ?? 0);
+                        b = ConversionEvaluator.ConvertToBool(condition ?? 0);
                     }
                     if(b && !cgs.JumpIfFalse ||
                        !b && cgs.JumpIfFalse)

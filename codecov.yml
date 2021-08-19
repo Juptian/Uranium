@@ -23,8 +23,8 @@ coverage:
 
         if_not_found: failure
 ignore:
-  - "/Source/Uranium/CodeAnalysis/Syntax/SyntaxFactsSupport/**/*"
-  - "/Source/Uranium/CodeAnalysis/Evaluator/EvaluatorSupport/**/*"
+  - "/Source/Uranium/CodeAnalysis/Syntax/SyntaxFacts/**/*.cs"
+  - "/Source/Uranium/CodeAnalysis/Evaluator/EvaluatorSupport/**/*.cs"
 
 comment:
   layout: "reach,diff,flags,files,footer"
