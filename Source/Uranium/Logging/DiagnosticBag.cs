@@ -113,6 +113,8 @@ namespace Uranium.Logging
             var message = $"UR00013: Cannot have a compound operator ({token.Text}) without a variable. Error at index: {token.Span.Start} through {token.Span.End}";
             Report(span, message);
         }
+
+
         public void ReportInvalidEqualsToken(TextSpan span)
         {
             var message = $"UR00014: Cannot have an equals expression without an identifier token";
@@ -147,5 +149,30 @@ namespace Uranium.Logging
             var message = $"UR00019: Cannot have a const keyword without a variable type keyword after";
             Report(span, message);
         }
+
+        public void ReportUndefinedFunction(TextSpan span, string text)
+        {
+            var message = $"UR00020: The function {text} does not exist";
+            Report(span, message);
+        }
+
+        public void ReportWrongArgumentCount(int providedCount, int requiredCount, string text, TextSpan span)
+        {
+            var message = $"UR00021: The function '{text}' was expecting {requiredCount} arguments, but was given {providedCount} arguments"; 
+            Report(span, message);
+        }
+
+        internal void ReportInvalidParameter(TextSpan span, string functionName, string paramName, TypeSymbol expected, TypeSymbol actual)
+        {
+            var message = $"UR00022: The argument '{paramName}' of the function '{functionName}' expected a value of type {expected} but got a value of type {actual}";
+            Report(span, message);
+        }
+
+        internal void ReportExpressionMustHaveValue(TextSpan span)
+        {
+            var message = $"UR00023: Expression must have a value";
+            Report(span, message);
+        }
+
     }
 }

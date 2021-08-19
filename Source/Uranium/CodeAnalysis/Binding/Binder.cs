@@ -10,6 +10,7 @@ using Uranium.Logging;
 using Uranium.CodeAnalysis.Binding.NodeKinds;
 using Uranium.CodeAnalysis.Binding.Statements;
 using Uranium.CodeAnalysis.Symbols;
+using Uranium.CodeAnalysis.Parsing.ParserSupport.Expression;
 
 namespace Uranium.CodeAnalysis.Binding
 {
@@ -99,7 +100,18 @@ namespace Uranium.CodeAnalysis.Binding
 
         
         //Binding the expression
-        private BoundExpression BindExpression(ExpressionSyntax syntax)
+        private BoundExpression BindExpression(ExpressionSyntax syntax, bool canBeVoid = false)
+        {
+            var result = BindExpressionInternal(syntax);
+            if(!canBeVoid && result.Type == TypeSymbol.Void)
+            {
+                _diagnostics.ReportExpressionMustHaveValue(syntax.Span);
+                return new BoundErrorExpression();
+            }
+            return result;
+        }
+
+        private BoundExpression BindExpressionInternal(ExpressionSyntax syntax)
             => syntax.Kind switch // Calling the correct function based off of the syntax kind and returning it's value.
             {
                 //Base expressions
@@ -111,8 +123,10 @@ namespace Uranium.CodeAnalysis.Binding
                 //Name + Assignments
                 SyntaxKind.NameExpression => BindNameExpression( (NameExpressionSyntax)syntax ),
                 SyntaxKind.AssignmentExpression => BindAssignmentExpression( (AssignmentExpressionSyntax)syntax ),
+                SyntaxKind.CallExpression => BindCallExpression( (CallExpressionSyntax)syntax),
                 _ => throw new($"Unexpected syntax {syntax.Kind}"),
             };
+
 
         //Scoping
         private BoundStatement BindBlockStatement(BlockStatementSyntax syntax)
@@ -138,7 +152,7 @@ namespace Uranium.CodeAnalysis.Binding
         //Expressions
         private BoundStatement BindExpressionStatement(ExpressionStatementSyntax syntax)
         {
-            var expression = BindExpression(syntax.Expression);
+            var expression = BindExpression(syntax.Expression, true);
             return new BoundExpressionStatement(expression);
         }
 
@@ -289,6 +303,44 @@ namespace Uranium.CodeAnalysis.Binding
             }
 
             return new BoundAssignmentExpression(variable, boundExpression, syntax.CompoundOperator, syntax.IsCompound);
+        }
+
+        private BoundExpression BindCallExpression(CallExpressionSyntax syntax)
+        {
+            var arguments = ImmutableArray.CreateBuilder<BoundExpression>();
+
+            foreach(var arg in syntax.Arguments)
+            {
+                var boundArg = BindExpression(arg);
+                arguments.Add(boundArg);
+            }
+
+            var builtInFunctions = BuiltInFunctions.GetAll();
+            var identifiedFunction = builtInFunctions.SingleOrDefault(f => f?.Name == syntax.Identifier.Text);
+            if(identifiedFunction is null)
+            {
+                _diagnostics.ReportUndefinedFunction(syntax.Identifier.Span, syntax.Identifier.Text);
+                return new BoundErrorExpression();
+            }
+
+            if(syntax.Arguments.Count != identifiedFunction.Parameters.Length)
+            {
+                _diagnostics.ReportWrongArgumentCount(syntax.Arguments.Count, identifiedFunction.Parameters.Length, syntax.Identifier.Text, syntax.Identifier.Span);
+                return new BoundErrorExpression();
+            }
+
+            for(var i = 0; i < syntax.Arguments.Count; i++)
+            {
+                var argument = arguments[i];
+                var parameter = identifiedFunction.Parameters[i];
+                
+                if(argument.Type != parameter.Type)
+                {
+                    _diagnostics.ReportInvalidParameter(syntax.Span, identifiedFunction.Name, parameter.Name, parameter.Type, argument.Type);
+                    return new BoundErrorExpression();
+                }
+            }
+            return new BoundCallExpression(identifiedFunction, arguments.ToImmutable());
         }
 
         private VariableSymbol BindVariable(SyntaxToken identifier, bool isReadOnly, TypeSymbol type)

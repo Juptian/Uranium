@@ -34,12 +34,13 @@ namespace Uranium.CodeAnalysis.Lowering
 
             return node.Kind switch
             {
+                BoundNodeKind.ErrorExpression => RewriteErrorExpression((BoundErrorExpression)node),
                 BoundNodeKind.UnaryExpression => RewriteUnaryExpression((BoundUnaryExpression)node),
                 BoundNodeKind.LiteralExpression => RewriteLiteralExpression((BoundLiteralExpression)node),
                 BoundNodeKind.BinaryExpression => RewriteBinaryExpression((BoundBinaryExpression)node),
                 BoundNodeKind.VariableExpression => RewriteVariableExpression((BoundVariableExpression)node),
                 BoundNodeKind.AssignmentExpression => RewriteAssignmentExpression((BoundAssignmentExpression)node),
-                BoundNodeKind.ErrorExpression => RewriteErrorExpression((BoundErrorExpression)node),
+                BoundNodeKind.CallExpression => RewriteCallExpression((BoundCallExpression)node),
                 _ => throw new($"Unexpected node: {node.Kind}"),
             };
         }
@@ -179,6 +180,9 @@ namespace Uranium.CodeAnalysis.Lowering
             return new BoundConditionalGotoStatement(node.Label, condition, node.JumpIfFalse);
         }
 
+        protected virtual BoundExpression RewriteErrorExpression(BoundErrorExpression node)
+            => node;
+
         protected virtual BoundExpression RewriteUnaryExpression(BoundUnaryExpression node)
         {
             var operand = RewriteExpression(node.Operand);
@@ -213,7 +217,39 @@ namespace Uranium.CodeAnalysis.Lowering
             }
             return new BoundAssignmentExpression(node.Variable, expression, node.CompoundOperator, node.IsCompound);
         }
-        protected virtual BoundExpression RewriteErrorExpression(BoundErrorExpression node)
-            => node;
+
+        protected virtual BoundExpression RewriteCallExpression(BoundCallExpression node)
+        {
+            ImmutableArray<BoundExpression>.Builder? builder = null;
+            for(var i = 0; i < node.Arguments.Length; i++)
+            {
+                var oldArgument = node.Arguments[i];
+                var newArgument = RewriteExpression(oldArgument);
+                if(newArgument != oldArgument)
+                {
+                    if(builder is null)
+                    {
+                        builder = ImmutableArray.CreateBuilder<BoundExpression>(node.Arguments.Length);
+                        for(var j = 0; j < i; j++)
+                        {
+                            builder.Add(node.Arguments[j]);
+                        }
+                    }
+                }
+                if(builder is not null)
+                {
+                    builder.Add(newArgument);
+                }
+            }
+
+            if(builder is null)
+            {
+                return node;
+            }
+
+            return new BoundCallExpression(node.Function, builder.MoveToImmutable());
+
+        }
+
     }
 }

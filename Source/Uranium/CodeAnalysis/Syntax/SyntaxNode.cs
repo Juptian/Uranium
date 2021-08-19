@@ -6,6 +6,7 @@ using System.Reflection;
 using System.IO;
 using Uranium.CodeAnalysis.Text;
 using Uranium.CodeAnalysis.Syntax.Statement;
+using Uranium.CodeAnalysis.Parsing.ParserSupport.Expression;
 
 namespace Uranium.CodeAnalysis.Syntax
 {
@@ -39,6 +40,21 @@ namespace Uranium.CodeAnalysis.Syntax
                         yield return child;
                     }
                 }
+                else if (typeof(SeparatedSyntaxList).IsAssignableFrom(property.PropertyType))
+                {
+                    var list = property.GetValue(this) as SeparatedSyntaxList;
+                    if(list is not null)
+                    {
+                        foreach(var item in list.GetWithSeparators())
+                        {
+                            if(item is not null)
+                            {
+                                yield return item;
+                            }
+                        }
+                    }
+                }
+
                 else if (typeof(IEnumerable<SyntaxNode>).IsAssignableFrom(property.PropertyType))
                 {
                     var children = property.GetValue(this) as IEnumerable<SyntaxNode>;

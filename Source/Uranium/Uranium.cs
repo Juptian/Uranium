@@ -56,8 +56,10 @@ namespace Uranium
             }
 
             var result = compilation.Evaluate(variables);
-            result.DealWithDiagnostics();
-            
+            if (result is not null)
+            {
+                result.DealWithDiagnostics();
+            }
             return true;
         }
 
@@ -86,13 +88,14 @@ namespace Uranium
             Diagnostics = diagnostics;
             //If there are any diagnostics, we print them in red
             //This makes it more easy to determine what is and isn't an error
-            if(!diagnostics.Any())
+            /*if(!diagnostics.Any())
             {
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine(result.Value);
                 Console.ResetColor();
             } 
-            else
+            else*/
+            if(diagnostics.Any())
             {
                 var treeText = _syntaxTree.Text;
                 Console.ForegroundColor = ConsoleColor.Red;

@@ -10,11 +10,11 @@ namespace Uranium.CodeAnalysis.Syntax.EvaluatorSupport
             var value = ExpressionEvaluator.Evaluate(a.Expression, eval);
             if (a.IsCompound)
             {
-                CompoundExpressionEvaluator.EvaluateCompoundOperator(a, value, eval);
+                CompoundExpressionEvaluator.EvaluateCompoundOperator(a, value!, eval);
             }
             else
             {
-                eval.Variables[a.Variable] = value;
+                eval.Variables[a.Variable] = value!;
             }
             return eval.Variables[a.Variable];
         }

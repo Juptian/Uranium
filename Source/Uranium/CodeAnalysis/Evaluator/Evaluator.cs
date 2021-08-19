@@ -6,6 +6,7 @@ using Uranium.CodeAnalysis.Binding.Statements;
 using Uranium.CodeAnalysis.Text;
 using Uranium.CodeAnalysis.Syntax.EvaluatorSupport;
 using Uranium.CodeAnalysis.Symbols;
+using Uranium.CodeAnalysis.Binding.NodeKinds;
 
 namespace Uranium.CodeAnalysis.Syntax
 {
@@ -51,14 +52,13 @@ namespace Uranium.CodeAnalysis.Syntax
         {
             switch (statement.Kind)
             {
-                case BoundNodeKind.ExpressionStatement:
+                case BoundNodeKind.ExpressionStatement or BoundNodeKind.CallExpression:
                     EvaluateExpressionStatement((BoundExpressionStatement)statement);
-
                     return;
+
                 case BoundNodeKind.VariableDeclaration:
                     VariableDeclarationEvaluator.Evaluate((BoundVariableDeclaration)statement, this);
                     return;
-
                 case BoundNodeKind.LabelStatement:
                     return;
 
@@ -72,7 +72,7 @@ namespace Uranium.CodeAnalysis.Syntax
                     var condition = ExpressionEvaluator.Evaluate(cgs.Condition, this);
                     if(condition is not bool b)
                     {
-                        b = BinaryExpressionEvaluator.ConvertToBool(condition);
+                        b = BinaryExpressionEvaluator.ConvertToBool(condition ?? 0);
                     }
                     if(b && !cgs.JumpIfFalse ||
                        !b && cgs.JumpIfFalse)
@@ -88,6 +88,6 @@ namespace Uranium.CodeAnalysis.Syntax
         }
 
         private void EvaluateExpressionStatement(BoundExpressionStatement statement) 
-            => LastValue = ExpressionEvaluator.Evaluate(statement.Expression, this);
+            => LastValue = ExpressionEvaluator.Evaluate(statement.Expression, this) ?? LastValue;
     }
 }

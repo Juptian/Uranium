@@ -1,5 +1,3 @@
 ﻿{
-	string s = "foobar";
-	double d = 10.10;
-	string b = "hello" + " world!";
+	var x = print("foobar");
 }

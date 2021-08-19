@@ -41,7 +41,7 @@ namespace Uranium.CodeAnalysis.Syntax.EvaluatorSupport
             };
         }
         
-        public static bool ConvertToBool(object obj)
+        public static bool ConvertToBool(object? obj)
         {
             return obj switch
             {
