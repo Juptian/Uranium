@@ -24,11 +24,11 @@ coverage:
         if_not_found: failure
 ignore:
   - "/Source/Uranium/CodeAnalysis/Syntax/SyntaxFacts/**/*.cs"
-  - "/Source/Uranium/CodeAnalysis/Evaluator/EvaluatorSupport/**/*.cs"
+  - "/Source/Uranium/CodeAnalysis/Evaluator/EvaluatorSupport/Expression/**/*.cs"
 
 comment:
   layout: "reach,diff,flags,files,footer"
-  behavior: default
+  behavior: new
   require_changes: false
   require_base: false
   require_head: false
