@@ -1,10 +1,6 @@
-﻿using System;
-using System.Linq;
-using Uranium.CodeAnalysis.Syntax;
-using Uranium.CodeAnalysis.Syntax.Expression;
+﻿using Uranium.CodeAnalysis.Parsing.ParserSupport.Expression;
 
-
-namespace Uranium.CodeAnalysis.Parsing.ParserSupport.Expression
+namespace Uranium.CodeAnalysis.Syntax.Expression
 {
     public sealed class CallExpressionSyntax : ExpressionSyntax
     {
