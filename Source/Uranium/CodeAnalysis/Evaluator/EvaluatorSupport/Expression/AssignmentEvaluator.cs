@@ -5,7 +5,7 @@ namespace Uranium.CodeAnalysis.Syntax.EvaluatorSupport
 {
     internal static class AssignmentEvaluator
     {
-        public static object EvaluateAssignmentExpression(BoundAssignmentExpression a, Evaluator eval)
+        public static object? EvaluateAssignmentExpression(BoundAssignmentExpression a, Evaluator eval)
         {
             var value = ExpressionEvaluator.Evaluate(a.Expression, eval);
             if (a.IsCompound)

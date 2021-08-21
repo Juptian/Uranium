@@ -16,7 +16,7 @@ namespace Uranium.CodeAnalysis.Syntax
     internal sealed class Evaluator
     {
         private readonly BoundBlockStatement _root;
-        internal readonly Dictionary<VariableSymbol, object> Variables;
+        internal readonly Dictionary<VariableSymbol, object?> Variables;
         private readonly Dictionary<BoundLabel, int> _labelIndex = new();
 
         private int _index = 0;
@@ -24,7 +24,7 @@ namespace Uranium.CodeAnalysis.Syntax
         internal object? LastValue;
 
 
-        public Evaluator(BoundBlockStatement root, Dictionary<VariableSymbol, object> variables)
+        public Evaluator(BoundBlockStatement root, Dictionary<VariableSymbol, object?> variables)
         {
             _root = root;
             Variables = variables;

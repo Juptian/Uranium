@@ -14,6 +14,7 @@ namespace Uranium.CodeAnalysis.Parsing.ParserSupport
                 SyntaxKind.NumberToken => NumberLiteralParser.Parse(parser),
                 SyntaxKind.StringToken => StringLiteralParser.Parse(parser),
                 SyntaxKind.CharToken => StringLiteralParser.ParseChar(parser),
+                SyntaxKind.Null => new LiteralExpressionSyntax(parser.NextToken()),
                 _ => NameOrCallExpressionParser.Parse(parser),
             };
 

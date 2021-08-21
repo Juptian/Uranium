@@ -91,6 +91,10 @@ namespace Uranium.CodeAnalysis.Lowering
 
         protected virtual BoundStatement RewriteVariableDeclaration(BoundVariableDeclaration node)
         {
+            if(node.Initializer is null)
+            {
+                return node;
+            }
             var initializer = RewriteExpression(node.Initializer);
             if(initializer == node.Initializer)
             {

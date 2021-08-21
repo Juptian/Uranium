@@ -26,12 +26,42 @@ namespace Uranium.CodeAnalysis.Parsing.ParserSupport
         {
             var keyword = parser.NextToken();
             var identifier = parser.MatchToken(SyntaxKind.IdentifierToken);
-            var equals = parser.MatchToken(SyntaxKind.Equals);
-            var initializer = Parser.ParseExpression(parser);
-            var semicolon = parser.MatchToken(SyntaxKind.Semicolon);
+            SyntaxToken semicolon;
+            if(parser.Current.Kind == SyntaxKind.Equals)
+            {
+                var equals = parser.MatchToken(SyntaxKind.Equals);
+                var initializer = Parser.ParseExpression(parser);
+                semicolon = parser.MatchToken(SyntaxKind.Semicolon);
 
-            return new VariableDeclarationSyntax(constKeyword, keyword, identifier, equals, initializer, semicolon);
+                return new VariableDeclarationSyntax(constKeyword, keyword, identifier, equals, initializer, semicolon);
+            }
+            else if(parser.Current.Kind == SyntaxKind.Semicolon)
+            {
+                semicolon = parser.NextToken();
+                return new VariableDeclarationSyntax(constKeyword, keyword, identifier, null, null, semicolon);
+            }
 
+            semicolon = new SyntaxToken(SyntaxKind.Semicolon, parser.Current.Position, ";", null);
+
+            var isCommaValid = IsNextTokenTypeKeyword(parser);
+            if((parser.Current.Kind != SyntaxKind.Comma && isCommaValid) && parser.Peek(-1).Kind != SyntaxKind.Comma)
+            {
+                parser._diagnostics.ReportInvalidToken(identifier.Span, parser.Current, SyntaxKind.Equals, SyntaxKind.Semicolon, SyntaxKind.Comma);
+            }
+            return new VariableDeclarationSyntax(constKeyword, keyword, identifier, null, null, semicolon);
         }
+
+        private static bool IsNextTokenTypeKeyword(Parser parser)
+            => parser.Next.Kind switch
+            {
+                SyntaxKind.IntKeyword or
+                SyntaxKind.BoolKeyword or
+                SyntaxKind.LongKeyword or
+                SyntaxKind.FloatKeyword or
+                SyntaxKind.DoubleKeyword or
+                SyntaxKind.CharKeyword or
+                SyntaxKind.StringKeyword => true,
+                _ => false,
+            };
     }
 }

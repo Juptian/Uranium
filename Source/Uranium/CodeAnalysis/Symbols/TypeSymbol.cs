@@ -15,6 +15,7 @@ namespace Uranium.CodeAnalysis.Symbols
         public static readonly TypeSymbol String = new("string");
         public static readonly TypeSymbol Char = new("char");
         public static readonly TypeSymbol Bool = new("bool");
+        public static readonly TypeSymbol Null = new("null");
         public static readonly TypeSymbol Error = new("Error");
         public static readonly TypeSymbol Void = new("void");
 

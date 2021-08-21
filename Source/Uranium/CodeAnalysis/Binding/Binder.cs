@@ -176,8 +176,13 @@ namespace Uranium.CodeAnalysis.Binding
         private BoundStatement BindVariableDeclaration(VariableDeclarationSyntax syntax)
         {
             var isReadOnly = syntax.ConstKeywordToken is not null;
-            var initializer = BindExpression(syntax.Initializer);
-            var type = TextChecker.GetKeywordType(syntax.KeywordToken.Kind) ?? initializer.Type;
+            var initializer = syntax.Initializer is null ? null : BindExpression(syntax.Initializer);
+            var type = TextChecker.GetKeywordType(syntax.KeywordToken.Kind) ?? initializer?.Type;
+            if(type is null)
+            {
+                _diagnostics.ReportImplicitNullAssignment(syntax.KeywordToken.Span);
+                return new BoundErrorStatement();
+            }
             var variable = BindVariable(syntax.Identifier, isReadOnly, type); 
 
             return new BoundVariableDeclaration(variable, initializer);
@@ -237,9 +242,11 @@ namespace Uranium.CodeAnalysis.Binding
 
         //Value is being parsed into a nullable int
         //That then gets checked to see if it's null, and gets assigned to 0 if it is.
-        private static BoundExpression BindLiteralExpression(LiteralExpressionSyntax syntax) 
-            => new BoundLiteralExpression(syntax.Value);
-
+        private static BoundExpression BindLiteralExpression(LiteralExpressionSyntax syntax)
+        {
+            var type = TypeChecker.GetType(syntax.Type);
+            return new BoundLiteralExpression(syntax.Value, type);
+        }
         private BoundExpression BindUnaryExpression(UnaryExpressionSyntax syntax)
         {
             var boundOperand = BindExpression(syntax.Operand);
@@ -399,7 +406,7 @@ namespace Uranium.CodeAnalysis.Binding
             {
                 var variableDec = (VariableDeclarationSyntax)syntax.Variable;
 
-                var initializer = BindExpression(variableDec.Initializer);
+                var initializer = variableDec.Initializer is null ? null : BindExpression(variableDec.Initializer!);
 
                 if(!_scope.TryLookupVariable(variableDec.Identifier.Text ?? "?", out var symbol))
                 {

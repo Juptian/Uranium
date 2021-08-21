@@ -52,7 +52,7 @@ namespace Uranium.CodeAnalysis
             return new(this, syntaxTree);
         }
 
-        public EvaluationResult Evaluate(Dictionary<VariableSymbol, object> variables)
+        public EvaluationResult Evaluate(Dictionary<VariableSymbol, object?> variables)
         {
             var globalScope = GlobalScope;
             var diagnostics = Syntax.Diagnostics.Concat(globalScope.Diagnostics).ToImmutableArray();

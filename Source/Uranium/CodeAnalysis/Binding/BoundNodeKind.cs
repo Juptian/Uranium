@@ -31,5 +31,6 @@ namespace Uranium.CodeAnalysis.Binding
         LabelStatement,
         CallExpression,
         ConversionExpression,
+        ErrorStatement,
     }
 }

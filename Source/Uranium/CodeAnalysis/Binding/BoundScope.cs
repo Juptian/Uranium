@@ -23,7 +23,7 @@ namespace Uranium.CodeAnalysis.Binding
 
         public bool TryDeclareVariable(VariableSymbol variable)
         {
-            if(_variables.ContainsKey(variable.Name))
+            if(_variables.ContainsKey(variable.Name) || variable.Name == "?")
             {
                 return false;
             }

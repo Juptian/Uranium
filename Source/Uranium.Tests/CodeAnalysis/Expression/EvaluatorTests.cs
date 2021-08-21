@@ -213,6 +213,8 @@ for(int i = 10; i; i--)
         [InlineData("{ char ch = 'a'; int b = ch; }", 97)]
         [InlineData("{ print(string(10)); }", null)]
         [InlineData("{ double d = 10; println(string(d)) }", null)]
+        [InlineData("{ int a; }", null)]
+        [InlineData("{ int a = null; }", null)]
         [MemberData(nameof(TestCases))]
         public void EvaluatorTestCases(string text, object expectedResult)
         {

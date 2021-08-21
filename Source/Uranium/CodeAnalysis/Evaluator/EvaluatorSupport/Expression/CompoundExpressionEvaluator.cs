@@ -5,8 +5,9 @@ namespace Uranium.CodeAnalysis.Syntax.EvaluatorSupport
 {
     internal static class CompoundExpressionEvaluator
     {
-        public static void EvaluateCompoundOperator(BoundAssignmentExpression a, object value, Evaluator eval)
+        public static void EvaluateCompoundOperator(BoundAssignmentExpression a, object? value, Evaluator eval)
         {
+            value = Operations.ConvertNullToInt(value);
             var current = eval.Variables[a.Variable];
             eval.Variables[a.Variable] = a.CompoundOperator!.Kind switch
             {

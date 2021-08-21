@@ -9,6 +9,7 @@ namespace Uranium.CodeAnalysis.Syntax.EvaluatorSupport
         {
             var left = ExpressionEvaluator.Evaluate(b.Left, eval);
             var right = ExpressionEvaluator.Evaluate(b.Right, eval);
+            
             return b.Op.Kind switch
             {
                 //Universal
@@ -41,5 +42,19 @@ namespace Uranium.CodeAnalysis.Syntax.EvaluatorSupport
             };
         }
         
+        public static bool ConvertToBool(object? obj)
+        {
+            return obj switch
+            {
+                int => (int)obj != 0,
+                long => (long)obj != 0,
+                float => (float)obj != 0,
+                double => (double)obj != 0,
+                string => (string)obj == "true" || (string)obj != "0",
+                char => (char)obj != '0',
+                null => false,
+                _ => Convert.ToBoolean(obj)
+            };
+        }
     }
 }

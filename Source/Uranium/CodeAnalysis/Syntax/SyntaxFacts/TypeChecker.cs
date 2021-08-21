@@ -6,14 +6,14 @@ namespace Uranium.CodeAnalysis.Syntax
 {
     public static class TypeChecker
     {
+        public static bool IsNumber(object? obj)
+            => obj is not null && obj is int or long or float or double;
+
         public static bool IsTypeKeyword(SyntaxToken token)
             => IsTypeKeyword(token.Kind);
 
         public static bool IsTypeKeyword(SyntaxKind kind)
             => IsFloatingPoint(kind) || IsInteger(kind) || IsCharOrString(kind);
-
-        public static bool IsNumber(object obj)
-            => obj is int or long or float or double;
 
         public static bool IsNumber(SyntaxKind kind)
             => IsFloatingPoint(kind) || IsInteger(kind);
@@ -81,6 +81,44 @@ namespace Uranium.CodeAnalysis.Syntax
             }
             return typeof(void);
         }
+
+        public static TypeSymbol GetType(Type type)
+        {
+            if(type == typeof(int))
+            {
+                return TypeSymbol.Int;
+            }
+            if(type == typeof(bool))
+            {
+                return TypeSymbol.Bool;
+            }
+            if(type == typeof(float))
+            {
+                return TypeSymbol.Float;
+            }
+
+            if(type == typeof(long))
+            {
+                return TypeSymbol.Long;
+            }
+
+            if(type == typeof(double))
+            {
+                return TypeSymbol.Double;
+            }
+
+            if(type == typeof(string))
+            {
+                return TypeSymbol.String;
+            }
+
+            if(type == typeof(char))
+            {
+                return TypeSymbol.Char;
+            }
+            return TypeSymbol.Void;
+        }
+
 
         public static int GetTypePriority(object? obj)
         {

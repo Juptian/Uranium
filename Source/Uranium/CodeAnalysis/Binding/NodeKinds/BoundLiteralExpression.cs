@@ -11,10 +11,14 @@ namespace Uranium.CodeAnalysis.Binding.NodeKinds
     //It holds a value, and that's literally it.
     internal sealed class BoundLiteralExpression : BoundExpression
     {
-        public BoundLiteralExpression(object value)
+        public BoundLiteralExpression(object? value)
         {
             Value = value;
-            if (value is int)
+            if(value is null)
+            {
+                Type = TypeSymbol.Null;
+            }
+            else if (value is int)
             {
                 Type = TypeSymbol.Int;
             }
@@ -47,9 +51,13 @@ namespace Uranium.CodeAnalysis.Binding.NodeKinds
                 throw new($"Unexpected literal '{value}' of type {value.GetType().ToString()[7..]}");
             }
         }
+        public BoundLiteralExpression(object? value, TypeSymbol type)
+        {
+            Value = value;
+            Type = type;
+        }
 
-
-        public object Value { get; }
+        public object? Value { get; }
 
         public override TypeSymbol Type { get; } 
 

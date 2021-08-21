@@ -15,6 +15,8 @@ namespace Uranium.Logging
     {
         private readonly List<Diagnostic> _diagnostics = new();
 
+        private readonly string BadTokenString = SyntaxKind.BadToken.ToString("G");
+
         public IEnumerator<Diagnostic> GetEnumerator() => _diagnostics.AsReadOnly().GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
@@ -44,7 +46,7 @@ namespace Uranium.Logging
         public void ReportInvalidToken(TextSpan span, SyntaxToken actualKind, SyntaxKind expectedKind)
         {
             var expectedText = expectedKind == SyntaxKind.EndOfFile ? "EndOfFileToken" : $"{TextChecker.GetText(expectedKind)}";
-            if(expectedText.Equals("BadToken", StringComparison.OrdinalIgnoreCase))
+            if(expectedText.Equals(BadTokenString, StringComparison.OrdinalIgnoreCase))
             {
                 expectedText = "IdentifierToken";
             }
@@ -53,11 +55,40 @@ namespace Uranium.Logging
             Report(span, message);
         }
 
+        public void ReportInvalidToken(TextSpan span, SyntaxToken actualKind, params SyntaxKind[] expectedKinds)
+        {
+            var textBuilder = new StringBuilder();
+            string expectedText;
+            for(int i = 0; i < expectedKinds.Length; i++)
+            {
+                var currentTokenText = TextChecker.GetText(expectedKinds[i]);
+                if(currentTokenText.Equals(BadTokenString, StringComparison.OrdinalIgnoreCase))
+                {
+                    currentTokenText = "IdentifierToken";
+                }
+
+                if(i == 0)
+                {
+                    textBuilder.Append($"{currentTokenText}");
+                }
+                else
+                {
+                    textBuilder.Append($", {currentTokenText}");
+                }
+            }
+
+            expectedText = textBuilder.ToString();
+
+            var message = $"UR00003: Unexpected token: `{actualKind.Text}`. Expected one of the following: `{expectedText}`.";
+            Report(span, message);
+        }
+
         public void ReportUnfinishedMultiLineComment(TextSpan span, int position)
         {
             var message = $"UR00004: Unfinished comment at index: {position}.";
             Report(span, message);
         }
+
 
         public void ReportUndefinedUnaryOperator(TextSpan span, string operatorText, TypeSymbol operandType)
         {
@@ -162,15 +193,21 @@ namespace Uranium.Logging
             Report(span, message);
         }
 
-        internal void ReportInvalidParameter(TextSpan span, string functionName, string paramName, TypeSymbol expected, TypeSymbol actual)
+        public void ReportInvalidParameter(TextSpan span, string functionName, string paramName, TypeSymbol expected, TypeSymbol actual)
         {
             var message = $"UR00022: The argument '{paramName}' of the function '{functionName}' expected a value of type {expected} but got a value of type {actual}";
             Report(span, message);
         }
 
-        internal void ReportExpressionMustHaveValue(TextSpan span)
+        public void ReportExpressionMustHaveValue(TextSpan span)
         {
             var message = $"UR00023: Expression must have a value";
+            Report(span, message);
+        }
+       
+        public void ReportImplicitNullAssignment(TextSpan span)
+        {
+            var message = $"UR00020: Cannot have an implicit typed variable be assigned to null";
             Report(span, message);
         }
 

@@ -14,8 +14,8 @@ namespace Uranium.CodeAnalysis.Syntax.Statement
                 SyntaxToken? constKeywordToken,
                 SyntaxToken keywordToken,
                 SyntaxToken identifier, 
-                SyntaxToken equalsToken, 
-                ExpressionSyntax initializer,
+                SyntaxToken? equalsToken, 
+                ExpressionSyntax? initializer,
                 SyntaxToken semicolon
             )
         {
@@ -32,8 +32,8 @@ namespace Uranium.CodeAnalysis.Syntax.Statement
         public SyntaxToken? ConstKeywordToken { get; }
         public SyntaxToken KeywordToken { get; }
         public SyntaxToken Identifier { get; }
-        public SyntaxToken EqualsToken { get; }
-        public ExpressionSyntax Initializer { get; }
+        public SyntaxToken? EqualsToken { get; }
+        public ExpressionSyntax? Initializer { get; }
         public SyntaxToken Semicolon { get; }
     }
 }
