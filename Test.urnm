@@ -1,3 +1,5 @@
 ﻿{
-	int a = null;
+	var a = ---------5;
+	string b = string(a);
+	print(b);
 }

@@ -375,7 +375,9 @@ namespace Uranium.CodeAnalysis.Binding
             var conversion = Conversion.Classify(expression.Type, type);
             if(!conversion.Exists)
             {
-                _diagnostics.ReportCannotConvert(syntax.Span, expression.Type, type);
+                if(expression.Type != TypeSymbol.Error && type != TypeSymbol.Error)
+                    _diagnostics.ReportCannotConvert(syntax.Span, expression.Type, type);
+                
                 return new BoundErrorExpression();
             }
             return new BoundConversionExpression(type, expression);

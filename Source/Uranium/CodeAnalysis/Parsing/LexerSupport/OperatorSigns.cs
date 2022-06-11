@@ -11,7 +11,7 @@ namespace Uranium.CodeAnalysis.Lexing.LexerSupport
             {
                 lexer.Current = SyntaxKind.PlusEquals;
             } 
-            else if (lexer.Match('+', 1))
+            else if (lexer.Match('+', 1) ^ ( lexer.MatchNoMove('-', 2) || lexer.MatchNoMove('+', 2) || char.IsNumber(lexer.Peek(2)) ))
             {
                 lexer.Current = SyntaxKind.PlusPlus;
             } 
@@ -23,12 +23,13 @@ namespace Uranium.CodeAnalysis.Lexing.LexerSupport
 
         public static void MinusSign(Lexer lexer)
         {
-            if(lexer.Match('=', 1))
+            if (lexer.Match('=', 1))
             {
                 lexer.Current = SyntaxKind.MinusEquals;
-            } 
-            else if (lexer.Match('-', 1))
+            }
+            else if (lexer.MatchNoMove('-', 1) ^ ( lexer.MatchNoMove('-', 2) || lexer.MatchNoMove('+', 2) || char.IsNumber(lexer.Peek(2)) ))
             {
+                lexer.Match('-', 0);
                 lexer.Current = SyntaxKind.MinusMinus;
             } 
             else

@@ -53,7 +53,11 @@ namespace Uranium.CodeAnalysis.Lexing
             return false;
         }
 
-        private char Peek(int offset)
+        public bool MatchNoMove(char ch, int offset)
+        {
+            return ch.Equals(Peek(offset));
+        }
+        public char Peek(int offset)
         {
             var peekIndex = Index + offset;
             return peekIndex >= Source.Length ? '\0' : Source[peekIndex];    
